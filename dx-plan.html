@@ -1739,13 +1739,21 @@ async function showConsultantPanel() {
 async function renderConsultantPanel() {
   const body = document.getElementById('consultant-body');
   body.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gray-500)">載入中...</div>';
-  // 載入邀請碼與名下使用者
-  const [{ data: myCode }, { data: clients }] = await Promise.all([
-    sb.from('invite_codes').select('*').eq('consultant_id', currentUser.id)
-      .order('created_at', { ascending: false }).limit(1).single(),
-    sb.from('consultant_clients').select('client_id, profiles!client_id(id,display_name,email,is_invited,role,created_at)')
-      .eq('consultant_id', currentUser.id)
-  ]);
+  // 載入邀請碼
+  const { data: myCode } = await sb.from('invite_codes').select('*')
+    .eq('consultant_id', currentUser.id)
+    .order('created_at', { ascending: false }).limit(1).single();
+  // 載入名下使用者：先取 client_id 清單，再查 profiles
+  const { data: ccRows } = await sb.from('consultant_clients')
+    .select('client_id').eq('consultant_id', currentUser.id);
+  const clientIds = (ccRows || []).map(r => r.client_id);
+  let clientList = [];
+  if (clientIds.length > 0) {
+    const { data: profileRows } = await sb.from('profiles')
+      .select('id,display_name,email,is_invited,role,created_at')
+      .in('id', clientIds);
+    clientList = profileRows || [];
+  }
   const codeExpired = myCode && new Date(myCode.expires_at) < new Date();
   const codeValid = myCode && !codeExpired;
   let html = `
@@ -1763,7 +1771,6 @@ async function renderConsultantPanel() {
   }
   html += `</div><div style="height:1px;background:var(--gray-100);margin-bottom:16px"></div>`;
   // 名下使用者清單
-  const clientList = (clients || []).map(c => c.profiles).filter(Boolean);
   const pending = clientList.filter(p => !p.is_invited);
   const active = clientList.filter(p => p.is_invited);
   html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">👥 我的學員（${clientList.length} 人）</div>`;
