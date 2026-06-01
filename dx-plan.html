@@ -1160,8 +1160,11 @@ function getRoleLabel() {
 function showAuthScreen(name) {
   // name: 'login' | 'register' | 'forgot'
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  document.getElementById('nav-bar').style.display = 'none';
+  const target = document.getElementById('screen-' + name);
+  if (!target) { console.warn('showAuthScreen: screen not found:', name); return; }
+  target.classList.add('active');
+  const navBar = document.getElementById('nav-bar');
+  if (navBar) navBar.style.display = 'none';
   // 清除訊息
   ['login-msg','register-msg','forgot-msg'].forEach(id => {
     const el = document.getElementById(id);
@@ -1565,7 +1568,7 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
       const name = ic.profiles?.display_name || ic.profiles?.email || '未知教練';
       html += `<div style="background:${expired?'#fef2f2':'#f0fdf4'};border:1px solid ${expired?'#fecaca':'#bbf7d0'};border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
         <div>
-          <div style="font-size:var(--font-sm);font-weight:700;color:${expired?'var(--red)':'var(--green)');letter-spacing:2px">${ic.code}</div>
+          <div style="font-size:var(--font-sm);font-weight:700;color:${expired?'var(--red)':'var(--green)'};letter-spacing:2px">${ic.code}</div>
           <div style="font-size:12px;color:var(--gray-500)">${name}・${expired?'已過期':'到期 '+ic.expires_at.slice(0,10)}</div>
         </div>
         <button onclick="adminDeleteInviteCode('${ic.id}')" style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:18px;padding:4px">🗑️</button>
