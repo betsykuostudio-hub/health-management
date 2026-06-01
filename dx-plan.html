@@ -1636,7 +1636,7 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
   const filtered = q
     ? profiles.filter(p => (p.display_name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q))
     : profiles;
-  const pendingUsers = filtered.filter(p => !p.is_invited || p.role === 'pending');
+  const pendingUsers = filtered.filter(p => (!p.is_invited || p.role === 'pending') && !p.delete_requested_at);
   const deleteRequested = filtered.filter(p => p.delete_requested_at);
   const activeUsers = filtered.filter(p => p.is_invited && p.role !== 'pending' && !p.delete_requested_at);
   let html = `
@@ -1807,7 +1807,7 @@ async function renderConsultantPanel() {
   let clientList = [];
   if (clientIds.length > 0) {
     const { data: profileRows } = await sb.from('profiles')
-      .select('id,display_name,email,is_invited,role,created_at')
+      .select('id,display_name,email,is_invited,role,created_at,delete_requested_at')
       .in('id', clientIds);
     clientList = profileRows || [];
   }
@@ -1827,10 +1827,12 @@ async function renderConsultantPanel() {
     <button onclick="generateInviteCode()" style="width:100%;padding:12px;background:var(--green);color:white;border:none;border-radius:12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">✨ 產生邀請碼</button>`;
   }
   html += `</div><div style="height:1px;background:var(--gray-100);margin-bottom:16px"></div>`;
-  // 名下使用者清單
-  const pending = clientList.filter(p => !p.is_invited);
-  const active = clientList.filter(p => p.is_invited);
-  html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">👥 我的學員（${clientList.length} 人）</div>`;
+  // 名下使用者清單（排除已申請刪除的）
+  const deleteRequested = clientList.filter(p => p.delete_requested_at);
+  const pending = clientList.filter(p => !p.is_invited && !p.delete_requested_at);
+  const active = clientList.filter(p => p.is_invited && !p.delete_requested_at);
+  const activeCount = clientList.filter(p => !p.delete_requested_at).length;
+  html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">👥 我的學員（${activeCount} 人）</div>`;
   if (pending.length > 0) {
     html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${pending.length}</span>待開通</div>`;
     pending.forEach(p => { html += renderConsultantClientCard(p); });
@@ -1838,6 +1840,16 @@ async function renderConsultantPanel() {
   }
   if (active.length > 0) {
     active.forEach(p => { html += renderConsultantClientCard(p); });
+  }
+  if (deleteRequested.length > 0) {
+    html += `<div style="height:1px;background:var(--gray-100);margin:12px 0"></div>`;
+    html += `<div style="font-size:var(--font-sm);color:var(--gray-400);margin-bottom:8px">已申請刪除（${deleteRequested.length} 人）</div>`;
+    deleteRequested.forEach(p => {
+      html += `<div style="background:#f9fafb;border:1px solid var(--gray-200);border-radius:12px;padding:12px 14px;margin-bottom:8px;opacity:.6">
+        <div style="font-size:var(--font-sm);color:var(--gray-500)">${p.display_name||'（未填姓名）'}</div>
+        <div style="font-size:12px;color:var(--gray-400)">${p.email}・申請於 ${p.delete_requested_at?.slice(0,10)}</div>
+      </div>`;
+    });
   }
   if (clientList.length === 0) {
     html += `<div style="padding:32px 0;text-align:center;color:var(--gray-500);font-size:var(--font-sm)">尚無學員，請分享邀請碼給學員註冊</div>`;
