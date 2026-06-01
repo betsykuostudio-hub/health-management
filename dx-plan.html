@@ -1670,7 +1670,14 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
     html += '<div style="height:1px;background:var(--gray-100);margin:16px 0"></div>';
   }
   if (deleteRequested.length > 0) {
-    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${deleteRequested.length}</span>申請刪除帳號</div>`;
+    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${deleteRequested.length}</span>申請刪除帳號</div>`;
+    html += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:12px;color:#92400e;line-height:1.7">
+      <strong>📋 處理步驟：</strong><br>
+      1. 至 Supabase Dashboard → Authentication → Users<br>
+      2. 搜尋下方使用者的 email<br>
+      3. 點擊 ⋯ → Delete user 完成刪除<br>
+      （刪除後所有資料將自動串聯清除）
+    </div>`;
     deleteRequested.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
     html += '<div style="height:1px;background:var(--gray-100);margin:16px 0"></div>';
   }
@@ -2812,31 +2819,37 @@ async function exportPlans(scope = 'self', userId = null) {
   const today = todayISO().replace(/-/g, '');
   if (scope === 'all') {
     const { data, error } = await sb.from('dx_plans')
-      .select('*, profiles(display_name, email)')
-      .order('created_at', { ascending: false });
+      .select('*').order('created_at', { ascending: false });
     if (error) { alert('匯出失敗：' + error.message); return; }
     plans = data || [];
+    const userIds = [...new Set(plans.map(p => p.user_id))];
+    const { data: profileRows } = await sb.from('profiles').select('id,display_name,email').in('id', userIds);
+    const profileMap = {};
+    (profileRows || []).forEach(p => { profileMap[p.id] = p; });
+    plans = plans.map(p => ({ ...p, _profile: profileMap[p.user_id] || {} }));
     filename = `DX全部計畫備份_${today}.json`;
   } else if (scope === 'user' && userId) {
     const { data, error } = await sb.from('dx_plans')
-      .select('*, profiles(display_name, email)')
-      .eq('user_id', userId)
+      .select('*').eq('user_id', userId)
       .order('created_at', { ascending: false });
     if (error) { alert('匯出失敗：' + error.message); return; }
     plans = data || [];
-    const userName = plans[0]?.profiles?.display_name || userId;
+    const { data: profileRow } = await sb.from('profiles').select('id,display_name,email').eq('id', userId).single();
+    plans = plans.map(p => ({ ...p, _profile: profileRow || {} }));
+    const userName = profileRow?.display_name || userId;
     filename = `DX計畫備份_${userName}_${today}.json`;
   } else {
     const data = await loadAllPlans();
     plans = data || [];
+    plans = plans.map(p => ({ ...p, _profile: { display_name: currentProfile?.display_name, email: currentProfile?.email } }));
     const userName = currentProfile?.display_name || '';
     filename = `DX計畫備份_${userName}_${today}.json`;
   }
   if (plans.length === 0) { alert('沒有找到任何計畫資料。'); return; }
   const exportData = plans.map(p => ({
     id: p.id,
-    user_email: p.profiles?.email || null,
-    user_name: p.profiles?.display_name || null,
+    user_email: p._profile?.email || null,
+    user_name: p._profile?.display_name || null,
     createdAt: p.created_at,
     archivedAt: p.archived_at || null,
     state: p.plan_state,
