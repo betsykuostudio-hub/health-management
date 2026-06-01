@@ -1278,22 +1278,22 @@ async function doRegister() {
   if (!privacyChecked) { setAuthMsg('register-msg','error','請閱讀並同意隱私說明後再註冊'); return; }
   setAuthLoading('register-btn', true, '註冊');
   try {
-    // ── 先驗證邀請碼（若有填寫）
+    // ── 先驗證邀請碼（改用 RPC，不直接查 invite_codes 表）
     let consultantId = null;
     if (inviteCode) {
-      const { data: invite } = await sb.from('invite_codes')
-        .select('consultant_id, expires_at')
-        .eq('code', inviteCode)
-        .single();
-      if (!invite) {
-        setAuthMsg('register-msg','error','邀請碼無效，請確認後重試');
+      const { data: result, error: rpcErr } = await sb.rpc('verify_invite_code', { p_code: inviteCode });
+      if (rpcErr || !result) {
+        setAuthMsg('register-msg','error','邀請碼驗證失敗，請稍後再試');
         return;
       }
-      if (new Date(invite.expires_at) < new Date()) {
-        setAuthMsg('register-msg','error','邀請碼已過期，請向教練索取新的邀請碼');
+      if (!result.valid) {
+        const msg = result.reason === 'expired'
+          ? '邀請碼已過期，請向教練索取新的邀請碼'
+          : '邀請碼無效，請確認後重試';
+        setAuthMsg('register-msg','error', msg);
         return;
       }
-      consultantId = invite.consultant_id;
+      consultantId = result.consultant_id;
     }
     // ── 所有驗證通過，才建立帳號
     const { data, error } = await sb.auth.signUp({ email, password: pw });
@@ -1304,13 +1304,13 @@ async function doRegister() {
       if (consultantId) profileUpdate.role = 'client';
       const { error: profileErr } = await sb.from('profiles').update(profileUpdate).eq('id', data.user.id);
       if (profileErr) console.error('profiles update error:', profileErr);
-      // 建立教練與使用者的關係
+      // 建立教練與使用者的關係（改用 RPC，不直接 INSERT consultant_clients）
       if (consultantId) {
-        const { error: ccErr } = await sb.from('consultant_clients').insert({
-          consultant_id: consultantId,
-          client_id: data.user.id
+        const { error: ccErr } = await sb.rpc('bind_consultant_on_register', {
+          p_client_id: data.user.id,
+          p_consultant_id: consultantId
         });
-        if (ccErr) console.error('consultant_clients insert error:', ccErr);
+        if (ccErr) console.error('bind_consultant_on_register error:', ccErr);
       }
     }
     const successMsg = consultantId
@@ -1416,20 +1416,15 @@ async function handleAuthSuccess(user) {
   showAppMain();
 }
 
-// ── 權限相關 UI 顯示更新（每次切換畫面時呼叫）──────────
-function updateNavVisibility() {
+// ── 進入主畫面 ────────────────────────────────────────
+function showAppMain() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('nav-bar').style.display = 'flex';
   // 體組成 Tab 只對 vip / admin 顯示
   document.getElementById('nav-bodylog').style.display = isVip() ? 'flex' : 'none';
   // 備份匯入匯出只對 admin 顯示
   document.getElementById('history-backup-btns').style.display = isAdmin() ? 'flex' : 'none';
   document.getElementById('account-modal-import-btn').style.display = isAdmin() ? 'block' : 'none';
-}
-
-// ── 進入主畫面 ────────────────────────────────────────
-function showAppMain() {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('nav-bar').style.display = 'flex';
-  updateNavVisibility();
   if (state.startDate) {
     const today = todayISO();
     if (state.pretestDate && today === state.pretestDate) {
@@ -2969,11 +2964,7 @@ const BLOG_GOOD_DOWN=new Set(['weight','bodyfat','visceral','bmi','bodyage']);
 
 let blogActiveMetric='weight'; // 目前顯示的折線指標
 
-function showBodyLog(){
-  if(!isVip()){return;}
-  renderBodyLog();
-  showScreen('screen-bodylog','nav-bodylog');
-}
+function showBodyLog(){renderBodyLog();showScreen('screen-bodylog','nav-bodylog');}
 
 function renderBodyLog(){
   const logs=(state.bodyLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
@@ -3147,7 +3138,6 @@ function setBlogMetric(metric){
   renderBodyLog();
 }
 function showHistory(){
-  updateNavVisibility();
   showScreen('screen-history','nav-history');
   renderHistory();
 }
