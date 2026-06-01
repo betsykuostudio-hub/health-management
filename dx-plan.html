@@ -521,7 +521,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <div style="margin-bottom:16px">您的資料僅供本人存取。若您隸屬於某位教練，該教練可查看您的計畫進度（不含健康數值）。系統管理者具備資料備份與維護所需的存取權限。</div>
 
     <div style="font-weight:700;color:var(--gray-700);margin-bottom:6px">五、您的權利</div>
-    <div style="margin-bottom:16px">您可隨時於帳號設定中申請刪除全部資料。刪除後所有紀錄將永久移除，無法復原。</div>
+    <div style="margin-bottom:16px">您可隨時於帳號設定中申請停用帳號及刪除資料。提交申請後帳號將立即停用，管理者將於合理期限內完成資料刪除。如需確認刪除狀態，請聯繫您的教練或管理者。</div>
 
     <div style="font-weight:700;color:var(--gray-700);margin-bottom:6px">六、注意事項</div>
     <div style="margin-bottom:16px">本服務為健康管理輔助工具，所有內容僅供參考，不構成醫療建議、診斷或治療依據。如有健康疑慮請諮詢專業醫療人員。</div>
@@ -940,7 +940,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
   <div class="header"><span style="font-size:22px">📖</span><span class="header-title">歷史計畫</span></div>
   <div style="padding:16px 16px 0">
     <div class="io-btn-row" id="history-backup-btns" style="display:none">
-      <button class="io-btn io-btn-export" onclick="exportPlans()">
+      <button class="io-btn io-btn-export" onclick="showExportModal()">
         <span class="io-btn-icon">📤</span>
         <span class="io-btn-label">備份資料</span>
         <span class="io-btn-sub">匯出 JSON</span>
@@ -976,6 +976,48 @@ input[type=date].field-input{width:145px;overflow:hidden}
 </div>
 <!-- 隱藏 file input -->
 <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(this)"/>
+
+<!-- EXPORT MODAL -->
+<div id="export-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:510;align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:440px;width:100%;background:white;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <div style="background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;padding:20px 20px 16px">
+      <div style="font-size:22px;font-weight:900;margin-bottom:4px">📤 備份資料</div>
+      <div style="font-size:var(--font-sm);opacity:.85">選擇要備份的範圍</div>
+    </div>
+    <div style="padding:20px">
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:10px;background:#f8f7ff;border:2px solid var(--purple-light);border-radius:12px;padding:12px;cursor:pointer">
+          <input type="radio" name="export-scope" value="all" checked style="accent-color:var(--purple)" onchange="document.getElementById('export-user-select').style.display='none'"/>
+          <div>
+            <div style="font-size:var(--font-sm);font-weight:700;color:var(--purple-dark)">所有使用者的資料</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px">匯出系統內所有計畫紀錄</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;background:#f9fafb;border:2px solid var(--gray-200);border-radius:12px;padding:12px;cursor:pointer">
+          <input type="radio" name="export-scope" value="self" style="accent-color:var(--purple)" onchange="document.getElementById('export-user-select').style.display='none'"/>
+          <div>
+            <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-700)">只備份我自己的資料</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px">只匯出目前登入帳號的計畫</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;background:#f9fafb;border:2px solid var(--gray-200);border-radius:12px;padding:12px;cursor:pointer">
+          <input type="radio" name="export-scope" value="user" style="accent-color:var(--purple)" onchange="document.getElementById('export-user-select').style.display='block'"/>
+          <div style="flex:1">
+            <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-700)">指定使用者</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px">只匯出特定使用者的計畫</div>
+          </div>
+        </label>
+        <select id="export-user-select" style="display:none;border:1px solid var(--gray-300);border-radius:10px;padding:10px 12px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;margin-top:4px">
+          <option value="">請選擇使用者</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="closeExportModal()" style="flex:1;padding:14px;border:2px solid var(--gray-300);border-radius:12px;background:white;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--gray-700)">取消</button>
+        <button onclick="confirmExport()" style="flex:2;padding:14px;background:var(--purple);color:white;border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">開始備份 →</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- NEW PLAN MODAL -->
 <div id="new-plan-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:24px">
@@ -1086,7 +1128,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
     </div>
     <button onclick="closeAccountModal();doLogout()" style="width:100%;padding:14px;background:var(--red-bg);color:var(--red);border:1px solid #fecaca;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">登出</button>
     <button onclick="closeAccountModal();showPrivacyPolicy()" style="width:100%;padding:14px;background:white;color:var(--gray-500);border:1px solid var(--gray-200);border-radius:12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:10px">🔒 隱私說明</button>
-    <button onclick="closeAccountModal();showDeleteAccount()" class="delete-account-btn">🗑️ 刪除帳號與所有資料</button>
+    <button onclick="closeAccountModal();showDeleteAccount()" class="delete-account-btn">🗑️ 申請停用與刪除資料</button>
     <button onclick="closeAccountModal()" style="width:100%;padding:14px;background:white;color:var(--gray-500);border:2px solid var(--gray-300);border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:10px">取消</button>
   </div>
 </div>
@@ -1094,11 +1136,11 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <!-- DELETE ACCOUNT CONFIRM -->
 <div class="delete-confirm-overlay" id="delete-confirm-overlay">
   <div class="delete-confirm-box">
-    <div class="delete-confirm-title">⚠️ 確認刪除帳號</div>
-    <div class="delete-confirm-desc">此操作將永久刪除您的帳號與所有計畫資料，無法復原。<br>請輸入您的電子郵件地址以確認：</div>
+    <div class="delete-confirm-title">⚠️ 申請停用與刪除資料</div>
+    <div class="delete-confirm-desc">申請後帳號將立即停用，管理者將於合理期限內刪除您的所有資料。如需確認請聯繫管理者。<br>請輸入您的電子郵件地址以確認：</div>
     <input type="email" id="delete-confirm-email" class="auth-field-input" placeholder="輸入您的 email" style="margin-bottom:14px"/>
     <div id="delete-confirm-msg" style="font-size:var(--font-sm);color:var(--red);min-height:20px;margin-bottom:10px"></div>
-    <button id="delete-confirm-btn" onclick="confirmDeleteAccount()" style="width:100%;padding:14px;background:var(--red);color:white;border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-bottom:10px">確認刪除</button>
+    <button id="delete-confirm-btn" onclick="confirmDeleteAccount()" style="width:100%;padding:14px;background:var(--red);color:white;border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-bottom:10px">確認申請</button>
     <button onclick="closeDeleteAccount()" style="width:100%;padding:14px;background:white;color:var(--gray-500);border:2px solid var(--gray-300);border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">取消</button>
   </div>
 </div>
@@ -1183,10 +1225,6 @@ function showAuthScreen(name) {
     const el = document.getElementById(id);
     if (el) { el.className = 'auth-msg'; el.textContent = ''; }
   });
-  // vip/admin 切換到忘記密碼頁時顯示加密資料警告
-  if (name === 'forgot' && isVip()) {
-    setAuthMsg('forgot-msg','warn','⚠️ 注意：您的帳號已啟用進階加密功能。重設密碼後，加密儲存的體組成與體檢數據將無法復原。建議先至統計頁下載備份後再重設密碼。');
-  }
 }
 
 function setAuthMsg(id, type, text) {
@@ -1311,24 +1349,22 @@ async function confirmDeleteAccount() {
   if (inputEmail !== currentUser.email) { msgEl.textContent = '電子郵件不符，請確認後重試'; return; }
   const btn = document.getElementById('delete-confirm-btn');
   btn.disabled = true;
-  btn.textContent = '刪除中...';
+  btn.textContent = '處理中...';
   try {
-    // 刪除所有計畫資料
-    await sb.from('dx_plans').delete().eq('user_id', currentUser.id);
-    // 刪除 consultant_clients 關係
-    await sb.from('consultant_clients').delete().eq('client_id', currentUser.id);
-    await sb.from('consultant_clients').delete().eq('consultant_id', currentUser.id);
-    // 刪除 profiles
-    await sb.from('profiles').delete().eq('id', currentUser.id);
-    // 登出
+    // 停用帳號 + 標記申請刪除時間
+    await sb.from('profiles').update({
+      is_invited: false,
+      delete_requested_at: new Date().toISOString()
+    }).eq('id', currentUser.id);
     await sb.auth.signOut();
+    _encryptionKey = null;
     closeDeleteAccount();
-    alert('帳號已刪除，感謝您的使用。');
+    alert('申請已送出，帳號已停用。管理者將盡快處理您的資料刪除請求。');
     location.reload();
   } catch(e) {
-    msgEl.textContent = '刪除失敗，請稍後再試';
+    msgEl.textContent = '操作失敗，請稍後再試';
     btn.disabled = false;
-    btn.textContent = '確認刪除';
+    btn.textContent = '確認申請';
   }
 }
 
@@ -1601,7 +1637,8 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
     ? profiles.filter(p => (p.display_name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q))
     : profiles;
   const pendingUsers = filtered.filter(p => !p.is_invited || p.role === 'pending');
-  const activeUsers = filtered.filter(p => p.is_invited && p.role !== 'pending');
+  const deleteRequested = filtered.filter(p => p.delete_requested_at);
+  const activeUsers = filtered.filter(p => p.is_invited && p.role !== 'pending' && !p.delete_requested_at);
   let html = `
     <div style="margin-bottom:16px">
       <input type="text" id="admin-search" class="auth-field-input" placeholder="🔍 搜尋姓名或 email"
@@ -1630,6 +1667,11 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
   if (pendingUsers.length > 0) {
     html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${pendingUsers.length}</span>待審核帳號</div>`;
     pendingUsers.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
+    html += '<div style="height:1px;background:var(--gray-100);margin:16px 0"></div>';
+  }
+  if (deleteRequested.length > 0) {
+    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${deleteRequested.length}</span>申請刪除帳號</div>`;
+    deleteRequested.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
     html += '<div style="height:1px;background:var(--gray-100);margin:16px 0"></div>';
   }
   if (activeUsers.length > 0) {
@@ -1681,8 +1723,11 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
         style="flex:1;border:1px solid var(--gray-300);border-radius:8px;padding:6px 8px;font-size:12px;font-family:'Noto Sans TC',sans-serif">${options}</select>
     </div>`;
   }
+  const deleteTag = p.delete_requested_at
+    ? `<span style="font-size:11px;background:#fef2f2;color:var(--red);border:1px solid #fecaca;padding:2px 8px;border-radius:99px;margin-left:6px">申請刪除 ${p.delete_requested_at.slice(0,10)}</span>`
+    : '';
   return `<div class="admin-user-card" id="admin-card-${p.id}">
-    <div class="admin-user-email">${p.display_name||'（未填姓名）'} ${isSelf?'<span style="font-size:11px;background:var(--purple-light);color:var(--purple-dark);padding:2px 6px;border-radius:99px">我</span>':''}</div>
+    <div class="admin-user-email">${p.display_name||'（未填姓名）'} ${isSelf?'<span style="font-size:11px;background:var(--purple-light);color:var(--purple-dark);padding:2px 6px;border-radius:99px">我</span>':''}${deleteTag}</div>
     <div class="admin-user-meta">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
     <div class="admin-role-row">${roleBtns}${inviteBtn}</div>
     <div class="admin-role-row" style="margin-top:6px">${vipBtn}</div>
@@ -2726,24 +2771,84 @@ function toggleQA(el){const a=el.nextElementSibling,isOpen=a.classList.contains(
 // ── 歷史計畫 ──────────────────────────────────────────────────
 
 // ── 匯出 / 匯入 ────────────────────────────────────────────
-async function exportPlans(){
-  const plans = await loadAllPlans();
-  if(plans.length===0){alert('目前沒有任何計畫資料可以備份。');return;}
-  // 轉換格式相容舊版
-  const exportPlans = plans.map(p => ({
+async function showExportModal() {
+  // 非管理者直接匯出自己的資料
+  if (!isAdmin()) { await exportPlans('self'); return; }
+  // 填入使用者下拉選單
+  const select = document.getElementById('export-user-select');
+  select.innerHTML = '<option value="">請選擇使用者</option>';
+  (_adminProfiles || []).forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = (p.display_name || '（未填姓名）') + '・' + p.email;
+    select.appendChild(opt);
+  });
+  // 重置狀態
+  document.querySelector('input[name="export-scope"][value="all"]').checked = true;
+  select.style.display = 'none';
+  document.getElementById('export-modal').style.display = 'flex';
+}
+
+function closeExportModal() {
+  document.getElementById('export-modal').style.display = 'none';
+}
+
+async function confirmExport() {
+  const scope = document.querySelector('input[name="export-scope"]:checked')?.value || 'all';
+  if (scope === 'user') {
+    const userId = document.getElementById('export-user-select').value;
+    if (!userId) { alert('請選擇使用者'); return; }
+    closeExportModal();
+    await exportPlans('user', userId);
+  } else {
+    closeExportModal();
+    await exportPlans(scope);
+  }
+}
+
+async function exportPlans(scope = 'self', userId = null) {
+  let plans = [];
+  let filename = '';
+  const today = todayISO().replace(/-/g, '');
+  if (scope === 'all') {
+    const { data, error } = await sb.from('dx_plans')
+      .select('*, profiles(display_name, email)')
+      .order('created_at', { ascending: false });
+    if (error) { alert('匯出失敗：' + error.message); return; }
+    plans = data || [];
+    filename = `DX全部計畫備份_${today}.json`;
+  } else if (scope === 'user' && userId) {
+    const { data, error } = await sb.from('dx_plans')
+      .select('*, profiles(display_name, email)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) { alert('匯出失敗：' + error.message); return; }
+    plans = data || [];
+    const userName = plans[0]?.profiles?.display_name || userId;
+    filename = `DX計畫備份_${userName}_${today}.json`;
+  } else {
+    const data = await loadAllPlans();
+    plans = data || [];
+    const userName = currentProfile?.display_name || '';
+    filename = `DX計畫備份_${userName}_${today}.json`;
+  }
+  if (plans.length === 0) { alert('沒有找到任何計畫資料。'); return; }
+  const exportData = plans.map(p => ({
     id: p.id,
+    user_email: p.profiles?.email || null,
+    user_name: p.profiles?.display_name || null,
     createdAt: p.created_at,
+    archivedAt: p.archived_at || null,
     state: p.plan_state,
     reportData: p.report_data || {}
   }));
-  const payload={version:2,exportedAt:new Date().toISOString(),plans:exportPlans};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  const today=todayISO().replace(/-/g,'');
-  a.href=url;a.download=`DX計畫備份_${today}.json`;
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);URL.revokeObjectURL(url);
+  const payload = { version:2, exportedAt:new Date().toISOString(), exportedBy:currentUser.email, plans:exportData };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
 let _pendingImportData=null;
