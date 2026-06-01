@@ -1131,6 +1131,8 @@ async function handleAuthSuccess(user) {
 function showAppMain() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('nav-bar').style.display = 'flex';
+  // 體組成 Tab 只對 vip / admin 顯示
+  document.getElementById('nav-bodylog').style.display = isVip() ? 'flex' : 'none';
   if (state.startDate) {
     const today = todayISO();
     if (state.pretestDate && today === state.pretestDate) {
@@ -1205,8 +1207,9 @@ async function saveState() {
 }
 
 async function saveReportData(body, exam) {
+  // 只有 vip / admin 才存雲端
+  if (!isVip()) return;
   if (!currentUser || !_currentPlanId) return;
-  const update = {};
   const { data: cur } = await sb.from('dx_plans').select('report_data').eq('id', _currentPlanId).single();
   const existing = cur?.report_data || {};
   if (body !== undefined) existing.body = body;
@@ -1215,6 +1218,8 @@ async function saveReportData(body, exam) {
 }
 
 async function getReportData() {
+  // 只有 vip / admin 才從雲端讀取
+  if (!isVip()) return {};
   if (!currentUser || !_currentPlanId) return {};
   const { data } = await sb.from('dx_plans').select('report_data').eq('id', _currentPlanId).single();
   return data?.report_data || {};
@@ -1937,10 +1942,13 @@ const BADGE_CLASS={normal:'badge-normal',warn:'badge-warn',danger:'badge-danger'
 async function showReportForm(){
   const saved=await getReportData();
   const sb=saved.body||{},se=saved.exam||{};
+  const noticeText = isVip()
+    ? '數據會自動儲存於雲端，下次開啟可繼續編輯。日期從計畫設定自動帶入。'
+    : '填入數據後點下方按鈕即可產生報告。此頁面關閉後數據不會保留，請確認填寫完整再產出。';
   let html=`
     <div class="notice-box" style="margin-bottom:20px">
       <strong>💡 注意事項</strong>
-      數據會自動儲存於雲端，下次開啟可繼續編輯。日期從計畫設定自動帶入。
+      ${noticeText}
     </div>
     <div class="form-section">
       <div class="form-section-title">基本資訊</div>
