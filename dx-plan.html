@@ -1808,7 +1808,10 @@ async function generateInviteCode() {
   const { error } = await sb.from('invite_codes').insert({
     code, consultant_id: currentUser.id, expires_at: expires
   });
-  if (error) { alert('產生邀請碼失敗：' + error.message); return; }
+  if (error) {
+    alert('產生邀請碼失敗：' + error.message + '\ncode: ' + error.code + '\ndetails: ' + error.details + '\nhint: ' + error.hint);
+    return;
+  }
   renderConsultantPanel();
 }
 
