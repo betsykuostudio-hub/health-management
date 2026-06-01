@@ -1264,13 +1264,15 @@ async function doRegister() {
       // 有邀請碼：自動設為 client，跳過 pending
       const profileUpdate = { display_name: name };
       if (consultantId) profileUpdate.role = 'client';
-      await sb.from('profiles').update(profileUpdate).eq('id', data.user.id);
+      const { error: profileErr } = await sb.from('profiles').update(profileUpdate).eq('id', data.user.id);
+      if (profileErr) console.error('profiles update error:', profileErr);
       // 建立教練與使用者的關係
       if (consultantId) {
-        await sb.from('consultant_clients').insert({
+        const { error: ccErr } = await sb.from('consultant_clients').insert({
           consultant_id: consultantId,
           client_id: data.user.id
         });
+        if (ccErr) console.error('consultant_clients insert error:', ccErr);
       }
     }
     const successMsg = consultantId
