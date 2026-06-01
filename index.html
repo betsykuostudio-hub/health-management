@@ -20,6 +20,68 @@
     /* 隱藏滾動條但保留滾動功能 */
     ::-webkit-scrollbar { width: 0; background: transparent; }
 
+    /* ── 入口密碼 Splash Screen ─────────────────────────── */
+    #app-gate {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(160deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #app-gate.hidden { display: none; }
+    .gate-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px 28px 32px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 8px 32px rgba(21,128,61,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .gate-icon { font-size: 52px; margin-bottom: 12px; }
+    .gate-title {
+      font-size: 22px; font-weight: 800;
+      color: #14532d; margin-bottom: 6px;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    .gate-subtitle {
+      font-size: 15px; color: #6b7280; margin-bottom: 28px;
+      line-height: 1.6;
+    }
+    .gate-input {
+      width: 100%; padding: 16px 18px;
+      font-size: 18px; font-family: inherit;
+      border: 2px solid #d1fae5; border-radius: 14px;
+      background: #f0fdf4; color: #1f2937;
+      outline: none; text-align: center;
+      letter-spacing: 3px;
+      transition: border-color 0.2s;
+      margin-bottom: 8px;
+    }
+    .gate-input:focus { border-color: #16a34a; }
+    .gate-input.error { border-color: #ef4444; background: #fff1f2; animation: shake 0.3s ease; }
+    .gate-error {
+      font-size: 14px; color: #dc2626;
+      min-height: 20px; margin-bottom: 16px;
+    }
+    .gate-btn {
+      width: 100%; padding: 16px;
+      font-size: 17px; font-weight: 700;
+      font-family: inherit;
+      background: linear-gradient(135deg, #15803d, #16a34a);
+      color: #fff; border: none; border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(21,128,61,0.3);
+      transition: opacity 0.2s;
+    }
+    .gate-btn:active { opacity: 0.85; }
+    .gate-hint {
+      font-size: 13px; color: #9ca3af; margin-top: 20px; line-height: 1.5;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
     /* 列印模式：只顯示報告內容，隱藏所有 UI 元素 */
     @media print {
       body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
@@ -37,6 +99,26 @@
   </style>
 </head>
 <body>
+  <!-- ── 入口密碼 Splash Screen ─────────────────────────── -->
+  <div id="app-gate">
+    <div class="gate-card">
+      <div class="gate-icon">🌿</div>
+      <div class="gate-title">健康管理 App</div>
+      <div class="gate-subtitle">請輸入通行密碼以繼續</div>
+      <input
+        id="gate-input"
+        class="gate-input"
+        type="password"
+        placeholder="••••••••••"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter') checkAppPassword()"
+      />
+      <div id="gate-error" class="gate-error"></div>
+      <button class="gate-btn" onclick="checkAppPassword()">進入 →</button>
+      <div class="gate-hint">如需取得密碼，請聯絡您的諮詢師</div>
+    </div>
+  </div>
+
   <div id="root"></div>
 
   <!-- React + Babel（透過 CDN 載入，讓瀏覽器直接執行 JSX） -->
@@ -3311,6 +3393,49 @@ function M4Placeholder() {
     // ── 啟動 App ─────────────────────────────────────────────
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(<App />);
+  </script>
+
+  <!-- ── 入口密碼驗證（純 JS，不依賴 React）────────────────── -->
+  <script>
+    const APP_PASSWORD = 'HEALTH2026';
+    const SESSION_KEY  = 'app_unlocked';
+
+    function initAppGate() {
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        document.getElementById('app-gate').classList.add('hidden');
+      } else {
+        // 讓 React App 在背景渲染，但被 gate 遮住
+        setTimeout(() => {
+          document.getElementById('gate-input').focus();
+        }, 100);
+      }
+    }
+
+    function checkAppPassword() {
+      const input = document.getElementById('gate-input');
+      const errEl = document.getElementById('gate-error');
+      const val   = input.value.trim();
+
+      if (val === APP_PASSWORD) {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        const gate = document.getElementById('app-gate');
+        gate.style.transition = 'opacity 0.35s ease';
+        gate.style.opacity = '0';
+        setTimeout(() => gate.classList.add('hidden'), 350);
+      } else {
+        errEl.textContent = '密碼錯誤，請再試一次';
+        input.classList.add('error');
+        input.value = '';
+        setTimeout(() => {
+          input.classList.remove('error');
+          errEl.textContent = '';
+          input.focus();
+        }, 1000);
+      }
+    }
+
+    // 頁面載入時立即執行
+    initAppGate();
   </script>
 </body>
 </html>
