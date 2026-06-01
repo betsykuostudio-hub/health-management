@@ -1001,9 +1001,9 @@ function isAdmin()      { return currentProfile?.role === 'admin'; }
 function isConsultant() { return currentProfile?.role === 'consultant'; }
 function isVip()        { return currentProfile?.is_vip === true || isAdmin(); }
 function getRoleLabel() {
-  const base = { admin:'管理者', consultant:'諮詢師', client:'客戶', pending:'待審核' };
+  const base = { admin:'管理者', consultant:'教練', client:'一般使用者', pending:'待審核' };
   const label = base[currentProfile?.role] || currentProfile?.role || '';
-  const vipBadge = isVip() && !isAdmin() ? ' ⭐ VIP' : '';
+  const vipBadge = isVip() && !isAdmin() ? ' ⭐ 進階' : '';
   return label + vipBadge;
 }
 
@@ -1265,7 +1265,7 @@ async function renderAdminPanel() {
   body.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gray-500)">載入中...</div>';
   const { data: profiles, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
   if (error) { body.innerHTML = '<div style="padding:20px;color:var(--red)">載入失敗：' + error.message + '</div>'; return; }
-  const roleMap = { admin:'管理者', consultant:'諮詢師', client:'客戶', pending:'待審核' };
+  const roleMap = { admin:'管理者', consultant:'教練', client:'一般使用者', pending:'待審核' };
   const pendingUsers = profiles.filter(p => !p.is_invited || p.role === 'pending');
   const activeUsers = profiles.filter(p => p.is_invited && p.role !== 'pending');
   let html = '';
@@ -1290,7 +1290,7 @@ function renderAdminUserCard(p, roleMap) {
     `<button class="admin-role-btn ${p.role===r?roleColors[r]:''}" onclick="adminSetRole('${p.id}','${r}',this)">${roleMap[r]||r}</button>`
   ).join('');
   const inviteBtn = `<button class="admin-invite-btn ${p.is_invited?'admin-invite-on':'admin-invite-off'}" onclick="adminToggleInvite('${p.id}',${p.is_invited},this)">${p.is_invited?'✅ 已開通':'🔒 待審核'}</button>`;
-  const vipBtn = `<button class="admin-vip-btn ${p.is_vip?'active-vip':''}" onclick="adminSetVip('${p.id}',${!!p.is_vip},this)">⭐ VIP${p.is_vip?' 開':'（未開通）'}</button>`;
+  const vipBtn = `<button class="admin-vip-btn ${p.is_vip?'active-vip':''}" onclick="adminSetVip('${p.id}',${!!p.is_vip},this)">⭐ 進階${p.is_vip?' 開':'（未開通）'}</button>`;
   return `<div class="admin-user-card" id="admin-card-${p.id}">
     <div class="admin-user-email">${p.display_name||'（未填姓名）'} ${isSelf?'<span style="font-size:11px;background:var(--purple-light);color:var(--purple-dark);padding:2px 6px;border-radius:99px">我</span>':''}</div>
     <div class="admin-user-meta">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
