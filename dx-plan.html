@@ -1059,7 +1059,20 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 20px"></div>
     <div id="account-modal-user" style="background:var(--purple-light);border-radius:14px;padding:14px 16px;margin-bottom:16px">
       <div style="font-size:var(--font-sm);color:var(--gray-500);margin-bottom:2px">目前登入</div>
-      <div id="account-modal-email" style="font-size:var(--font-md);font-weight:700;color:var(--purple-dark)"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <div id="account-modal-name-display" style="font-size:var(--font-md);font-weight:700;color:var(--purple-dark);flex:1"></div>
+        <button onclick="startEditName()" id="account-name-edit-btn" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;color:var(--purple)">✏️</button>
+      </div>
+      <div id="account-modal-name-edit" style="display:none;margin-bottom:6px">
+        <div style="display:flex;gap:6px">
+          <input type="text" id="account-name-input" class="auth-field-input"
+            style="padding:8px 12px;font-size:var(--font-sm);flex:1"/>
+          <button onclick="saveDisplayName()" style="padding:8px 14px;background:var(--purple);color:white;border:none;border-radius:10px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap">儲存</button>
+          <button onclick="cancelEditName()" style="padding:8px 10px;background:white;color:var(--gray-500);border:1px solid var(--gray-300);border-radius:10px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">✕</button>
+        </div>
+        <div id="account-name-msg" style="font-size:12px;min-height:16px;margin-top:4px"></div>
+      </div>
+      <div id="account-modal-email" style="font-size:var(--font-sm);color:var(--purple-dark);opacity:.7"></div>
       <div id="account-modal-role" style="font-size:var(--font-sm);color:var(--gray-500);margin-top:2px"></div>
     </div>
     <div id="account-modal-admin-btn" style="display:none;margin-bottom:10px">
@@ -1219,6 +1232,7 @@ async function doRegister() {
   const pw2 = document.getElementById('register-password2').value;
   const inviteCode = document.getElementById('register-invite-code').value.trim().toUpperCase();
   const privacyChecked = document.getElementById('register-privacy').checked;
+  // ── 前端驗證（不需要網路）
   if (!name) { setAuthMsg('register-msg','error','請填寫姓名'); return; }
   if (!email) { setAuthMsg('register-msg','error','請填寫電子郵件'); return; }
   if (pw.length < 6) { setAuthMsg('register-msg','error','密碼至少需要 6 位'); return; }
@@ -1226,36 +1240,37 @@ async function doRegister() {
   if (!privacyChecked) { setAuthMsg('register-msg','error','請閱讀並同意隱私說明後再註冊'); return; }
   setAuthLoading('register-btn', true, '註冊');
   try {
+    // ── 先驗證邀請碼（若有填寫）
+    let consultantId = null;
+    if (inviteCode) {
+      const { data: invite } = await sb.from('invite_codes')
+        .select('consultant_id, expires_at')
+        .eq('code', inviteCode)
+        .single();
+      if (!invite) {
+        setAuthMsg('register-msg','error','邀請碼無效，請確認後重試');
+        return;
+      }
+      if (new Date(invite.expires_at) < new Date()) {
+        setAuthMsg('register-msg','error','邀請碼已過期，請向教練索取新的邀請碼');
+        return;
+      }
+      consultantId = invite.consultant_id;
+    }
+    // ── 所有驗證通過，才建立帳號
     const { data, error } = await sb.auth.signUp({ email, password: pw });
     if (error) { setAuthMsg('register-msg','error','註冊失敗：' + error.message); return; }
     if (data.user) {
-      // 驗證邀請碼並綁定教練
-      let consultantId = null;
-      if (inviteCode) {
-        const { data: invite } = await sb.from('invite_codes')
-          .select('consultant_id, expires_at')
-          .eq('code', inviteCode)
-          .single();
-        if (!invite) {
-          setAuthMsg('register-msg','error','邀請碼無效，請確認後重試');
-          await sb.auth.signOut();
-          return;
-        }
-        if (new Date(invite.expires_at) < new Date()) {
-          setAuthMsg('register-msg','error','邀請碼已過期，請向教練索取新的邀請碼');
-          await sb.auth.signOut();
-          return;
-        }
-        consultantId = invite.consultant_id;
-        // 建立教練與使用者的關係
+      await sb.from('profiles').update({ display_name: name }).eq('id', data.user.id);
+      // 建立教練與使用者的關係
+      if (consultantId) {
         await sb.from('consultant_clients').insert({
           consultant_id: consultantId,
           client_id: data.user.id
         });
       }
-      await sb.from('profiles').update({ display_name: name }).eq('id', data.user.id);
     }
-    const successMsg = inviteCode
+    const successMsg = consultantId
       ? '✅ 註冊成功！請等待教練開通權限後再登入。'
       : '✅ 註冊成功！請等待管理者開通權限後再登入。';
     setAuthMsg('register-msg','success', successMsg);
@@ -1391,11 +1406,42 @@ function showAppMain() {
 // ── 帳號選單 ──────────────────────────────────────────
 function showAccountMenu() {
   if (!currentProfile) return;
+  document.getElementById('account-modal-name-display').textContent = currentProfile.display_name || '（未設定姓名）';
   document.getElementById('account-modal-email').textContent = currentProfile.email;
   document.getElementById('account-modal-role').textContent = getRoleLabel();
   document.getElementById('account-modal-admin-btn').style.display = isAdmin() ? 'block' : 'none';
   document.getElementById('account-modal-consultant-btn').style.display = isConsultant() ? 'block' : 'none';
   document.getElementById('account-modal').style.display = 'flex';
+  // 重置編輯狀態
+  cancelEditName();
+}
+
+function startEditName() {
+  document.getElementById('account-modal-name-display').style.display = 'none';
+  document.getElementById('account-name-edit-btn').style.display = 'none';
+  document.getElementById('account-modal-name-edit').style.display = 'block';
+  const input = document.getElementById('account-name-input');
+  input.value = currentProfile.display_name || '';
+  input.focus();
+}
+
+function cancelEditName() {
+  document.getElementById('account-modal-name-display').style.display = 'block';
+  document.getElementById('account-name-edit-btn').style.display = 'inline';
+  document.getElementById('account-modal-name-edit').style.display = 'none';
+  document.getElementById('account-name-msg').textContent = '';
+}
+
+async function saveDisplayName() {
+  const newName = document.getElementById('account-name-input').value.trim();
+  const msgEl = document.getElementById('account-name-msg');
+  if (!newName) { msgEl.style.color = 'var(--red)'; msgEl.textContent = '請填寫姓名'; return; }
+  msgEl.style.color = 'var(--gray-500)'; msgEl.textContent = '儲存中...';
+  const { error } = await sb.from('profiles').update({ display_name: newName }).eq('id', currentUser.id);
+  if (error) { msgEl.style.color = 'var(--red)'; msgEl.textContent = '儲存失敗，請稍後再試'; return; }
+  currentProfile.display_name = newName;
+  document.getElementById('account-modal-name-display').textContent = newName;
+  cancelEditName();
 }
 function closeAccountModal() {
   document.getElementById('account-modal').style.display = 'none';
