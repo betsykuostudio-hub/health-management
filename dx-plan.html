@@ -1281,8 +1281,15 @@ async function doRegister() {
     // ── 先驗證邀請碼（改用 RPC，不直接查 invite_codes 表）
     let consultantId = null;
     if (inviteCode) {
-      const { data: result, error: rpcErr } = await sb.rpc('verify_invite_code', { p_code: inviteCode });
-      if (rpcErr || !result) {
+      const { data: rpcData, error: rpcErr } = await sb.rpc('verify_invite_code', { p_code: inviteCode });
+      if (rpcErr) {
+        setAuthMsg('register-msg','error','邀請碼驗證失敗，請稍後再試');
+        return;
+      }
+      // RETURNS TABLE → data 是陣列；RETURNS json → data 可能是字串或物件，一律正規化
+      let result = Array.isArray(rpcData) ? rpcData[0] : rpcData;
+      if (typeof result === 'string') { try { result = JSON.parse(result); } catch(e) { result = null; } }
+      if (!result) {
         setAuthMsg('register-msg','error','邀請碼驗證失敗，請稍後再試');
         return;
       }
