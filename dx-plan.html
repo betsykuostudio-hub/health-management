@@ -1416,15 +1416,20 @@ async function handleAuthSuccess(user) {
   showAppMain();
 }
 
-// ── 進入主畫面 ────────────────────────────────────────
-function showAppMain() {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('nav-bar').style.display = 'flex';
+// ── 權限相關 UI 顯示更新（每次切換畫面時呼叫）──────────
+function updateNavVisibility() {
   // 體組成 Tab 只對 vip / admin 顯示
   document.getElementById('nav-bodylog').style.display = isVip() ? 'flex' : 'none';
   // 備份匯入匯出只對 admin 顯示
   document.getElementById('history-backup-btns').style.display = isAdmin() ? 'flex' : 'none';
   document.getElementById('account-modal-import-btn').style.display = isAdmin() ? 'block' : 'none';
+}
+
+// ── 進入主畫面 ────────────────────────────────────────
+function showAppMain() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('nav-bar').style.display = 'flex';
+  updateNavVisibility();
   if (state.startDate) {
     const today = todayISO();
     if (state.pretestDate && today === state.pretestDate) {
@@ -2964,7 +2969,11 @@ const BLOG_GOOD_DOWN=new Set(['weight','bodyfat','visceral','bmi','bodyage']);
 
 let blogActiveMetric='weight'; // 目前顯示的折線指標
 
-function showBodyLog(){renderBodyLog();showScreen('screen-bodylog','nav-bodylog');}
+function showBodyLog(){
+  if(!isVip()){return;}
+  renderBodyLog();
+  showScreen('screen-bodylog','nav-bodylog');
+}
 
 function renderBodyLog(){
   const logs=(state.bodyLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
@@ -3138,6 +3147,7 @@ function setBlogMetric(metric){
   renderBodyLog();
 }
 function showHistory(){
+  updateNavVisibility();
   showScreen('screen-history','nav-history');
   renderHistory();
 }
