@@ -1261,7 +1261,10 @@ async function doRegister() {
     const { data, error } = await sb.auth.signUp({ email, password: pw });
     if (error) { setAuthMsg('register-msg','error','註冊失敗：' + error.message); return; }
     if (data.user) {
-      await sb.from('profiles').update({ display_name: name }).eq('id', data.user.id);
+      // 有邀請碼：自動設為 client，跳過 pending
+      const profileUpdate = { display_name: name };
+      if (consultantId) profileUpdate.role = 'client';
+      await sb.from('profiles').update(profileUpdate).eq('id', data.user.id);
       // 建立教練與使用者的關係
       if (consultantId) {
         await sb.from('consultant_clients').insert({
