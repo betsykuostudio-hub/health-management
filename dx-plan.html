@@ -271,6 +271,8 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .admin-role-btn.active-client{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8}
 .admin-role-btn.active-consultant{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
 .admin-role-btn.active-admin{background:var(--purple-light);border-color:var(--purple-mid);color:var(--purple-dark)}
+.admin-vip-btn{padding:7px 14px;border-radius:20px;border:2px solid #fcd34d;background:white;font-size:var(--font-sm);font-weight:700;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.admin-vip-btn.active-vip{background:#fef3c7;border-color:#fcd34d;color:#92400e}
 .admin-invite-btn{padding:7px 14px;border-radius:20px;border:none;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
 .admin-invite-on{background:var(--green-bg);color:var(--green)}
 .admin-invite-off{background:var(--red-bg);color:var(--red)}
@@ -994,6 +996,17 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let currentProfile = null;
 
+// ── 角色判斷 helper ───────────────────────────────────
+function isAdmin()      { return currentProfile?.role === 'admin'; }
+function isConsultant() { return currentProfile?.role === 'consultant'; }
+function isVip()        { return currentProfile?.is_vip === true || isAdmin(); }
+function getRoleLabel() {
+  const base = { admin:'管理者', consultant:'諮詢師', client:'客戶', pending:'待審核' };
+  const label = base[currentProfile?.role] || currentProfile?.role || '';
+  const vipBadge = isVip() && !isAdmin() ? ' ⭐ VIP' : '';
+  return label + vipBadge;
+}
+
 // ── Auth UI 工具 ──────────────────────────────────────
 function showAuthScreen(name) {
   // name: 'login' | 'register' | 'forgot'
@@ -1141,9 +1154,8 @@ function showAppMain() {
 function showAccountMenu() {
   if (!currentProfile) return;
   document.getElementById('account-modal-email').textContent = currentProfile.email;
-  const roleMap = { admin:'管理者', consultant:'諮詢師', client:'客戶', pending:'待審核' };
-  document.getElementById('account-modal-role').textContent = roleMap[currentProfile.role] || currentProfile.role;
-  document.getElementById('account-modal-admin-btn').style.display = currentProfile.role === 'admin' ? 'block' : 'none';
+  document.getElementById('account-modal-role').textContent = getRoleLabel();
+  document.getElementById('account-modal-admin-btn').style.display = isAdmin() ? 'block' : 'none';
   document.getElementById('account-modal').style.display = 'flex';
 }
 function closeAccountModal() {
@@ -1278,16 +1290,25 @@ function renderAdminUserCard(p, roleMap) {
     `<button class="admin-role-btn ${p.role===r?roleColors[r]:''}" onclick="adminSetRole('${p.id}','${r}',this)">${roleMap[r]||r}</button>`
   ).join('');
   const inviteBtn = `<button class="admin-invite-btn ${p.is_invited?'admin-invite-on':'admin-invite-off'}" onclick="adminToggleInvite('${p.id}',${p.is_invited},this)">${p.is_invited?'✅ 已開通':'🔒 待審核'}</button>`;
+  const vipBtn = `<button class="admin-vip-btn ${p.is_vip?'active-vip':''}" onclick="adminSetVip('${p.id}',${!!p.is_vip},this)">⭐ VIP${p.is_vip?' 開':'（未開通）'}</button>`;
   return `<div class="admin-user-card" id="admin-card-${p.id}">
     <div class="admin-user-email">${p.display_name||'（未填姓名）'} ${isSelf?'<span style="font-size:11px;background:var(--purple-light);color:var(--purple-dark);padding:2px 6px;border-radius:99px">我</span>':''}</div>
     <div class="admin-user-meta">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
     <div class="admin-role-row">${roleBtns}${inviteBtn}</div>
+    <div class="admin-role-row" style="margin-top:6px">${vipBtn}</div>
   </div>`;
 }
 
 async function adminSetRole(userId, role, btn) {
   btn.disabled = true;
   const { error } = await sb.from('profiles').update({ role }).eq('id', userId);
+  if (!error) { renderAdminPanel(); }
+  else { btn.disabled = false; alert('更新失敗：' + error.message); }
+}
+
+async function adminSetVip(userId, currentVal, btn) {
+  btn.disabled = true;
+  const { error } = await sb.from('profiles').update({ is_vip: !currentVal }).eq('id', userId);
   if (!error) { renderAdminPanel(); }
   else { btn.disabled = false; alert('更新失敗：' + error.message); }
 }
