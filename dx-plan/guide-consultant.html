@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DX 45天計畫 · 教練指南</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#059669;--pd:#065f46;--pl:#d1fae5;--pm:#34d399;
+  --bg:#f0fdf8;--white:#fff;
+  --g100:#f3f4f6;--g300:#d1d5db;--g500:#6b7280;--g700:#374151;--g900:#111827;
+  --yellow:#d97706;--ybg:#fef3c7;
+  --r:16px;--r2:12px;
+}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700);font-size:15px;max-width:480px;margin:0 auto;min-height:100vh}
+.hero{background:linear-gradient(145deg,var(--pd),var(--p),var(--pm));color:#fff;padding:44px 24px 36px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;bottom:-60px;left:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.18);color:#a7f3d0;font-size:12px;font-weight:700;letter-spacing:2px;padding:5px 16px;border-radius:99px;margin-bottom:16px}
+.hero-emoji{font-size:52px;margin-bottom:12px;line-height:1}
+.hero h1{font-size:26px;font-weight:900;margin-bottom:8px;line-height:1.3}
+.hero p{font-size:14px;color:#a7f3d0;line-height:1.7}
+.section{background:var(--white);margin:10px 0 0;padding:22px 20px}
+.sec-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:900;color:var(--pd);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--pl)}
+.sec-icon{width:32px;height:32px;background:var(--p);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.steps{display:flex;flex-direction:column;gap:10px}
+.step{display:flex;align-items:flex-start;gap:12px;background:#f0fdf8;border:1.5px solid var(--pl);border-radius:var(--r2);padding:14px}
+.step-num{width:28px;height:28px;flex-shrink:0;background:var(--p);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900}
+.step-title{font-size:15px;font-weight:700;color:var(--pd);margin-bottom:3px}
+.step-desc{font-size:13px;color:var(--g500);line-height:1.65}
+.func-list{display:flex;flex-direction:column;gap:10px}
+.func-item{display:flex;align-items:flex-start;gap:12px;background:#f0fdf8;border:1.5px solid var(--pl);border-radius:var(--r2);padding:14px}
+.func-icon{font-size:24px;flex-shrink:0}
+.func-title{font-size:15px;font-weight:700;color:var(--pd);margin-bottom:3px}
+.func-desc{font-size:13px;color:var(--g500);line-height:1.6}
+.also-box{background:linear-gradient(135deg,var(--pd),var(--p));border-radius:var(--r);padding:16px 18px}
+.also-label{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:8px}
+.also-tags{display:flex;flex-wrap:wrap;gap:8px}
+.also-tag{background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:700;padding:5px 12px;border-radius:99px}
+.faq{display:flex;flex-direction:column;gap:0}
+.faq-item{border-bottom:1px solid var(--g100);padding:14px 0}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-size:15px;font-weight:700;color:var(--g900);margin-bottom:6px;display:flex;align-items:flex-start;gap:8px}
+.faq-q::before{content:'Q';background:var(--p);color:#fff;font-size:11px;font-weight:900;padding:2px 6px;border-radius:6px;flex-shrink:0;margin-top:2px}
+.faq-a{font-size:14px;color:var(--g500);line-height:1.7;padding-left:26px}
+.pro-wrap{border:1.5px solid var(--pl);border-radius:var(--r);overflow:hidden}
+.pro-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#f0fdf8;cursor:pointer;user-select:none}
+.pro-header-left{display:flex;align-items:center;gap:10px}
+.pro-badge{background:var(--p);color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px}
+.pro-header-title{font-size:15px;font-weight:700;color:var(--pd)}
+.pro-arrow{font-size:18px;color:var(--g500);transition:transform .2s;display:inline-block}
+.pro-body{display:none;padding:16px}
+.pro-feat{display:flex;align-items:flex-start;gap:12px;background:#f0fdf8;border-radius:10px;padding:12px;margin-bottom:10px}
+.pro-feat-icon{font-size:22px;flex-shrink:0}
+.pro-feat-title{font-size:15px;font-weight:700;color:var(--pd);margin-bottom:3px}
+.pro-feat-desc{font-size:13px;color:var(--g500);line-height:1.55}
+.warning-box{background:var(--ybg);border:1.5px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:12px}
+.warning-title{font-size:14px;font-weight:700;color:var(--yellow);margin-bottom:6px}
+.warning-text{font-size:13px;color:#92400e;line-height:1.75}
+.info-box{background:#f0fdf8;border:1.5px solid var(--pl);border-radius:10px;padding:14px;margin-bottom:12px}
+.info-title{font-size:14px;font-weight:700;color:var(--pd);margin-bottom:6px}
+.info-text{font-size:13px;color:var(--g500);line-height:1.75}
+.limit-list{border:1.5px solid var(--g100);border-radius:10px;overflow:hidden}
+.limit-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--g100);background:var(--white)}
+.limit-item:last-child{border-bottom:none}
+.limit-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.limit-text{font-size:14px;color:var(--g700);line-height:1.6}
+.tips{display:flex;flex-direction:column;gap:8px}
+.tip{padding:12px 14px;border-radius:10px;background:var(--pl);border-left:4px solid var(--p);font-size:14px;color:var(--g700);line-height:1.65}
+.tip strong{color:var(--pd)}
+.footer{background:linear-gradient(135deg,var(--pd),var(--p));padding:22px 20px;text-align:center;margin-top:10px}
+.footer-brand{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.footer-text{font-size:12px;color:#a7f3d0;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">一般教練 使用指南</div>
+  <div class="hero-emoji">🏋️</div>
+  <h1>DX 45天<br/>健康管理計畫</h1>
+  <p>掌握後台功能，輕鬆帶領學員完成計畫</p>
+</div>
+
+<div class="section">
+  <div class="sec-title"><div class="sec-icon">🚀</div>開始使用（4步驟）</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div><div class="step-title">管理者提供帳號給你</div><div class="step-desc">教練帳號由管理者直接設定，不需要邀請碼。</div></div></div>
+    <div class="step"><div class="step-num">2</div><div><div class="step-title">用 Email 與密碼登入 App</div><div class="step-desc">右下角帳號選單會顯示你的姓名與「教練」身份。</div></div></div>
+    <div class="step"><div class="step-num">3</div><div><div class="step-title">點右下角帳號選單 → 教練後台</div><div class="step-desc">可管理學員與邀請碼。</div></div></div>
+    <div class="step"><div class="step-num">4</div><div><div class="step-title">產生邀請碼，開始帶學員加入</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><div class="sec-icon">👥</div>帶學員加入（4步驟）</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div><div class="step-title">🎟️ 後台產生邀請碼</div><div class="step-desc">格式為 DX-XXXXXX，有效期 30 天，可讓多位學員使用。</div></div></div>
+    <div class="step"><div class="step-num">2</div><div><div class="step-title">📨 把邀請碼傳給學員</div><div class="step-desc">學員在登入頁點「用邀請碼註冊」，填入邀請碼、姓名、Email 與密碼完成註冊。</div></div></div>
+    <div class="step"><div class="step-num">3</div><div><div class="step-title">🔓 後台開通學員帳號</div><div class="step-desc">學員出現在「待開通」清單後，點「開通」按鈕即可。</div></div></div>
+    <div class="step"><div class="step-num">4</div><div><div class="step-title">📣 主動通知學員可以登入了</div><div class="step-desc">App 不會自動發送開通通知，開通後請主動告知學員。</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><div class="sec-icon">⚙️</div>教練後台功能</div>
+  <div class="func-list">
+    <div class="func-item"><div class="func-icon">🎟️</div><div><div class="func-title">邀請碼管理</div><div class="func-desc">產生、查看、更新邀請碼。30 天到期後一鍵重新產生，舊碼自動失效。</div></div></div>
+    <div class="func-item"><div class="func-icon">👤</div><div><div class="func-title">學員清單</div><div class="func-desc">查看名下所有學員狀態：待開通 / 已開通 / 申請刪除。</div></div></div>
+    <div class="func-item"><div class="func-icon">🔓</div><div><div class="func-title">開通帳號</div><div class="func-desc">學員完成註冊後，一鍵開通讓他們正式進入計畫。</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><div class="sec-icon">📱</div>你也可以執行自己的計畫</div>
+  <div class="also-box">
+    <div class="also-label">和學員一樣，你也可以使用以下所有功能：</div>
+    <div class="also-tags">
+      <span class="also-tag">✅ 打卡</span>
+      <span class="also-tag">📦 備品庫存</span>
+      <span class="also-tag">🍽️ 菜單</span>
+      <span class="also-tag">📊 統計報告</span>
+      <span class="also-tag">📄 體檢 PDF</span>
+      <span class="also-tag">📖 歷史回顧</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><div class="sec-icon">💬</div>常見問題</div>
+  <div class="faq">
+    <div class="faq-item"><div class="faq-q">邀請碼到期了怎麼辦？</div><div class="faq-a">後台點「重新產生邀請碼」，新碼立即生效，舊碼自動失效。建議定期確認有效期。</div></div>
+    <div class="faq-item"><div class="faq-q">學員說沒收到開通通知？</div><div class="faq-a">App 不會自動發送通知，開通後請主動告知學員可以登入了。</div></div>
+    <div class="faq-item"><div class="faq-q">可以看到學員的健康數值嗎？</div><div class="faq-a">不行。學員所有健康資料僅本人可查看，教練後台只顯示姓名、Email 與帳號狀態。</div></div>
+    <div class="faq-item"><div class="faq-q">學員忘記密碼怎麼辦？</div><div class="faq-a">請學員在登入頁點「忘記密碼？」，自行收信設定新密碼，不需要教練協助。</div></div>
+    <div class="faq-item"><div class="faq-q">如何升級為進階教練？</div><div class="faq-a">請聯絡管理者申請開通進階權限。</div></div>
+    <div class="faq-item"><div class="faq-q">可以管理多少學員？</div><div class="faq-a">無上限，所有透過你邀請碼註冊的學員都會顯示在後台。</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><div class="sec-icon">⭐</div>進階教練專區</div>
+  <div class="pro-wrap">
+    <div class="pro-header" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block';this.querySelector('.pro-arrow').style.transform=b.style.display==='block'?'rotate(180deg)':'rotate(0deg)'">
+      <div class="pro-header-left"><span class="pro-badge">⭐ 進階</span><span class="pro-header-title">進階教練專區</span></div>
+      <span class="pro-arrow">▾</span>
+    </div>
+    <div class="pro-body">
+      <div style="font-size:14px;font-weight:700;color:var(--pd);margin-bottom:12px">升級後多了這些功能</div>
+      <div class="pro-feat"><div class="pro-feat-icon">📈</div><div><div class="pro-feat-title">體組成記錄</div><div class="pro-feat-desc">隨時記錄體重、體脂、肌肉量，查看 45 天趨勢圖。</div></div></div>
+      <div class="pro-feat" style="margin-bottom:16px"><div class="pro-feat-icon">☁️</div><div><div class="pro-feat-title">體檢數值與報告雲端儲存</div><div class="pro-feat-desc">加密存雲端，可隨時重新查看，不限次數。</div></div></div>
+      <div class="warning-box">
+        <div class="warning-title">⚠️ 升級前請了解</div>
+        <div class="warning-text">升級後，體組成與體檢數值將<strong>自動加密儲存於雲端</strong>，無法單獨關閉。升級前請確認你願意將健康數值存放雲端，並了解<strong>密碼遺失後資料永久無法讀取</strong>的風險。</div>
+      </div>
+      <div class="info-box">
+        <div class="info-title">🔐 資料存放說明</div>
+        <div class="info-text">你的健康數值採用 AES-GCM 256-bit 加密後，儲存於日本東京的 Supabase 雲端伺服器。加密金鑰由你的登入密碼產生，只存在你的裝置上，任何人（包含管理者）都無法讀取你的資料。</div>
+      </div>
+      <div class="limit-list">
+        <div class="limit-item"><div class="limit-icon">⚠️</div><div class="limit-text">修改或重設密碼後，加密資料<strong>永久無法讀取</strong></div></div>
+        <div class="limit-item"><div class="limit-icon">⚠️</div><div class="limit-text">刪除帳號後，所有資料一併刪除，<strong>無法復原</strong></div></div>
+        <div class="limit-item"><div class="limit-icon">⚠️</div><div class="limit-text">請妥善保管密碼，避免頻繁更換</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><div class="sec-icon">💡</div>教練小提醒</div>
+  <div class="tips">
+    <div class="tip">💚 <strong>邀請碼 30 天到期</strong>，記得定期更新</div>
+    <div class="tip">💚 開通學員後<strong>主動通知</strong>，App 不會自動發送</div>
+    <div class="tip">💚 有任何問題，<strong>請聯絡管理者</strong></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-brand">DX 45天健康管理計畫 🌿</div>
+  <div class="footer-text">⚠️ 本工具僅供健康管理輔助，所有內容不構成醫療建議或診斷依據</div>
+</div>
+</body>
+</html>
