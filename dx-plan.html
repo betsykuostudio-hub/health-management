@@ -3425,7 +3425,25 @@ function renderHistoryCheckin(plan){
   return html;
 }
 function init(){
-  // 先顯示登入頁，等 Supabase session 確認後再切換
+  // 優先檢查 URL hash，若為密碼重設連結則直接顯示設定新密碼畫面
+  const hash = window.location.hash;
+  if (hash && hash.includes('type=recovery')) {
+    // 讓 Supabase 處理 hash 並建立 session，再顯示重設畫面
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        showAuthScreen('reset-password');
+      } else {
+        // session 尚未建立，透過 onAuthStateChange 等待
+        sb.auth.onAuthStateChange((event, session) => {
+          if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && hash.includes('type=recovery'))) {
+            showAuthScreen('reset-password');
+          }
+        });
+      }
+    });
+    return;
+  }
+  // 一般流程
   initAuth();
 }
 init();
