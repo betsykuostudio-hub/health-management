@@ -497,6 +497,31 @@ input[type=date].field-input{width:145px;overflow:hidden}
   </div>
 </div>
 
+<!-- CHANGE PASSWORD -->
+<div id="screen-change-password" class="screen">
+  <div class="header">
+    <span style="font-size:22px">🔑</span>
+    <span class="header-title">修改密碼</span>
+    <button class="back-btn" onclick="showAppMain()">← 返回</button>
+  </div>
+  <div style="padding:24px 20px">
+    <div id="change-pw-vip-warning" style="display:none;background:#fef3c7;border:1.5px solid #fde68a;border-radius:14px;padding:16px;margin-bottom:20px;font-size:var(--font-sm);color:#92400e;line-height:1.7">
+      ⚠️ <strong>進階使用者請注意：</strong><br/>
+      修改密碼後，已儲存的體組成紀錄與體檢數值將<strong>永久無法讀取</strong>，此為加密設計限制，無法還原，也無法由管理者或教練協助解密。請確認後再繼續。
+    </div>
+    <div id="change-pw-msg" class="auth-msg"></div>
+    <div class="auth-field">
+      <label class="auth-field-label">🔒 新密碼（至少 6 位）</label>
+      <input type="password" id="change-pw-new" class="auth-field-input" placeholder="••••••••" autocomplete="new-password"/>
+    </div>
+    <div class="auth-field">
+      <label class="auth-field-label">🔒 確認新密碼</label>
+      <input type="password" id="change-pw-new2" class="auth-field-input" placeholder="••••••••" autocomplete="new-password"/>
+    </div>
+    <button class="auth-submit-btn" id="change-pw-btn" onclick="doChangePassword()" style="margin-top:8px">確認修改密碼</button>
+  </div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div id="screen-admin" class="screen">
   <div class="header">
@@ -1149,6 +1174,12 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <div id="account-modal-import-btn" style="display:none;margin-bottom:10px">
       <button onclick="closeAccountModal();showImportFromLocalStorage()" style="width:100%;padding:14px;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">📥 匯入本機備份資料</button>
     </div>
+    <div id="account-modal-guide-btn" style="margin-bottom:10px">
+      <button onclick="closeAccountModal();openGuide()" style="width:100%;padding:14px;background:#f5f3ff;color:var(--purple-dark);border:1px solid var(--purple-light);border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">📖 使用指南</button>
+    </div>
+    <div style="margin-bottom:10px">
+      <button onclick="closeAccountModal();showChangePassword()" style="width:100%;padding:14px;background:#f9fafb;color:var(--gray-700);border:1px solid var(--gray-300);border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">🔑 修改密碼</button>
+    </div>
     <button onclick="closeAccountModal();doLogout()" style="width:100%;padding:14px;background:var(--red-bg);color:var(--red);border:1px solid #fecaca;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">登出</button>
     <button onclick="closeAccountModal();showPrivacyPolicy()" style="width:100%;padding:14px;background:white;color:var(--gray-500);border:1px solid var(--gray-200);border-radius:12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:10px">🔒 隱私說明</button>
     <button onclick="closeAccountModal();showDeleteAccount()" class="delete-account-btn">🗑️ 申請停用與刪除資料</button>
@@ -1413,6 +1444,46 @@ async function doForgotPassword() {
     setAuthMsg('forgot-msg','error','連線失敗，請稍後再試');
   } finally {
     setAuthLoading('forgot-btn', false, '寄送重設連結');
+  }
+}
+
+// ── 使用指南 ──────────────────────────────────────────
+function openGuide() {
+  const url = isConsultant()
+    ? '../dx-plan/guide-consultant.html'
+    : '../dx-plan/guide-user.html';
+  window.open(url, '_blank');
+}
+
+// ── 修改密碼 ──────────────────────────────────────────
+function showChangePassword() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-change-password').classList.add('active');
+  document.getElementById('nav-bar').style.display = 'none';
+  // 進階使用者顯示警告
+  document.getElementById('change-pw-vip-warning').style.display = isVip() ? 'block' : 'none';
+  document.getElementById('change-pw-new').value = '';
+  document.getElementById('change-pw-new2').value = '';
+  const msg = document.getElementById('change-pw-msg');
+  msg.className = 'auth-msg';
+  msg.textContent = '';
+}
+
+async function doChangePassword() {
+  const pw  = document.getElementById('change-pw-new').value;
+  const pw2 = document.getElementById('change-pw-new2').value;
+  if (!pw || pw.length < 6) { setAuthMsg('change-pw-msg','error','密碼至少需要 6 位'); return; }
+  if (pw !== pw2) { setAuthMsg('change-pw-msg','error','兩次密碼不一致，請確認後重試'); return; }
+  setAuthLoading('change-pw-btn', true, '確認修改密碼');
+  try {
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) { setAuthMsg('change-pw-msg','error','修改失敗：' + error.message); return; }
+    setAuthMsg('change-pw-msg','success','✅ 密碼已更新！');
+    setTimeout(() => showAppMain(), 2000);
+  } catch(e) {
+    setAuthMsg('change-pw-msg','error','連線失敗，請稍後再試');
+  } finally {
+    setAuthLoading('change-pw-btn', false, '確認修改密碼');
   }
 }
 
