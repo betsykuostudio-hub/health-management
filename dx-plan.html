@@ -474,6 +474,29 @@ input[type=date].field-input{width:145px;overflow:hidden}
   </div>
 </div>
 
+<!-- RESET PASSWORD -->
+<div id="screen-reset-password" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🔐</div>
+        <div class="auth-logo-title">設定新密碼</div>
+        <div class="auth-logo-sub">請輸入你的新密碼</div>
+      </div>
+      <div id="reset-msg" class="auth-msg"></div>
+      <div class="auth-field">
+        <label class="auth-field-label">🔒 新密碼（至少 6 位）</label>
+        <input type="password" id="reset-password" class="auth-field-input" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-field-label">🔒 確認新密碼</label>
+        <input type="password" id="reset-password2" class="auth-field-input" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <button class="auth-submit-btn" id="reset-btn" onclick="doResetPassword()">確認設定新密碼</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div id="screen-admin" class="screen">
   <div class="header">
@@ -1913,10 +1936,35 @@ async function initAuth() {
   // 監聽 auth 狀態變化（例如重設密碼後跳回）
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
-      showAuthScreen('login');
-      setAuthMsg('login-msg','info','請重新登入');
+      // 顯示設定新密碼畫面
+      showAuthScreen('reset-password');
     }
   });
+}
+
+// ── 設定新密碼 ────────────────────────────────────────
+async function doResetPassword() {
+  const pw  = document.getElementById('reset-password').value;
+  const pw2 = document.getElementById('reset-password2').value;
+  if (!pw || pw.length < 6) { setAuthMsg('reset-msg','error','密碼至少需要 6 位'); return; }
+  if (pw !== pw2) { setAuthMsg('reset-msg','error','兩次密碼不一致，請確認後重試'); return; }
+  setAuthLoading('reset-btn', true, '確認設定新密碼');
+  try {
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) { setAuthMsg('reset-msg','error','設定失敗：' + error.message); return; }
+    setAuthMsg('reset-msg','success','✅ 密碼已更新！請重新登入');
+    setTimeout(async () => {
+      await sb.auth.signOut();
+      currentUser = null;
+      currentProfile = null;
+      _encryptionKey = null;
+      showAuthScreen('login');
+    }, 2000);
+  } catch(e) {
+    setAuthMsg('reset-msg','error','連線失敗，請稍後再試');
+  } finally {
+    setAuthLoading('reset-btn', false, '確認設定新密碼');
+  }
 }
 
 // ══════════════════════════════════════════════════════
