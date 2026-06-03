@@ -374,9 +374,16 @@ input[type=date].field-input{width:145px;overflow:hidden}
 </head>
 <body>
 
+<!-- LOADING（session 確認前的過渡畫面） -->
+<div id="screen-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--purple-dark) 0%,var(--purple) 50%,var(--purple-mid) 100%)">
+  <div style="font-size:52px;margin-bottom:16px">🎯</div>
+  <div style="font-size:20px;font-weight:900;color:white;margin-bottom:8px">DX 健康管理計畫</div>
+  <div style="font-size:14px;color:rgba(255,255,255,.7);margin-top:8px">載入中...</div>
+</div>
+
 <!-- SETUP -->
 <!-- AUTH: LOGIN -->
-<div id="screen-login" class="screen active">
+<div id="screen-login" class="screen">
   <div class="auth-wrap">
     <div class="auth-card">
       <div class="auth-logo">
@@ -1140,7 +1147,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
   <button class="nav-btn" id="nav-menu" onclick="showScreen('screen-menu','nav-menu')"><div class="nav-icon">🍽️</div><div class="nav-label">菜單</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-notes" onclick="showScreen('screen-notes','nav-notes')"><div class="nav-icon">📋</div><div class="nav-label">須知</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-history" onclick="showHistory()"><div class="nav-icon">📖</div><div class="nav-label">歷史</div><div class="nav-indicator"></div></button>
-  <button class="nav-btn" id="nav-account" onclick="showAccountMenu()"><div class="nav-icon">👤</div><div class="nav-label">帳號</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-account" onclick="showAccountMenu()"><div class="nav-icon" style="position:relative">👤<span id="nav-account-badge" style="display:none;position:absolute;top:-4px;right:-8px;background:var(--red);color:white;border-radius:99px;font-size:10px;font-weight:700;min-width:16px;height:16px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span></div><div class="nav-label">帳號</div><div class="nav-indicator"></div></button>
 </div>
 
 <!-- ACCOUNT MENU MODAL -->
@@ -1503,17 +1510,22 @@ async function handleAuthSuccess(user) {
   // 取得 profile
   const { data: profile, error } = await sb.from('profiles').select('*').eq('id', user.id).single();
   if (error || !profile) {
+    hideLoading();
+    showAuthScreen('login');
     setAuthMsg('login-msg','error','無法取得帳號資料，請稍後再試');
     await sb.auth.signOut();
     return;
   }
   if (!profile.is_invited) {
+    hideLoading();
+    showAuthScreen('login');
     setAuthMsg('login-msg','info','⏳ 帳號尚未獲得授權，請聯繫管理者開通後再登入。');
     await sb.auth.signOut();
     return;
   }
   currentProfile = profile;
   await loadStateFromSupabase();
+  hideLoading();
   showAppMain();
 }
 
@@ -1526,6 +1538,8 @@ function showAppMain() {
   // 備份匯入匯出只對 admin 顯示
   document.getElementById('history-backup-btns').style.display = isAdmin() ? 'flex' : 'none';
   document.getElementById('account-modal-import-btn').style.display = isAdmin() ? 'block' : 'none';
+  // 待審核 badge（管理者 & 教練）
+  if (isAdmin() || isConsultant()) updatePendingBadge();
   if (state.startDate) {
     const today = todayISO();
     if (state.pretestDate && today === state.pretestDate) {
@@ -1542,6 +1556,40 @@ function showAppMain() {
   } else {
     document.getElementById('screen-setup').classList.add('active');
     document.getElementById('start-date').value = todayISO();
+  }
+}
+
+// ── 待審核 Badge ──────────────────────────────────────
+async function updatePendingBadge() {
+  const badge = document.getElementById('nav-account-badge');
+  if (!badge) return;
+  let count = 0;
+  try {
+    if (isAdmin()) {
+      const { data } = await sb.from('profiles')
+        .select('id', { count: 'exact' })
+        .eq('is_invited', false)
+        .is('delete_requested_at', null);
+      count = data?.length || 0;
+    } else if (isConsultant()) {
+      const { data: ccRows } = await sb.from('consultant_clients')
+        .select('client_id').eq('consultant_id', currentUser.id);
+      const ids = (ccRows || []).map(r => r.client_id);
+      if (ids.length > 0) {
+        const { data } = await sb.from('profiles')
+          .select('id')
+          .in('id', ids)
+          .eq('is_invited', false)
+          .is('delete_requested_at', null);
+        count = data?.length || 0;
+      }
+    }
+  } catch(e) { /* 靜默失敗，不影響主流程 */ }
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
   }
 }
 
@@ -1728,11 +1776,19 @@ async function renderAdminPanel() {
   const clientConsultantMap = {};
   (ccData || []).forEach(r => { clientConsultantMap[r.client_id] = r.consultant_id; });
   renderAdminBody(_adminProfiles, inviteCodes || [], clientConsultantMap, '');
+  updatePendingBadge();
 }
 
+// 管理者後台區塊開合狀態
+let _adminSections = { inviteCodes: false, pending: true, deleteReq: true, active: false };
+let _adminDeleteStepsOpen = false;
+let _adminInviteCodesData = [];
+let _adminClientConsultantMap = {};
+
 function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery) {
+  _adminInviteCodesData = inviteCodes;
+  _adminClientConsultantMap = clientConsultantMap;
   const body = document.getElementById('admin-body');
-  const roleMap = { admin:'管理者', consultant:'教練', client:'一般使用者', pending:'待審核' };
   const q = searchQuery.toLowerCase();
   const filtered = q
     ? profiles.filter(p => (p.display_name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q))
@@ -1740,54 +1796,110 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
   const pendingUsers = filtered.filter(p => (!p.is_invited || p.role === 'pending') && !p.delete_requested_at);
   const deleteRequested = filtered.filter(p => p.delete_requested_at);
   const activeUsers = filtered.filter(p => p.is_invited && p.role !== 'pending' && !p.delete_requested_at);
-  let html = `
-    <div style="margin-bottom:16px">
-      <input type="text" id="admin-search" class="auth-field-input" placeholder="🔍 搜尋姓名或 email"
-        oninput="adminSearch(this.value)" value="${searchQuery}"
-        style="font-size:var(--font-sm);padding:10px 14px"/>
+  const roleMap = { admin:'管理者', consultant:'教練', client:'一般使用者', pending:'待審核' };
+
+  let html = `<div style="margin-bottom:16px">
+    <input type="text" id="admin-search" class="auth-field-input" placeholder="🔍 搜尋姓名或 email"
+      oninput="adminSearch(this.value)" value="${searchQuery}"
+      style="font-size:var(--font-sm);padding:10px 14px"/>
+  </div>`;
+
+  // ── 邀請碼區塊（可收合）
+  const icOpen = _adminSections.inviteCodes;
+  html += `<div style="margin-bottom:4px">
+    <div onclick="adminToggleSection('inviteCodes')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${icOpen?'2px solid var(--gray-100)':'none'};margin-bottom:${icOpen?'12px':'0'}">
+      <span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">🎟️ 教練邀請碼（${inviteCodes.length} 組）</span>
+      <span style="font-size:13px;color:var(--gray-500);transform:${icOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
     </div>`;
-  // 邀請碼區塊
-  html += `<div style="margin-bottom:16px">
-    <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:8px">🎟️ 教練邀請碼</div>`;
-  if (inviteCodes.length === 0) {
-    html += `<div style="font-size:var(--font-sm);color:var(--gray-500);padding:8px 0">目前沒有任何邀請碼</div>`;
-  } else {
-    inviteCodes.forEach(ic => {
-      const expired = new Date(ic.expires_at) < new Date();
-      const name = ic.profiles?.display_name || ic.profiles?.email || '未知教練';
-      html += `<div style="background:${expired?'#fef2f2':'#f0fdf4'};border:1px solid ${expired?'#fecaca':'#bbf7d0'};border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-size:var(--font-sm);font-weight:700;color:${expired?'var(--red)':'var(--green)'};letter-spacing:2px">${ic.code}</div>
-          <div style="font-size:12px;color:var(--gray-500)">${name}・${expired?'已過期':'到期 '+ic.expires_at.slice(0,10)}</div>
-        </div>
-        <button onclick="adminDeleteInviteCode('${ic.id}')" style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:18px;padding:4px">🗑️</button>
-      </div>`;
-    });
+  if (icOpen) {
+    if (inviteCodes.length === 0) {
+      html += `<div style="font-size:var(--font-sm);color:var(--gray-500);padding:8px 0 12px">目前沒有任何邀請碼</div>`;
+    } else {
+      inviteCodes.forEach(ic => {
+        const expired = new Date(ic.expires_at) < new Date();
+        const name = ic.profiles?.display_name || ic.profiles?.email || '未知教練';
+        html += `<div style="background:${expired?'#fef2f2':'#f0fdf4'};border:1px solid ${expired?'#fecaca':'#bbf7d0'};border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:var(--font-sm);font-weight:700;color:${expired?'var(--red)':'var(--green)'};letter-spacing:2px">${ic.code}</div>
+            <div style="font-size:12px;color:var(--gray-500)">${name}・${expired?'已過期':'到期 '+ic.expires_at.slice(0,10)}</div>
+          </div>
+          <button onclick="adminDeleteInviteCode('${ic.id}')" style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:18px;padding:4px">🗑️</button>
+        </div>`;
+      });
+    }
+    html += `<div style="height:1px;background:var(--gray-100);margin:4px 0 16px"></div>`;
   }
-  html += `</div><div style="height:1px;background:var(--gray-100);margin-bottom:16px"></div>`;
+  html += `</div>`;
+
+  // ── 待審核區塊
   if (pendingUsers.length > 0) {
-    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${pendingUsers.length}</span>待審核帳號</div>`;
-    pendingUsers.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
-    html += '<div style="height:1px;background:var(--gray-100);margin:16px 0"></div>';
+    const pOpen = _adminSections.pending;
+    html += `<div style="margin-bottom:4px">
+      <div onclick="adminToggleSection('pending')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${pOpen?'2px solid var(--red-bg)':'none'};margin-bottom:${pOpen?'12px':'0'}">
+        <span style="font-size:var(--font-sm);font-weight:700;color:var(--red);flex:1">⚠️ 待審核帳號（${pendingUsers.length} 人）</span>
+        <span style="font-size:13px;color:var(--gray-500);transform:${pOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+      </div>`;
+    if (pOpen) {
+      pendingUsers.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
+      html += `<div style="height:1px;background:var(--gray-100);margin:4px 0 16px"></div>`;
+    }
+    html += `</div>`;
   }
+
+  // ── 申請刪除區塊
   if (deleteRequested.length > 0) {
-    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${deleteRequested.length}</span>申請刪除帳號</div>`;
-    html += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:12px;color:#92400e;line-height:1.7">
-      <strong>📋 處理步驟：</strong><br>
-      1. 至 Supabase Dashboard → Authentication → Users<br>
-      2. 搜尋下方使用者的 email<br>
-      3. 點擊 ⋯ → Delete user 完成刪除<br>
-      （刪除後所有資料將自動串聯清除）
-    </div>`;
-    deleteRequested.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
-    html += '<div style="height:1px;background:var(--gray-100);margin:16px 0"></div>';
+    const dOpen = _adminSections.deleteReq;
+    html += `<div style="margin-bottom:4px">
+      <div onclick="adminToggleSection('deleteReq')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${dOpen?'2px solid var(--red-bg)':'none'};margin-bottom:${dOpen?'12px':'0'}">
+        <span style="font-size:var(--font-sm);font-weight:700;color:var(--red);flex:1">🗑️ 申請刪除帳號（${deleteRequested.length} 人）</span>
+        <span style="font-size:13px;color:var(--gray-500);transform:${dOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+      </div>`;
+    if (dOpen) {
+      // 處理步驟（可收合）
+      html += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;margin-bottom:10px;overflow:hidden">
+        <div onclick="adminToggleDeleteSteps()" style="display:flex;align-items:center;padding:10px 14px;cursor:pointer;gap:8px">
+          <span style="font-size:12px;font-weight:700;color:#92400e;flex:1">📋 處理步驟</span>
+          <span style="font-size:11px;color:#92400e;transform:${_adminDeleteStepsOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+        </div>
+        ${_adminDeleteStepsOpen?`<div style="padding:0 14px 12px;font-size:12px;color:#92400e;line-height:1.8;border-top:1px solid #fecaca">
+          1. 至 Supabase Dashboard → Authentication → Users<br>
+          2. 搜尋下方使用者的 email<br>
+          3. 點擊 ⋯ → Delete user 完成刪除<br>
+          （刪除後所有資料將自動串聯清除）
+        </div>`:''}
+      </div>`;
+      deleteRequested.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
+      html += `<div style="height:1px;background:var(--gray-100);margin:4px 0 16px"></div>`;
+    }
+    html += `</div>`;
   }
-  if (activeUsers.length > 0) {
-    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">已開通帳號（${activeUsers.length} 人）</div>`;
+
+  // ── 已開通區塊
+  const aOpen = _adminSections.active;
+  html += `<div>
+    <div onclick="adminToggleSection('active')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${aOpen?'2px solid var(--gray-100)':'none'};margin-bottom:${aOpen?'12px':'0'}">
+      <span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">✅ 已開通帳號（${activeUsers.length} 人）</span>
+      <span style="font-size:13px;color:var(--gray-500);transform:${aOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+    </div>`;
+  if (aOpen) {
     activeUsers.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
   }
+  html += `</div>`;
+
   if (filtered.length === 0) html += '<div style="padding:40px 0;text-align:center;color:var(--gray-500)">找不到符合的使用者</div>';
   body.innerHTML = html;
+}
+
+function adminToggleSection(key) {
+  _adminSections[key] = !_adminSections[key];
+  const q = document.getElementById('admin-search')?.value || '';
+  renderAdminBody(_adminProfiles, _adminInviteCodesData, _adminClientConsultantMap, q);
+}
+
+function adminToggleDeleteSteps() {
+  _adminDeleteStepsOpen = !_adminDeleteStepsOpen;
+  const q = document.getElementById('admin-search')?.value || '';
+  renderAdminBody(_adminProfiles, _adminInviteCodesData, _adminClientConsultantMap, q);
 }
 
 let _adminSearchTimer = null;
@@ -1810,14 +1922,27 @@ async function adminDeleteInviteCode(id) {
 
 function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
   const isSelf = currentUser && p.id === currentUser.id;
-  const roleColors = { admin:'active-admin', consultant:'active-consultant', client:'active-client', pending:'' };
+  const roleColorMap = { admin:'active-admin', consultant:'active-consultant', client:'active-client', pending:'' };
+  const roleBgMap = { admin:'var(--purple-light)', consultant:'#d1fae5', client:'#dbeafe', pending:'var(--gray-100)' };
+  const roleTextMap = { admin:'var(--purple-dark)', consultant:'#065f46', client:'#1d4ed8', pending:'var(--gray-500)' };
+  const roleBorderMap = { admin:'var(--purple-mid)', consultant:'#6ee7b7', client:'#93c5fd', pending:'var(--gray-300)' };
+  const rc = { bg: roleBgMap[p.role]||roleBgMap.client, color: roleTextMap[p.role]||roleTextMap.client, border: roleBorderMap[p.role]||roleBorderMap.client };
+  const selfTag = isSelf ? `<span style="font-size:11px;background:var(--purple-light);color:var(--purple-dark);padding:2px 6px;border-radius:99px">我</span>` : '';
+  const deleteTag = p.delete_requested_at ? `<span style="font-size:11px;background:#fef2f2;color:var(--red);border:1px solid #fecaca;padding:2px 8px;border-radius:99px">申請刪除 ${p.delete_requested_at.slice(0,10)}</span>` : '';
+  const vipTag = p.is_vip ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--yellow-bg);color:var(--yellow);border:1px solid #fcd34d;white-space:nowrap">⭐ 進階</span>` : '';
+  const consultantName = clientConsultantMap[p.id] ? (_adminConsultants.find(c=>c.id===clientConsultantMap[p.id])?.display_name || '') : '';
+  const consultantTag = consultantName ? `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--gray-100);color:var(--gray-500);white-space:nowrap">👤 ${consultantName}</span>` : '';
+  const inviteStatus = p.is_invited
+    ? `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--green-bg);color:var(--green);white-space:nowrap">✅ 已開通</span>`
+    : `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--red-bg);color:var(--red);white-space:nowrap">🔒 待審核</span>`;
+
+  // 展開內容（操作按鈕）
   const roles = ['client','consultant','admin'];
   const roleBtns = roles.map(r =>
-    `<button class="admin-role-btn ${p.role===r?roleColors[r]:''}" onclick="adminSetRole('${p.id}','${r}',this)">${roleMap[r]||r}</button>`
+    `<button class="admin-role-btn ${p.role===r?roleColorMap[r]:''}" onclick="adminSetRole('${p.id}','${r}',this)">${roleMap[r]||r}</button>`
   ).join('');
   const inviteBtn = `<button class="admin-invite-btn ${p.is_invited?'admin-invite-on':'admin-invite-off'}" onclick="adminToggleInvite('${p.id}',${p.is_invited},this)">${p.is_invited?'✅ 已開通':'🔒 待審核'}</button>`;
   const vipBtn = `<button class="admin-vip-btn ${p.is_vip?'active-vip':''}" onclick="adminSetVip('${p.id}',${!!p.is_vip},this)">⭐ 進階${p.is_vip?' 開':'（未開通）'}</button>`;
-  // 指派教練下拉選單（只對 client 顯示）
   let assignBtn = '';
   if (p.role === 'client' || p.role === 'pending') {
     const currentConsultantId = clientConsultantMap[p.id] || '';
@@ -1825,22 +1950,40 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
       _adminConsultants.filter(c => c.id !== p.id).map(c =>
         `<option value="${c.id}" ${currentConsultantId===c.id?'selected':''}>${c.display_name||c.email}</option>`
       ).join('');
-    assignBtn = `<div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+    assignBtn = `<div style="margin-top:8px;display:flex;align-items:center;gap:8px">
       <span style="font-size:12px;color:var(--gray-500);white-space:nowrap">指派教練</span>
       <select onchange="adminAssignConsultant('${p.id}',this.value,'${currentConsultantId}')"
         style="flex:1;border:1px solid var(--gray-300);border-radius:8px;padding:6px 8px;font-size:12px;font-family:'Noto Sans TC',sans-serif">${options}</select>
     </div>`;
   }
-  const deleteTag = p.delete_requested_at
-    ? `<span style="font-size:11px;background:#fef2f2;color:var(--red);border:1px solid #fecaca;padding:2px 8px;border-radius:99px;margin-left:6px">申請刪除 ${p.delete_requested_at.slice(0,10)}</span>`
-    : '';
-  return `<div class="admin-user-card" id="admin-card-${p.id}">
-    <div class="admin-user-email">${p.display_name||'（未填姓名）'} ${isSelf?'<span style="font-size:11px;background:var(--purple-light);color:var(--purple-dark);padding:2px 6px;border-radius:99px">我</span>':''}${deleteTag}</div>
-    <div class="admin-user-meta">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
-    <div class="admin-role-row">${roleBtns}${inviteBtn}</div>
-    <div class="admin-role-row" style="margin-top:6px">${vipBtn}</div>
-    ${assignBtn}
+
+  return `<div class="admin-user-card" id="admin-card-${p.id}" style="padding:0;cursor:pointer">
+    <div onclick="adminToggleCard('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:11px 14px">
+      <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+        <span style="font-size:var(--font-sm);font-weight:700;color:#111827;white-space:nowrap">${p.display_name||'（未填姓名）'}</span>
+        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:${rc.bg};color:${rc.color};border:1px solid ${rc.border};white-space:nowrap">${roleMap[p.role]||p.role}</span>
+        ${vipTag}${consultantTag}${selfTag}${deleteTag}
+      </div>
+      ${inviteStatus}
+      <span id="admin-card-chevron-${p.id}" style="font-size:11px;color:var(--gray-300);flex-shrink:0;transform:rotate(0deg);transition:transform .2s;display:inline-block">▼</span>
+    </div>
+    <div id="admin-card-body-${p.id}" style="display:none;border-top:1px solid var(--gray-100);padding:12px 16px 14px">
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:12px">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px">角色</div>
+      <div class="admin-role-row" style="margin-bottom:10px">${roleBtns}</div>
+      <div class="admin-role-row" style="margin-bottom:8px">${inviteBtn}${vipBtn}</div>
+      ${assignBtn}
+    </div>
   </div>`;
+}
+
+function adminToggleCard(id) {
+  const body = document.getElementById(`admin-card-body-${id}`);
+  const chevron = document.getElementById(`admin-card-chevron-${id}`);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 async function adminAssignConsultant(clientId, newConsultantId, oldConsultantId) {
@@ -1920,6 +2063,10 @@ function showPrivacyPolicy() {
 }
 
 // ── 教練後台 ──────────────────────────────────────────
+let _consultantClientList = [];
+let _consultantCode = null;
+let _consultantSearchTimer = null;
+
 async function showConsultantPanel() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-consultant').classList.add('active');
@@ -1934,22 +2081,32 @@ async function renderConsultantPanel() {
   const { data: myCode } = await sb.from('invite_codes').select('*')
     .eq('consultant_id', currentUser.id)
     .order('created_at', { ascending: false }).limit(1).single();
+  _consultantCode = myCode || null;
   // 載入名下使用者：先取 client_id 清單，再查 profiles
   const { data: ccRows } = await sb.from('consultant_clients')
     .select('client_id').eq('consultant_id', currentUser.id);
   const clientIds = (ccRows || []).map(r => r.client_id);
-  let clientList = [];
+  _consultantClientList = [];
   if (clientIds.length > 0) {
     const { data: profileRows } = await sb.from('profiles')
       .select('id,display_name,email,is_invited,role,created_at,delete_requested_at')
       .in('id', clientIds);
-    clientList = profileRows || [];
+    _consultantClientList = profileRows || [];
   }
+  renderConsultantBody('');
+  updatePendingBadge();
+}
+
+let _consultantSections = { pending: true, active: false, deleteReq: false };
+
+function renderConsultantBody(searchQuery) {
+  const body = document.getElementById('consultant-body');
+  const myCode = _consultantCode;
   const codeExpired = myCode && new Date(myCode.expires_at) < new Date();
   const codeValid = myCode && !codeExpired;
-  let html = `
-    <div style="margin-bottom:20px">
-      <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">🎟️ 我的邀請碼</div>`;
+
+  let html = `<div style="margin-bottom:20px">
+    <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">🎟️ 我的邀請碼</div>`;
   if (codeValid) {
     html += `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:16px;margin-bottom:10px">
       <div style="font-size:24px;font-weight:700;letter-spacing:4px;color:var(--green);text-align:center;margin-bottom:8px">${myCode.code}</div>
@@ -1961,47 +2118,127 @@ async function renderConsultantPanel() {
     <button onclick="generateInviteCode()" style="width:100%;padding:12px;background:var(--green);color:white;border:none;border-radius:12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">✨ 產生邀請碼</button>`;
   }
   html += `</div><div style="height:1px;background:var(--gray-100);margin-bottom:16px"></div>`;
-  // 名下使用者清單（排除已申請刪除的）
-  const deleteRequested = clientList.filter(p => p.delete_requested_at);
-  const pending = clientList.filter(p => !p.is_invited && !p.delete_requested_at);
-  const active = clientList.filter(p => p.is_invited && !p.delete_requested_at);
-  const activeCount = clientList.filter(p => !p.delete_requested_at).length;
-  html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">👥 我的學員（${activeCount} 人）</div>`;
+
+  // 搜尋框
+  const totalCount = _consultantClientList.filter(p => !p.delete_requested_at).length;
+  html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:10px">👥 我的學員（${totalCount} 人）</div>`;
+  if (_consultantClientList.length > 0) {
+    html += `<div style="margin-bottom:12px">
+      <input type="text" id="consultant-search" class="auth-field-input"
+        placeholder="🔍 搜尋姓名或 email"
+        oninput="consultantSearch(this.value)"
+        value="${searchQuery}"
+        style="font-size:var(--font-sm);padding:10px 14px"/>
+    </div>`;
+  }
+
+  // 過濾
+  const q = searchQuery.toLowerCase();
+  const filtered = q
+    ? _consultantClientList.filter(p =>
+        (p.display_name||'').toLowerCase().includes(q) ||
+        (p.email||'').toLowerCase().includes(q))
+    : _consultantClientList;
+
+  const deleteRequested = filtered.filter(p => p.delete_requested_at);
+  const pending = filtered.filter(p => !p.is_invited && !p.delete_requested_at);
+  const active = filtered.filter(p => p.is_invited && !p.delete_requested_at);
+
+  // 待開通區塊
   if (pending.length > 0) {
-    html += `<div style="font-size:var(--font-sm);font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="background:var(--red);color:white;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">${pending.length}</span>待開通</div>`;
-    pending.forEach(p => { html += renderConsultantClientCard(p); });
-    html += '<div style="height:1px;background:var(--gray-100);margin:12px 0"></div>';
-  }
-  if (active.length > 0) {
-    active.forEach(p => { html += renderConsultantClientCard(p); });
-  }
-  if (deleteRequested.length > 0) {
-    html += `<div style="height:1px;background:var(--gray-100);margin:12px 0"></div>`;
-    html += `<div style="font-size:var(--font-sm);color:var(--gray-400);margin-bottom:8px">已申請刪除（${deleteRequested.length} 人）</div>`;
-    deleteRequested.forEach(p => {
-      html += `<div style="background:#f9fafb;border:1px solid var(--gray-200);border-radius:12px;padding:12px 14px;margin-bottom:8px;opacity:.6">
-        <div style="font-size:var(--font-sm);color:var(--gray-500)">${p.display_name||'（未填姓名）'}</div>
-        <div style="font-size:12px;color:var(--gray-400)">${p.email}・申請於 ${p.delete_requested_at?.slice(0,10)}</div>
+    const pOpen = _consultantSections.pending;
+    html += `<div style="margin-bottom:4px">
+      <div onclick="consultantToggleSection('pending')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${pOpen?'2px solid var(--red-bg)':'none'};margin-bottom:${pOpen?'12px':'0'}">
+        <span style="font-size:var(--font-sm);font-weight:700;color:var(--red);flex:1">⚠️ 待開通（${pending.length} 人）</span>
+        <span style="font-size:13px;color:var(--gray-500);transform:${pOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
       </div>`;
-    });
+    if (pOpen) {
+      pending.forEach(p => { html += renderConsultantClientCard(p); });
+      html += `<div style="height:1px;background:var(--gray-100);margin:4px 0 12px"></div>`;
+    }
+    html += `</div>`;
   }
-  if (clientList.length === 0) {
+
+  // 已開通區塊
+  const aOpen = _consultantSections.active;
+  html += `<div style="margin-bottom:4px">
+    <div onclick="consultantToggleSection('active')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${aOpen?'2px solid var(--gray-100)':'none'};margin-bottom:${aOpen?'12px':'0'}">
+      <span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">✅ 已開通（${active.length} 人）</span>
+      <span style="font-size:13px;color:var(--gray-500);transform:${aOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+    </div>`;
+  if (aOpen) { active.forEach(p => { html += renderConsultantClientCard(p); }); }
+  html += `</div>`;
+
+  // 已申請刪除區塊
+  if (deleteRequested.length > 0) {
+    const dOpen = _consultantSections.deleteReq;
+    html += `<div style="margin-top:8px">
+      <div onclick="consultantToggleSection('deleteReq')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${dOpen?'2px solid var(--gray-100)':'none'};margin-bottom:${dOpen?'12px':'0'}">
+        <span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-400);flex:1">🗑️ 已申請刪除（${deleteRequested.length} 人）</span>
+        <span style="font-size:13px;color:var(--gray-400);transform:${dOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+      </div>`;
+    if (dOpen) {
+      deleteRequested.forEach(p => {
+        html += `<div style="background:#f9fafb;border:1px solid var(--gray-200);border-radius:12px;padding:12px 14px;margin-bottom:8px;opacity:.6">
+          <div style="font-size:var(--font-sm);color:var(--gray-500)">${p.display_name||'（未填姓名）'}</div>
+          <div style="font-size:12px;color:var(--gray-400)">${p.email}・申請於 ${p.delete_requested_at?.slice(0,10)}</div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+  }
+
+  if (_consultantClientList.length === 0) {
     html += `<div style="padding:32px 0;text-align:center;color:var(--gray-500);font-size:var(--font-sm)">尚無學員，請分享邀請碼給學員註冊</div>`;
+  } else if (filtered.length === 0) {
+    html += `<div style="padding:24px 0;text-align:center;color:var(--gray-500);font-size:var(--font-sm)">找不到符合的學員</div>`;
   }
   body.innerHTML = html;
 }
 
+function consultantToggleSection(key) {
+  _consultantSections[key] = !_consultantSections[key];
+  const q = document.getElementById('consultant-search')?.value || '';
+  renderConsultantBody(q);
+}
+
+function consultantSearch(q) {
+  clearTimeout(_consultantSearchTimer);
+  _consultantSearchTimer = setTimeout(() => renderConsultantBody(q), 200);
+}
+
 function renderConsultantClientCard(p) {
-  return `<div class="admin-user-card">
-    <div class="admin-user-email">${p.display_name||'（未填姓名）'}</div>
-    <div class="admin-user-meta">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
-    <div class="admin-role-row" style="margin-top:8px">
-      <button class="admin-invite-btn ${p.is_invited?'admin-invite-on':'admin-invite-off'}"
-        onclick="consultantToggleInvite('${p.id}',${p.is_invited},this)">
-        ${p.is_invited?'✅ 已開通':'🔒 待開通'}
+  const isInvited = p.is_invited;
+  const vipTag = p.is_vip ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--yellow-bg);color:var(--yellow);border:1px solid #fcd34d;white-space:nowrap">⭐ 進階</span>` : '';
+  const inviteStatus = isInvited
+    ? `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--green-bg);color:var(--green);white-space:nowrap">✅ 已開通</span>`
+    : `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--red-bg);color:var(--red);white-space:nowrap">🔒 待開通</span>`;
+  return `<div class="admin-user-card" style="padding:0;cursor:pointer" id="cc-card-${p.id}">
+    <div onclick="consultantToggleCard('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:11px 14px">
+      <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+        <span style="font-size:var(--font-sm);font-weight:700;color:#111827;white-space:nowrap">${p.display_name||'（未填姓名）'}</span>
+        ${vipTag}
+      </div>
+      ${inviteStatus}
+      <span id="cc-card-chevron-${p.id}" style="font-size:11px;color:var(--gray-300);flex-shrink:0;transform:rotate(0deg);transition:transform .2s;display:inline-block">▼</span>
+    </div>
+    <div id="cc-card-body-${p.id}" style="display:none;border-top:1px solid var(--gray-100);padding:12px 16px 14px">
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:12px">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
+      <button class="admin-invite-btn ${isInvited?'admin-invite-on':'admin-invite-off'}"
+        onclick="consultantToggleInvite('${p.id}',${isInvited},this)">
+        ${isInvited?'✅ 已開通　點此關閉':'🔒 待開通　點此開通'}
       </button>
     </div>
   </div>`;
+}
+
+function consultantToggleCard(id) {
+  const body = document.getElementById(`cc-card-body-${id}`);
+  const chevron = document.getElementById(`cc-card-chevron-${id}`);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 async function generateInviteCode() {
@@ -2043,15 +2280,22 @@ async function consultantToggleInvite(userId, currentVal, btn) {
 }
 
 // ── 頁面啟動：檢查既有 session ────────────────────────
+function hideLoading() {
+  const el = document.getElementById('screen-loading');
+  if (el) el.style.display = 'none';
+}
+
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     await handleAuthSuccess(session.user);
+  } else {
+    hideLoading();
+    showAuthScreen('login');
   }
   // 監聽 auth 狀態變化（例如重設密碼後跳回）
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
-      // 顯示設定新密碼畫面
       showAuthScreen('reset-password');
     }
   });
@@ -3545,12 +3789,14 @@ function init(){
   if (hash && hash.includes('type=recovery')) {
     // 讓 Supabase 處理 hash 並建立 session，再顯示重設畫面
     sb.auth.getSession().then(({ data: { session } }) => {
+      hideLoading();
       if (session) {
         showAuthScreen('reset-password');
       } else {
         // session 尚未建立，透過 onAuthStateChange 等待
         sb.auth.onAuthStateChange((event, session) => {
           if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && hash.includes('type=recovery'))) {
+            hideLoading();
             showAuthScreen('reset-password');
           }
         });
