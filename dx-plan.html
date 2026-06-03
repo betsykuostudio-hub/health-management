@@ -1855,28 +1855,61 @@ async function adminAssignConsultant(clientId, newConsultantId, oldConsultantId)
       consultant_id: newConsultantId, client_id: clientId
     });
   }
-  renderAdminPanel();
+  // 局部更新：只更新 select 的 onchange，讓下次操作帶入新的 oldConsultantId
+  const sel = document.querySelector(`#admin-card-${clientId} select`);
+  if (sel) {
+    sel.setAttribute('onchange',
+      `adminAssignConsultant('${clientId}',this.value,'${newConsultantId}')`);
+  }
 }
 
 async function adminSetRole(userId, role, btn) {
   btn.disabled = true;
   const { error } = await sb.from('profiles').update({ role }).eq('id', userId);
-  if (!error) { renderAdminPanel(); }
-  else { btn.disabled = false; alert('更新失敗：' + error.message); }
+  if (!error) {
+    // 局部更新：只更新同一張卡片的角色按鈕樣式
+    const card = btn.closest('.admin-user-card');
+    const roleColors = { admin:'active-admin', consultant:'active-consultant', client:'active-client' };
+    card.querySelectorAll('.admin-role-btn').forEach(b => {
+      const m = b.getAttribute('onclick').match(/'([^']+)',this\)/);
+      const r = m ? m[1] : null;
+      b.className = `admin-role-btn ${r === role ? (roleColors[r] || '') : ''}`;
+    });
+    btn.disabled = false;
+  } else {
+    btn.disabled = false;
+    alert('更新失敗：' + error.message);
+  }
 }
 
 async function adminSetVip(userId, currentVal, btn) {
   btn.disabled = true;
   const { error } = await sb.from('profiles').update({ is_vip: !currentVal }).eq('id', userId);
-  if (!error) { renderAdminPanel(); }
-  else { btn.disabled = false; alert('更新失敗：' + error.message); }
+  if (!error) {
+    const newVal = !currentVal;
+    btn.textContent = `⭐ 進階${newVal ? ' 開' : '（未開通）'}`;
+    btn.className = `admin-vip-btn ${newVal ? 'active-vip' : ''}`;
+    btn.onclick = () => adminSetVip(userId, newVal, btn);
+    btn.disabled = false;
+  } else {
+    btn.disabled = false;
+    alert('更新失敗：' + error.message);
+  }
 }
 
 async function adminToggleInvite(userId, currentVal, btn) {
   btn.disabled = true;
   const { error } = await sb.from('profiles').update({ is_invited: !currentVal }).eq('id', userId);
-  if (!error) { renderAdminPanel(); }
-  else { btn.disabled = false; alert('更新失敗：' + error.message); }
+  if (!error) {
+    const newVal = !currentVal;
+    btn.textContent = newVal ? '✅ 已開通' : '🔒 待審核';
+    btn.className = `admin-invite-btn ${newVal ? 'admin-invite-on' : 'admin-invite-off'}`;
+    btn.onclick = () => adminToggleInvite(userId, newVal, btn);
+    btn.disabled = false;
+  } else {
+    btn.disabled = false;
+    alert('更新失敗：' + error.message);
+  }
 }
 
 // ── 隱私說明頁 ────────────────────────────────────────
@@ -1993,9 +2026,20 @@ async function regenerateInviteCode() {
 
 async function consultantToggleInvite(userId, currentVal, btn) {
   btn.disabled = true;
-  const { error } = await sb.from('profiles').update({ is_invited: !currentVal }).eq('id', userId);
-  if (!error) { renderConsultantPanel(); }
-  else { btn.disabled = false; alert('更新失敗：' + error.message); }
+  const { error } = await sb.rpc('toggle_client_invite', {
+    client_uuid: userId,
+    new_value: !currentVal
+  });
+  if (!error) {
+    const newVal = !currentVal;
+    btn.textContent = newVal ? '✅ 已開通' : '🔒 待開通';
+    btn.className = `admin-invite-btn ${newVal ? 'admin-invite-on' : 'admin-invite-off'}`;
+    btn.onclick = () => consultantToggleInvite(userId, newVal, btn);
+    btn.disabled = false;
+  } else {
+    btn.disabled = false;
+    alert('開通失敗：' + error.message);
+  }
 }
 
 // ── 頁面啟動：檢查既有 session ────────────────────────
