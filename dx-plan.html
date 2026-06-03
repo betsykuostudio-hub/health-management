@@ -1524,6 +1524,8 @@ async function handleAuthSuccess(user) {
     return;
   }
   currentProfile = profile;
+  // 背景更新最近開啟時間（不 await，不阻塞主流程）
+  sb.from('profiles').update({ last_seen_at: new Date().toISOString() }).eq('id', user.id);
   await loadStateFromSupabase();
   hideLoading();
   showAppMain();
@@ -1557,6 +1559,22 @@ function showAppMain() {
     document.getElementById('screen-setup').classList.add('active');
     document.getElementById('start-date').value = todayISO();
   }
+}
+
+// ── 最近開啟時間格式化 ────────────────────────────────
+function formatLastSeen(iso) {
+  if (!iso) return '尚未記錄';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffMins < 1) return '剛剛';
+  if (diffMins < 60) return `${diffMins} 分鐘前`;
+  if (diffHours < 24) return `${diffHours} 小時前`;
+  if (diffDays < 7) return `${diffDays} 天前`;
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
 }
 
 // ── 待審核 Badge ──────────────────────────────────────
@@ -1968,7 +1986,8 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
       <span id="admin-card-chevron-${p.id}" style="font-size:11px;color:var(--gray-300);flex-shrink:0;transform:rotate(0deg);transition:transform .2s;display:inline-block">▼</span>
     </div>
     <div id="admin-card-body-${p.id}" style="display:none;border-top:1px solid var(--gray-100);padding:12px 16px 14px">
-      <div style="font-size:13px;color:var(--gray-500);margin-bottom:12px">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:2px">${p.email}・${p.created_at?p.created_at.slice(0,10):''} 加入</div>
+      <div style="font-size:12px;color:var(--gray-300);margin-bottom:12px">最近開啟：<span style="color:var(--gray-500)">${formatLastSeen(p.last_seen_at)}</span></div>
       ${p.delete_requested_at ? `
       <button onclick="adminRestoreAccount('${p.id}',this)" style="width:100%;padding:9px;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0;border-radius:12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-bottom:10px">↩️ 復原帳號</button>
       ` : `
@@ -2244,7 +2263,8 @@ function renderConsultantClientCard(p) {
       <span id="cc-card-chevron-${p.id}" style="font-size:11px;color:var(--gray-300);flex-shrink:0;transform:rotate(0deg);transition:transform .2s;display:inline-block">▼</span>
     </div>
     <div id="cc-card-body-${p.id}" style="display:none;border-top:1px solid var(--gray-100);padding:12px 16px 14px">
-      <div style="font-size:13px;color:var(--gray-500);margin-bottom:12px">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:2px">${p.email}・${p.created_at?p.created_at.slice(0,10):''} 加入</div>
+      <div style="font-size:12px;color:var(--gray-300);margin-bottom:12px">最近開啟：<span style="color:var(--gray-500)">${formatLastSeen(p.last_seen_at)}</span></div>
       <button class="admin-invite-btn ${isInvited?'admin-invite-on':'admin-invite-off'}"
         onclick="consultantToggleInvite('${p.id}',${isInvited},this)">
         ${isInvited?'✅ 已開通　點此關閉':'🔒 待開通　點此開通'}
