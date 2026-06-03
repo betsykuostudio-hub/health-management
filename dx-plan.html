@@ -1524,8 +1524,10 @@ async function handleAuthSuccess(user) {
     return;
   }
   currentProfile = profile;
-  // 背景更新最近開啟時間（不 await，不阻塞主流程）
-  sb.from('profiles').update({ last_seen_at: new Date().toISOString() }).eq('id', user.id);
+  // 背景更新最近開啟時間（不阻塞主流程，用 RPC 繞過 RLS）
+  sb.rpc('update_last_seen').then(({ error }) => {
+    if (error) console.warn('last_seen_at 寫入失敗:', error.message);
+  });
   await loadStateFromSupabase();
   hideLoading();
   showAppMain();
