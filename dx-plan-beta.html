@@ -18,17 +18,17 @@
   --font-xs:13px;--font-sm:15px;--font-md:16px;--font-lg:18px;--font-xl:20px;--font-2xl:24px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;color:var(--gray-700);font-size:var(--font-md)}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;color:var(--gray-700);font-size:var(--font-md);padding-bottom:80px}
 .screen{display:none;min-height:100vh}.screen.active{display:block}
 .header{background:#2e4a2e;color:white;padding:16px 20px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
 .header-title{font-size:var(--font-lg);font-weight:700;flex:1}
 .back-btn{background:rgba(255,255,255,.2);border:none;color:white;height:36px;border-radius:10px;font-size:var(--font-md);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 12px;white-space:nowrap;gap:4px}
-.setup-hero{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,var(--purple-mid) 100%);color:white;padding:36px 24px 28px;text-align:center}
+.setup-hero{background:linear-gradient(135deg,#1e3d1a 0%,#2e4a2e 60%,#4a7a4a 100%);color:white;padding:36px 24px 28px;text-align:center}
 .setup-hero .emoji{font-size:52px;margin-bottom:12px}
 .setup-hero h1{font-size:28px;font-weight:900;margin-bottom:6px}
 .setup-hero p{font-size:var(--font-sm);opacity:.8;line-height:1.6}
 .setup-body{padding:24px 20px 100px}
-.section-title{font-size:var(--font-sm);font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;margin-top:24px}
+.section-title{font-size:var(--font-sm);font-weight:700;color:#2e4a2e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;margin-top:24px}
 .field-group{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
 .field-row{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--gray-100);gap:12px}
 .field-row:last-child{border-bottom:none}
@@ -39,9 +39,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh
 input[type=date].field-input{width:145px;overflow:hidden}
 .notice-box{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:var(--font-sm);color:#9a3412;line-height:1.7}
 .notice-box strong{display:block;margin-bottom:4px}
-.big-btn{width:100%;background:var(--purple);color:white;border:none;border-radius:16px;padding:18px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s,transform .1s}
-.big-btn:active{transform:scale(.97);background:var(--purple-dark)}
-.cal-summary{background:var(--purple);color:white;padding:16px 20px;display:flex;gap:16px}
+.big-btn{width:100%;background:#2e4a2e;color:white;border:none;border-radius:16px;padding:18px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s,transform .1s}
+.big-btn:active{transform:scale(.97);background:#1e3d1a}
+.cal-summary{background:#2e4a2e;color:white;padding:16px 20px;display:flex;gap:16px}
 .cal-stat{flex:1;text-align:center}
 .cal-stat-num{font-size:var(--font-2xl);font-weight:900}
 .cal-stat-label{font-size:var(--font-xs);opacity:.75;margin-top:2px}
@@ -96,23 +96,23 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .stats-body{padding:16px 16px 100px}
 .stat-card{background:white;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .stat-card-title{font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:14px}
-.big-stat{font-size:44px;font-weight:900;color:var(--purple-dark)}
+.big-stat{font-size:44px;font-weight:900;color:#2e4a2e}
 .big-stat-unit{font-size:var(--font-lg);font-weight:500;color:var(--gray-500);margin-left:4px}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .bar-label{font-size:var(--font-sm);color:var(--gray-500);width:60px;flex-shrink:0;text-align:right}
 .bar-track{flex:1;height:10px;background:var(--gray-100);border-radius:99px;overflow:hidden}
-.bar-fill{height:100%;border-radius:99px;background:var(--purple);transition:width .4s}
-.bar-val{font-size:var(--font-sm);font-weight:700;color:var(--purple-dark);width:36px}
+.bar-fill{height:100%;border-radius:99px;background:#2e4a2e;transition:width .4s}
+.bar-val{font-size:var(--font-sm);font-weight:700;color:#2e4a2e;width:36px}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .week-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
-.week-cell.done{background:var(--green);color:white}
+.week-cell.done{background:#2e4a2e;color:white}
 .week-cell.partial{background:var(--yellow-bg);color:var(--yellow)}
 .week-cell.missed{background:var(--gray-100);color:var(--gray-300)}
 .week-cell.missed-past{background:var(--red-bg);color:var(--red)}
-.week-cell.future{background:var(--purple-light);color:var(--purple-mid)}
+.week-cell.future{background:#eef5ed;color:#a5c4a5}
 .supply-body{padding:16px 16px 100px}
 .supply-warning{background:var(--red-bg);border:1px solid #fecaca;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:var(--font-sm);color:var(--red);line-height:1.7}
-.supply-total-card{background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center}
+.supply-total-card{background:linear-gradient(135deg,#1e3d1a,#2e4a2e);color:white;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center}
 .supply-total-label{font-size:var(--font-sm);opacity:.8;margin-bottom:4px}
 .supply-total-num{font-size:38px;font-weight:900}
 .supply-total-sub{font-size:var(--font-xs);opacity:.7;margin-top:4px}
@@ -152,7 +152,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .supply-modal-qty{color:var(--gray-500);font-size:var(--font-xs);white-space:nowrap}
 .supply-modal-price{font-weight:700;color:var(--purple-dark);white-space:nowrap;font-size:var(--font-sm)}
 .add-stock-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-.add-stock-btn{background:var(--purple);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap}
+.add-stock-btn{background:#2e4a2e;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap}
 .add-note-input{flex:1;min-width:80px;border:1.5px solid var(--purple-light);border-radius:8px;padding:6px 8px;font-size:var(--font-sm);outline:none;font-family:'Noto Sans TC',sans-serif}
 .optional-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:var(--font-sm);color:var(--gray-700)}
 .optional-toggle input{width:18px;height:18px;accent-color:var(--purple)}
@@ -163,10 +163,10 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .note-card strong{font-weight:700;color:#111827}
 .note-ul{margin:6px 0 0 4px;display:flex;flex-direction:column;gap:4px;list-style:none}
 .note-ul li{display:flex;gap:8px;align-items:flex-start;font-size:var(--font-md)}
-.note-ul li::before{content:"•";color:var(--purple);font-weight:700;flex-shrink:0}
+.note-ul li::before{content:"•";color:#c8922a;font-weight:700;flex-shrink:0}
 .warning-card{background:var(--red-bg);border:1px solid #fecaca;border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:var(--font-sm);color:var(--red);line-height:1.7}
 .task-card{background:white;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start}
-.task-num{width:30px;height:30px;border-radius:50%;background:var(--purple);color:white;display:flex;align-items:center;justify-content:center;font-size:var(--font-md);font-weight:900;flex-shrink:0;margin-top:1px}
+.task-num{width:30px;height:30px;border-radius:50%;background:#2e4a2e;color:white;display:flex;align-items:center;justify-content:center;font-size:var(--font-md);font-weight:900;flex-shrink:0;margin-top:1px}
 .task-content{flex:1;font-size:var(--font-md);line-height:1.75;color:var(--gray-700)}
 .task-content strong{font-weight:700;color:#111827;display:block;margin-bottom:4px}
 .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -298,14 +298,14 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .blog-field-label{font-size:11px;font-weight:700;color:var(--gray-500)}
 .blog-field-input{border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);text-align:center;width:100%;min-width:0;box-sizing:border-box}
 .blog-field-input:focus{border-color:var(--purple);background:white}
-.blog-save-btn{width:100%;background:var(--purple);color:white;border:none;border-radius:12px;padding:13px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.blog-save-btn{width:100%;background:#2e4a2e;color:white;border:none;border-radius:12px;padding:13px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
 .blog-chart-card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .blog-chart-title{font-size:var(--font-sm);font-weight:700;color:#111827;margin-bottom:4px}
 .blog-chart-wrap{overflow-x:auto;padding-bottom:4px}
 .blog-chart-svg{display:block}
 .blog-metric-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .blog-metric-tab{padding:5px 12px;border-radius:20px;border:1.5px solid var(--purple-light);background:white;font-size:var(--font-sm);font-weight:600;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
-.blog-metric-tab.active{background:var(--purple);border-color:var(--purple);color:white}
+.blog-metric-tab.active{background:#2e4a2e;border-color:#2e4a2e;color:white}
 .blog-log-card{background:white;border-radius:14px;padding:0;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
 .blog-log-header{display:flex;align-items:center;padding:12px 14px;gap:10px;border-bottom:1px solid var(--gray-100)}
 .blog-log-date{font-size:var(--font-sm);font-weight:700;color:var(--purple-dark);background:var(--purple-light);padding:3px 10px;border-radius:20px;flex-shrink:0}
@@ -339,7 +339,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .history-plan-body.open{display:block}
 .history-tab-row{display:flex;border-bottom:1px solid var(--gray-100)}
 .history-tab-btn{flex:1;padding:10px;border:none;background:transparent;font-size:var(--font-sm);font-weight:600;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;border-bottom:2px solid transparent;transition:all .15s}
-.history-tab-btn.active{color:var(--purple);border-bottom-color:var(--purple)}
+.history-tab-btn.active{color:#2e4a2e;border-bottom-color:#c8922a}
 .history-panel{display:none;padding:16px}
 .history-panel.active{display:block}
 .history-stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:var(--font-sm)}
@@ -689,23 +689,52 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 <!-- DAY -->
 <div id="screen-day" class="screen">
-  <div class="day-hero" id="day-hero">
-    <div class="day-hero-row">
-      <div>
-        <div class="day-badge" id="day-badge"></div>
-        <div class="day-title" id="day-title"></div>
-        <div class="day-date" id="day-date"></div>
+  <div id="day-hero" style="background:linear-gradient(135deg,#1a2e1a,#2e4a2e);position:sticky;top:0;z-index:100">
+    <div style="padding:14px 16px 12px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-size:9px;color:#a5c4a5;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px">DX 45-Day Plan</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#f0f7f0;line-height:1.15">健康管理計畫</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div id="day-num-box" style="display:none;text-align:center;background:rgba(255,255,255,.1);border:0.5px solid rgba(165,196,165,.25);border-radius:6px;padding:5px 10px">
+            <div id="day-num-display" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1">1</div>
+            <div style="font-size:9px;color:#a5c4a5;margin-top:1px;letter-spacing:.04em">DAY</div>
+          </div>
+          <button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號">👤</button>
+        </div>
       </div>
-      <div class="progress-ring-wrap">
-        <svg width="60" height="60" viewBox="0 0 60 60">
-          <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="5"/>
-          <circle id="progress-circle" cx="30" cy="30" r="24" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="150.8" transform="rotate(-90 30 30)" style="transition:stroke-dashoffset .4s"/>
-        </svg>
-        <div class="progress-ring-label" id="progress-label">0/0</div>
+      <div id="day-type-row" style="display:none;align-items:center;justify-content:space-between;margin-bottom:9px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:3px;height:17px;background:#c8922a;border-radius:2px;flex-shrink:0"></div>
+          <span id="day-type-chip" style="font-size:15px;font-weight:700;color:#fde68a"></span>
+        </div>
+        <span id="day-date-chip" style="font-size:12px;color:#f5d898;font-weight:500"></span>
+      </div>
+      <div id="day-prog-row" style="display:none;align-items:center;gap:8px">
+        <div style="flex:1;height:3px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden">
+          <div id="new-prog-fill" style="height:100%;background:#c8922a;border-radius:99px;width:0%;transition:width .4s"></div>
+        </div>
+        <span id="new-prog-label" style="font-size:9px;color:#a5c4a5;white-space:nowrap">0 / 45 天</span>
       </div>
     </div>
-    <button class="back-btn" style="margin-top:10px" onclick="goToCalendar()">← 返回日曆</button>
+    <div id="day-kpi-row" style="display:none;align-items:center;justify-content:space-between;padding:10px 16px;background:#f7f2eb;border-bottom:0.5px solid #ddd6cc">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span id="day-kpi-done" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#2e4a2e;line-height:1">0</span>
+          <span id="day-kpi-total" style="font-size:13px;color:#9a8a72">/ 0 時間點</span>
+        </div>
+        <div style="font-size:10px;color:#9a8a72;margin-top:2px">今日完成</div>
+      </div>
+      <button id="day-checkall-btn" onclick="checkAllToday()" style="display:flex;align-items:center;gap:5px;background:#2e4a2e;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;color:#f0f7f0;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:44px">✓ 一鍵全勾</button>
+    </div>
+    <div style="display:none">
+      <div id="day-badge"></div><div id="day-title"></div><div id="day-date"></div>
+      <svg width="1" height="1"><circle id="progress-circle" stroke-dasharray="150.8" stroke-dashoffset="150.8"/></svg>
+      <div id="progress-label"></div>
+    </div>
   </div>
+  <div id="day-film" style="display:flex;gap:2px;padding:8px 16px;background:#faf8f5;border-bottom:0.5px solid #e8e0d4"></div>
   <div id="test-day-notice" style="display:none;margin:16px;background:white;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
     <div style="font-size:20px;font-weight:900;margin-bottom:10px" id="test-day-title"></div>
     <div id="test-day-checklist"></div>
@@ -1033,7 +1062,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
       <div class="warning-card">本菜單純屬建議量，可依個人需求酌量調整</div>
     </div>
   </div>
-</div>
+  </div>
   </div>
 </div>
 
@@ -2698,11 +2727,49 @@ function openDay(dayIdx){
   if(isNaN(dayIdx)||dayIdx<0||dayIdx>=45){console.warn('openDay: invalid dayIdx',dayIdx);showCalendar();return;}
   currentDayIdx=dayIdx;const ti=TYPE_INFO[DAY_TYPES[dayIdx]];
   if(!ti){console.warn('openDay: unknown type for dayIdx',dayIdx);showCalendar();return;}
-  document.getElementById('day-hero').style.background=`linear-gradient(135deg,#1e293b,${ti.heroBg})`;
+  // Hero Header 背景
+  document.getElementById('day-hero').style.background=`linear-gradient(135deg,#1a2e1a,${ti.heroBg})`;
+  // 舊版欄位（保留供 openTestDay 使用）
   document.getElementById('day-badge').innerHTML=`${ti.emoji} ${ti.label}`;
   document.getElementById('day-title').textContent=`第 ${dayIdx+1} 天`;
   document.getElementById('day-date').textContent=formatDateLabel(addDays(state.startDate,dayIdx));
+  // 新版 Hero Header 欄位
+  const numBox=document.getElementById('day-num-box');
+  const numDisp=document.getElementById('day-num-display');
+  const typeRow=document.getElementById('day-type-row');
+  const typeChip=document.getElementById('day-type-chip');
+  const dateChip=document.getElementById('day-date-chip');
+  const progRow=document.getElementById('day-prog-row');
+  const progFill=document.getElementById('new-prog-fill');
+  const progLabel=document.getElementById('new-prog-label');
+  const kpiRow=document.getElementById('day-kpi-row');
+  if(numBox) numBox.style.display='block';
+  if(numDisp) numDisp.textContent=dayIdx+1;
+  if(typeRow) typeRow.style.display='flex';
+  if(typeChip) typeChip.textContent=ti.emoji+' '+ti.label;
+  if(dateChip){
+    const iso=addDays(state.startDate,dayIdx);
+    const d=new Date(iso+'T00:00:00');
+    const wk='日一二三四五六'[d.getDay()];
+    dateChip.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+wk+'）';
+  }
+  if(progRow) progRow.style.display='flex';
+  const planPct=Math.min(100,Math.round(((dayIdx+1)/45)*100));
+  if(progFill) progFill.style.width=planPct+'%';
+  if(progLabel) progLabel.textContent=(dayIdx+1)+' / 45 天';
+  if(kpiRow) kpiRow.style.display='flex';
+  // 45天進度條
+  const today=todayISO();
+  const filmEl=document.getElementById('day-film');
+  if(filmEl && state.startDate){
+    filmEl.innerHTML=Array.from({length:45},(_,i)=>{
+      const iso=addDays(state.startDate,i);
+      const cls=iso===today?'background:#c8922a':iso<today?'background:#2e4a2e':'background:#e0d8ce';
+      return`<div style="flex:1;height:5px;border-radius:2px;min-width:0;${cls}"></div>`;
+    }).join('');
+  }
   document.getElementById('test-day-notice').style.display='none';
+  document.getElementById('nav-bar').style.display='flex';
   renderChecklist(dayIdx);showScreen('screen-day',null);
 }
 
@@ -2711,12 +2778,15 @@ function renderChecklist(dayIdx){
   const checks=state.checks||{},amounts=state.amounts||{};
   let done=0;schedule.forEach((_,bi)=>{if(checks[`day${dayIdx}b${bi}`])done++;});
   updateProgress(done,schedule.length);
+  // 更新新版 KPI
+  const kpiDone=document.getElementById('day-kpi-done');
+  const kpiTotal=document.getElementById('day-kpi-total');
+  const allBtn=document.getElementById('day-checkall-btn');
   const allDone=done===schedule.length&&schedule.length>0;
-  let html=`<div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-    <button onclick="checkAll(${dayIdx},${allDone})" style="background:${allDone?'var(--gray-100)':'var(--green)'};color:${allDone?'var(--gray-500)':'white'};border:none;border-radius:10px;padding:8px 16px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
-      ${allDone?'取消全勾':'✓ 一鍵全勾'}
-    </button>
-  </div>`;
+  if(kpiDone) kpiDone.textContent=done;
+  if(kpiTotal) kpiTotal.textContent='/ '+schedule.length+' 時間點';
+  if(allBtn) allBtn.textContent=allDone?'取消全勾':'✓ 一鍵全勾';
+  let html='';
   schedule.forEach((block,bi)=>{
     const bKey=`day${dayIdx}b${bi}`,isChecked=!!checks[bKey];
     if(isChecked){
@@ -2756,6 +2826,12 @@ function toggleBlock(dayIdx,bi){
   saveState();renderChecklist(dayIdx);
 }
 
+function checkAllToday(){
+  if(currentDayIdx===null)return;
+  const schedule=buildSchedule(currentDayIdx,state.doses||{},state.useSlim,state.useProbio);
+  const allDone=schedule.every((_,bi)=>!!(state.checks||{})[`day${currentDayIdx}b${bi}`]);
+  checkAll(currentDayIdx,allDone);
+}
 function checkAll(dayIdx,allDone){
   const schedule=buildSchedule(dayIdx,state.doses||{},state.useSlim,state.useProbio);
   schedule.forEach((_,bi)=>{
