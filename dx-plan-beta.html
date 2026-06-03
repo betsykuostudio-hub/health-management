@@ -18,7 +18,7 @@
   --font-xs:13px;--font-sm:15px;--font-md:16px;--font-lg:18px;--font-xl:20px;--font-2xl:24px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;color:var(--gray-700);font-size:var(--font-md)}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;color:var(--gray-700);font-size:var(--font-md);padding-bottom:72px}
 .screen{display:none;min-height:100vh}.screen.active{display:block}
 .header{background:var(--purple);color:white;padding:16px 20px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
 .header-title{font-size:var(--font-lg);font-weight:700;flex:1}
@@ -278,7 +278,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .admin-invite-btn{padding:7px 14px;border-radius:20px;border:none;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
 .admin-invite-on{background:var(--green-bg);color:var(--green)}
 .admin-invite-off{background:var(--red-bg);color:var(--red)}
-#nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#f5efe7;border-top:0.5px solid #ddd6cc;display:flex;padding:4px 0 max(4px,env(safe-area-inset-bottom));z-index:200}
+#nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#f5efe7;border-top:0.5px solid #ddd6cc;display:flex;padding:4px 0 max(4px,env(safe-area-inset-bottom));z-index:9999}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;padding:8px 2px 7px;position:relative;border-right:0.5px solid #ddd6cc}
 .nav-btn:last-child{border-right:none}
 .nav-btn.active{background:#faf8f5}
@@ -375,11 +375,11 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .delete-confirm-desc{font-size:var(--font-sm);color:var(--gray-500);line-height:1.6;margin-bottom:16px}
 
 /* ── 新版視覺系統 CSS ─────────────────────────── */
-.new-header{background:#2e4a2e;padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.new-header{background:#2e4a2e;padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;-webkit-transform:translateZ(0);transform:translateZ(0)}
 .new-header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#f0f7f0;flex:1}
-.new-acct-btn{background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0;color:#a5c4a5;font-size:18px}
+.new-acct-btn{background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:50%;width:44px;height:44px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0;color:#a5c4a5;font-size:18px;-webkit-tap-highlight-color:rgba(255,255,255,.2)}
 #new-acct-badge{display:none;position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #2e4a2e}
-.new-hero{background:#2e4a2e;padding:14px 16px 12px;position:sticky;top:0;z-index:100}
+.new-hero{background:#2e4a2e;padding:14px 16px 12px;position:sticky;top:0;z-index:100;-webkit-transform:translateZ(0);transform:translateZ(0)}
 .new-hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
 .new-hero-left{}
 .new-hero-eyebrow{font-size:9px;color:#a5c4a5;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
@@ -1258,7 +1258,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 </div>
 
 <!-- NAV -->
-<div id="nav-bar" style="display:none">
+<div id="nav-bar" style="display:flex">
   <button class="nav-btn" id="nav-today" onclick="goToToday()"><div class="nav-icon">✅</div><div class="nav-label">今日</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-calendar" onclick="showCalendar()"><div class="nav-icon">📅</div><div class="nav-label">行程</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-records" onclick="showRecords()"><div class="nav-icon">📊</div><div class="nav-label">紀錄</div><div class="nav-indicator"></div></button>
@@ -1734,7 +1734,10 @@ async function updatePendingBadge() {
 
 // ── 帳號選單 ──────────────────────────────────────────
 function showAccountMenu() {
-  if (!currentProfile) return;
+  if (!currentProfile) {
+    document.getElementById('account-modal').style.display = 'flex';
+    return;
+  }
   document.getElementById('account-modal-name-display').textContent = currentProfile.display_name || '（未設定姓名）';
   document.getElementById('account-modal-email').textContent = currentProfile.email;
   document.getElementById('account-modal-role').textContent = getRoleLabel();
