@@ -1427,7 +1427,7 @@ async function confirmDeleteAccount() {
     await sb.auth.signOut();
     _encryptionKey = null;
     closeDeleteAccount();
-    alert('申請已送出，帳號已停用。管理者將盡快處理您的資料刪除請求。');
+    showToast('申請已送出，帳號已停用');
     location.reload();
   } catch(e) {
     msgEl.textContent = '操作失敗，請稍後再試';
@@ -1969,12 +1969,33 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
     </div>
     <div id="admin-card-body-${p.id}" style="display:none;border-top:1px solid var(--gray-100);padding:12px 16px 14px">
       <div style="font-size:13px;color:var(--gray-500);margin-bottom:12px">${p.email}・${p.created_at?p.created_at.slice(0,10):''}</div>
+      ${p.delete_requested_at ? `
+      <button onclick="adminRestoreAccount('${p.id}',this)" style="width:100%;padding:9px;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0;border-radius:12px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-bottom:10px">↩️ 復原帳號</button>
+      ` : `
       <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px">角色</div>
       <div class="admin-role-row" style="margin-bottom:10px">${roleBtns}</div>
       <div class="admin-role-row" style="margin-bottom:8px">${inviteBtn}${vipBtn}</div>
       ${assignBtn}
+      `}
     </div>
   </div>`;
+}
+
+async function adminRestoreAccount(userId, btn) {
+  if (!confirm('確認復原此帳號？帳號將恢復為已開通狀態。')) return;
+  btn.disabled = true;
+  btn.textContent = '復原中...';
+  const { error } = await sb.from('profiles').update({
+    delete_requested_at: null,
+    is_invited: true
+  }).eq('id', userId);
+  if (!error) {
+    renderAdminPanel();
+  } else {
+    btn.disabled = false;
+    btn.textContent = '↩️ 復原帳號';
+    alert('復原失敗：' + error.message);
+  }
 }
 
 function adminToggleCard(id) {
@@ -2467,7 +2488,7 @@ function showNewPlanSetup(){
 
 function startPlan(){
   const sd=document.getElementById('start-date').value;
-  if(!sd){alert('請先設定第 1 天（準備日）的日期');return;}
+  if(!sd){showToast('請先設定第 1 天（準備日）的日期');return;}
   state.startDate=sd;
   state.pretestDate=document.getElementById('pretest-date').value||null;
   state.posttestDate=document.getElementById('posttest-date').value||null;
@@ -2517,7 +2538,7 @@ function goToToday(){
   if(state.pretestDate&&today===state.pretestDate){openTestDay('pre');document.getElementById('nav-today').classList.add('active');return;}
   if(state.posttestDate&&today===state.posttestDate){openTestDay('post');document.getElementById('nav-today').classList.add('active');return;}
   const dayIdx=daysBetween(state.startDate,today);
-  if(dayIdx<0||dayIdx>=45){alert('今天不在計畫範圍內');showCalendar();return;}
+  if(dayIdx<0||dayIdx>=45){showToast('今天不在計畫範圍內');showCalendar();return;}
   openDay(dayIdx);document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('nav-today').classList.add('active');
 }
 
@@ -2889,7 +2910,7 @@ function toggleSupplyCard(pid){
   if(chev)chev.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
 }
 
-function addStockLog(pid){const dateEl=document.getElementById('add-date-'+pid),pkgsEl=document.getElementById('add-pkgs-'+pid),noteEl=document.getElementById('add-note-'+pid),pkgs=parseFloat(pkgsEl.value);if(!pkgs||isNaN(pkgs)||pkgs<=0){alert('請填入罐/盒數');return;}const p=PRODUCTS.find(x=>x.id===pid),units=Math.round(pkgs*p.pkgQty*10)/10,date=dateEl&&dateEl.value?dateEl.value:todayISO();if(!state.stockLogs)state.stockLogs={};if(!state.stockLogs[pid])state.stockLogs[pid]=[];state.stockLogs[pid].push({date,pkgs,units,note:noteEl.value||''});saveState();renderSupply();}
+function addStockLog(pid){const dateEl=document.getElementById('add-date-'+pid),pkgsEl=document.getElementById('add-pkgs-'+pid),noteEl=document.getElementById('add-note-'+pid),pkgs=parseFloat(pkgsEl.value);if(!pkgs||isNaN(pkgs)||pkgs<=0){showToast('請填入罐/盒數');return;}const p=PRODUCTS.find(x=>x.id===pid),units=Math.round(pkgs*p.pkgQty*10)/10,date=dateEl&&dateEl.value?dateEl.value:todayISO();if(!state.stockLogs)state.stockLogs={};if(!state.stockLogs[pid])state.stockLogs[pid]=[];state.stockLogs[pid].push({date,pkgs,units,note:noteEl.value||''});saveState();renderSupply();}
 function removeLog(pid,idx){if(!state.stockLogs||!state.stockLogs[pid])return;state.stockLogs[pid].splice(idx,1);saveState();renderSupply();}
 function toggleOptional(id,val){if(!state.optionalItems)state.optionalItems={};state.optionalItems[id]=val;saveState();renderSupply();}
 function toggleMenu(el){const body=el.nextElementSibling,toggle=el.querySelector('.full-menu-toggle'),isOpen=body.classList.contains('open');body.classList.toggle('open');toggle.textContent=isOpen?'展開 ▼':'收合 ▲';}
@@ -3515,14 +3536,14 @@ function renderBodyLog(){
 
 function saveBodyLog(){
   const date=document.getElementById('blog-date').value;
-  if(!date){alert('請選擇量測日期');return;}
+  if(!date){showToast('請選擇量測日期');return;}
   const entry={date};
   let hasVal=false;
   BLOG_FIELDS.forEach(f=>{
     const el=document.getElementById('blog-input-'+f.id);
     if(el&&el.value!==''){entry[f.id]=parseFloat(el.value);hasVal=true;}
   });
-  if(!hasVal){alert('請至少填入一項數值');return;}
+  if(!hasVal){showToast('請至少填入一項數值');return;}
   const logs=state.bodyLogs||[];
   // 同日期更新（合併）
   const existIdx=logs.findIndex(l=>l.date===date);
@@ -3808,6 +3829,24 @@ function init(){
   initAuth();
 }
 init();
+</script>
+
+<!-- Toast 提示 -->
+<div id="app-toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,30,30,.92);color:white;padding:10px 20px;border-radius:99px;font-size:14px;font-weight:600;white-space:nowrap;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:calc(100% - 48px);text-align:center;box-sizing:border-box"></div>
+<script>
+let _toastTimer = null;
+function showToast(msg, duration = 2500) {
+  const el = document.getElementById('app-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(20px)';
+  }, duration);
+}
 </script>
 </body>
 </html>
