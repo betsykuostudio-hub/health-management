@@ -2565,13 +2565,14 @@ function getMissedPastDays(){
 }
 
 function showScreen(id,navId){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));if(navId)document.getElementById(navId)?.classList.add('active');window.scrollTo(0,0);}
-function showCalendar(){renderCalendar();showScreen('screen-calendar','nav-calendar');}
+function showCalendar(){document.getElementById('nav-bar').style.display='flex';renderCalendar();showScreen('screen-calendar','nav-calendar');}
 
 // ── 紀錄 Tab 管理 ─────────────────────────────────────
 let _currentRecTab = 'stats';
 function showRecords(tab){
   tab = tab || _currentRecTab || 'stats';
   if(tab==='bodylog' && !isVip()){tab='stats';}
+  document.getElementById('nav-bar').style.display='flex';
   renderStats();
   if(tab==='bodylog') renderBodyLog();
   if(tab==='history') showHistory();
@@ -2600,6 +2601,7 @@ function switchRecTab(tab, skipRender){
 let _currentGuideTab = 'menu';
 function showGuide(tab){
   tab = tab || _currentGuideTab || 'menu';
+  document.getElementById('nav-bar').style.display='flex';
   showScreen('screen-guide','nav-guide');
   switchGuideTab(tab, true);
   if(tab==='menu') updateGuideTodayHint();
@@ -2634,8 +2636,8 @@ function checkAllToday(){
   checkAll(currentDayIdx, allDone);
 }
 function goToCalendar(){showCalendar();}
-function showStats(){renderStats();showScreen('screen-records','nav-records');}
-function showSupply(){renderSupply();showScreen('screen-supply','nav-supply');}
+function showStats(){document.getElementById('nav-bar').style.display='flex';renderStats();showScreen('screen-records','nav-records');}
+function showSupply(){document.getElementById('nav-bar').style.display='flex';renderSupply();showScreen('screen-supply','nav-supply');}
 function showSettings(){
   document.getElementById('nav-bar').style.display='none';
   if(state.startDate)document.getElementById('start-date').value=state.startDate;
@@ -2782,6 +2784,7 @@ function openTestDay(type){
       <label for="${prefix}${i}">${t}</label>
     </div>`).join('');
   document.getElementById('checklist').innerHTML='';
+  document.getElementById('nav-bar').style.display='flex';
   showScreen('screen-day',null);
 }
 function saveTestCheck(prefix,i,val){
@@ -2835,6 +2838,7 @@ function openDay(dayIdx){
   const navBadge = document.getElementById('nav-account-badge');
   if(acctBadge && navBadge) acctBadge.style.display = navBadge.style.display;
   document.getElementById('test-day-notice').style.display='none';
+  document.getElementById('nav-bar').style.display='flex';
   renderChecklist(dayIdx);showScreen('screen-day',null);
 }
 
