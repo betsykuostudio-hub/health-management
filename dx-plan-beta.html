@@ -656,7 +656,10 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <div id="screen-calendar" class="screen">
   <div class="new-header">
     <div class="new-header-title">行程</div>
-    <button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號">👤<span id="nav-account-badge" style="display:none;position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#c8922a;border:2px solid #2e4a2e"></span></button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onclick="showSettings()" style="background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:20px;padding:6px 12px;font-size:13px;color:#a5c4a5;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:36px">⚙️ 設定</button>
+      <button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號">👤<span id="nav-account-badge"
+    </div> style="display:none;position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#c8922a;border:2px solid #2e4a2e"></span></button>
   </div>
   <div class="new-cal-kpi">
     <div class="new-cal-stat"><div class="new-cal-num" id="cal-kpi-day">— / 45</div><div class="new-cal-lbl">計畫進度（天）</div></div>
@@ -734,7 +737,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
       <div id="progress-label"></div>
     </div>
   </div>
-  <div id="day-film" style="display:flex;gap:2px;padding:8px 16px;background:#faf8f5;border-bottom:0.5px solid #e8e0d4"></div>
+
   <div id="test-day-notice" style="display:none;margin:16px;background:white;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
     <div style="font-size:20px;font-weight:900;margin-bottom:10px" id="test-day-title"></div>
     <div id="test-day-checklist"></div>
@@ -938,7 +941,8 @@ input[type=date].field-input{width:145px;overflow:hidden}
         </div>
       </div>
     </div>
-  <
+  </div>
+
   </div>
   <div id="guide-panel-notes" style="display:none">
     <div class="notes-body">
@@ -1062,7 +1066,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
       <div class="warning-card">本菜單純屬建議量，可依個人需求酌量調整</div>
     </div>
   </div>
-  </div>
+
   </div>
 </div>
 
@@ -1209,7 +1213,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 <!-- ACCOUNT MENU MODAL -->
 <div id="account-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:510;align-items:flex-end;justify-content:center">
-  <div style="max-width:480px;width:100%;background:white;border-radius:24px 24px 0 0;padding:24px 20px 40px;box-shadow:0 -4px 20px rgba(0,0,0,.12)">
+  <div style="max-width:480px;width:100%;background:white;border-radius:24px 24px 0 0;padding:24px 20px 0;box-shadow:0 -4px 20px rgba(0,0,0,.12);max-height:calc(90vh - 70px);overflow-y:auto;padding-bottom:24px">
     <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 20px"></div>
     <div id="account-modal-user" style="background:var(--purple-light);border-radius:14px;padding:14px 16px;margin-bottom:16px">
       <div style="font-size:var(--font-sm);color:var(--gray-500);margin-bottom:2px">目前登入</div>
@@ -2786,7 +2790,9 @@ function renderChecklist(dayIdx){
   if(kpiDone) kpiDone.textContent=done;
   if(kpiTotal) kpiTotal.textContent='/ '+schedule.length+' 時間點';
   if(allBtn) allBtn.textContent=allDone?'取消全勾':'✓ 一鍵全勾';
-  let html='';
+  let html=`<div style="padding:10px 16px 0">
+    <button onclick="goToCalendar()" style="background:transparent;border:0.5px solid #c5b5a0;border-radius:20px;padding:6px 14px;font-size:13px;color:#7a6a58;cursor:pointer;font-family:'Noto Sans TC',sans-serif">← 返回日曆</button>
+  </div>`;
   schedule.forEach((block,bi)=>{
     const bKey=`day${dayIdx}b${bi}`,isChecked=!!checks[bKey];
     if(isChecked){
