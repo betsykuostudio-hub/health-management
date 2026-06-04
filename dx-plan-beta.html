@@ -19,7 +19,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;color:var(--gray-700);font-size:var(--font-md);padding-bottom:80px}
-.screen{display:none;min-height:100vh}.screen.active{display:block}
+.screen{display:none;min-height:100vh}.screen.active{display:block}#screen-calendar{min-height:auto}
 .header{background:#2e4a2e;color:white;padding:16px 20px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
 .header-title{font-size:var(--font-lg);font-weight:700;flex:1}
 .back-btn{background:rgba(255,255,255,.2);border:none;color:white;height:36px;border-radius:10px;font-size:var(--font-md);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 12px;white-space:nowrap;gap:4px}
@@ -656,10 +656,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <div id="screen-calendar" class="screen">
   <div class="new-header">
     <div class="new-header-title">行程</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button onclick="showSettings()" style="background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:20px;padding:6px 12px;font-size:13px;color:#a5c4a5;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:36px">⚙️ 設定</button>
-      <button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號" style="position:relative">👤<span id="nav-account-badge" style="display:none;position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#c8922a;border:2px solid #2e4a2e"></span></button>
-    </div>
+    <button onclick="showSettings()" style="background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:20px;padding:6px 12px;font-size:13px;color:#a5c4a5;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:36px">✏️ 修改計畫</button>
   </div>
   <div class="new-cal-kpi">
     <div class="new-cal-stat"><div class="new-cal-num" id="cal-kpi-day">— / 45</div><div class="new-cal-lbl">計畫進度（天）</div></div>
@@ -704,7 +701,6 @@ input[type=date].field-input{width:145px;overflow:hidden}
             <div id="day-num-display" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1">1</div>
             <div style="font-size:9px;color:#a5c4a5;margin-top:1px;letter-spacing:.04em">DAY</div>
           </div>
-          <button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號">👤</button>
         </div>
       </div>
       <div id="day-type-row" style="display:none;align-items:center;justify-content:space-between;margin-bottom:9px">
@@ -749,7 +745,6 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <div id="screen-records" class="screen">
   <div class="new-header">
     <div class="new-header-title">紀錄</div>
-    <button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號">👤</button>
   </div>
   <div class="sub-tab-bar">
     <button class="sub-tab-btn active" id="rec-tab-stats" onclick="switchRecTab('stats')">統計</button>
@@ -763,7 +758,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 <!-- SUPPLY -->
 <div id="screen-supply" class="screen">
-  <div class="new-header"><div class="new-header-title">備品</div><button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號">👤</button></div>
+  <div class="new-header"><div class="new-header-title">備品</div></div>
   <div class="supply-body" id="supply-body"></div>
 </div>
 
@@ -771,7 +766,6 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <div id="screen-guide" class="screen">
   <div class="new-header">
     <div class="new-header-title">指南</div>
-    <button class="new-acct-btn" onclick="showAccountMenu()" aria-label="帳號">👤</button>
   </div>
   <div class="sub-tab-bar">
     <button class="sub-tab-btn active" id="guide-tab-menu" onclick="switchGuideTab('menu')">菜單</button>
@@ -1209,6 +1203,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
   <button class="nav-btn" id="nav-records" onclick="showRecords()"><div class="nav-icon">📊</div><div class="nav-label">紀錄</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-supply" onclick="showSupply()"><div class="nav-icon">📦</div><div class="nav-label">備品</div><div class="nav-indicator"></div></button>
   <button class="nav-btn" id="nav-guide" onclick="showGuide()"><div class="nav-icon">📖</div><div class="nav-label">指南</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-account" onclick="showAccountMenu()" style="position:relative"><div class="nav-icon">👤</div><div class="nav-label">帳號</div><span id="nav-account-badge" style="display:none;position:absolute;top:2px;right:calc(50% - 18px);min-width:18px;height:18px;border-radius:99px;background:#c8922a;border:2px solid #f5efe7;font-size:11px;font-weight:700;color:white;align-items:center;justify-content:center;padding:0 4px;line-height:1"></span></button>
 </div>
 
 <!-- ACCOUNT MENU MODAL -->
@@ -1670,10 +1665,6 @@ async function updatePendingBadge() {
   } else {
     badge.style.display = 'none';
   }
-  // 同步 new-header 帳號 badge
-  document.querySelectorAll('.new-acct-btn span').forEach(b=>{
-    b.style.display=count>0?'block':'none';
-  });
 }
 
 // ── 帳號選單 ──────────────────────────────────────────
@@ -2509,7 +2500,7 @@ function getMissedPastDays(){
 }
 
 function showScreen(id,navId){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));if(navId)document.getElementById(navId)?.classList.add('active');window.scrollTo(0,0);}
-function showCalendar(){renderCalendar();showScreen('screen-calendar','nav-calendar');}
+function showCalendar(){renderCalendar();showScreen('screen-calendar','nav-calendar');setTimeout(()=>window.scrollTo({top:0,behavior:'instant'}),0);}
 // ── 紀錄 Tab ──────────────────────────────────────────
 let _currentRecTab='stats';
 function showRecords(tab){
