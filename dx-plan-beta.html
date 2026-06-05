@@ -1314,7 +1314,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <div style="background:#186637;color:white;padding:0 16px;height:56px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;position:sticky;top:0;z-index:10">
       <button onclick="closeReportPage()" style="background:none;border:none;color:rgba(255,255,255,.9);font-size:32px;font-weight:300;font-family:sans-serif;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer">‹</button>
       <span style="font-family:'DM Serif Display',serif;font-size:17px;font-weight:400;color:#f0f7f0;text-align:center">45 天完成報告</span>
-      <button onclick="downloadPDF()" style="background:rgba(255,255,255,.15);border:none;color:white;height:32px;border-radius:8px;padding:0 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans TC',sans-serif">📄 PDF</button>
+      <button onclick="downloadPDF()" style="background:rgba(255,255,255,.15);border:none;color:white;height:32px;border-radius:8px;padding:0 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans TC',sans-serif;max-width:70px;overflow:hidden">📄 PDF</button>
     </div>
     <div id="report-content" style="padding:16px 16px 40px"></div>
   </div>
@@ -3671,10 +3671,11 @@ function generateReport(){
       diffColor=isGood?'#16a34a':'#dc2626';
       diffText=diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;
     }
+    const preColor=diff!==null&&diff!==0?(BODY_GOOD_DOWN.has(f.id)?(diff<0?'#6b9e6b':'#e08080'):(diff>0?'#6b9e6b':'#e08080')):'#374151';
     const postColor=diff!==null&&diff!==0?(BODY_GOOD_DOWN.has(f.id)?(diff<0?'#16a34a':'#dc2626'):(diff>0?'#16a34a':'#dc2626')):'#111827';
-    bodyHtml+=`<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 0.8fr;gap:4px;align-items:center;padding:9px 12px;border-bottom:1px solid #f3f4f6">
+    bodyHtml+=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;gap:4px;align-items:center;padding:8px 12px;border-bottom:1px solid #f3f4f6">
       <div><div style="font-size:13px;font-weight:600;color:#374151">${f.label}</div><div style="font-size:10px;color:#9ca3af;margin-top:1px">${f.unit}</div></div>
-      <div style="text-align:center;font-size:14px;font-weight:700;color:#6b7280">${pre!==null?pre:'—'}</div>
+      <div style="text-align:center;font-size:14px;font-weight:700;color:${pre!==null?preColor:'#9ca3af'}">${pre!==null?pre:'—'}</div>
       <div style="text-align:center;font-size:14px;font-weight:700;color:${post!==null?postColor:'#9ca3af'}">${post!==null?post:'—'}</div>
       <div style="text-align:center;font-size:12px;font-weight:700;color:${diffColor}">${diffText}</div>
     </div>`;
@@ -3721,7 +3722,7 @@ function generateReport(){
   // ── 共用 helper ───────────────────────────────────────────
   const fmtShort=iso=>iso?iso.replace(/-/g,'/').slice(5):'';
   const bandHtml=(pg)=>`<div style="background:#f5f9f5;border-bottom:1px solid #e5e7eb;padding:7px 16px;display:flex;align-items:center;justify-content:space-between">
-    <div style="font-size:13px;font-weight:700;color:#186637">${name?name+'　':''}DX 45天計畫</div>
+    <div style="font-size:13px;font-weight:700;color:#186637">${name?name+'　':''}DX 45天健康管理計畫</div>
     <div style="display:flex;align-items:center;gap:8px">
       <div style="font-size:11px;color:#9ca3af">${fmtShort(state.pretestDate)}–${fmtShort(state.posttestDate)}</div>
       <div style="font-size:11px;font-weight:700;color:#c8922a;background:#fef9c3;padding:2px 8px;border-radius:99px">${pg} / 3</div>
@@ -3743,7 +3744,7 @@ function generateReport(){
   </div>`;
   const p1=`${bandHtml(1)}
   <div style="background:linear-gradient(165deg,#186637 0%,#2d9e5a 100%);padding:22px 20px 18px;position:relative;overflow:hidden">
-    <div style="position:absolute;top:0;right:0;width:160px;height:100%;opacity:.08;pointer-events:none"><svg viewBox='0 0 160 120' fill='none'><ellipse cx='140' cy='20' rx='100' ry='60' fill='white' transform='rotate(-15 140 20)'/><circle cx='120' cy='100' r='70' fill='white'/></svg></div>
+
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
       <div>
         <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#f0f7f0;line-height:1.2">${name?name+'<br>':''}<span style="font-size:${name?'16px':'20px'}">45天完成報告</span></div>
@@ -3762,7 +3763,7 @@ function generateReport(){
   </div>
   <div style="padding:10px 14px 6px">
     ${secTitle('45 天打卡總覽')}
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px">${['一','二','三','四','五','六','日'].map((d,i)=>`<div style="text-align:center;font-size:10px;font-weight:700;color:${i>=5?'#ef4444':'#9ca3af'};padding:2px 0">${d}</div>`).join('')}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px">${['一','二','三','四','五','六','日'].map((d,i)=>`<div style="display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${i>=5?'#ef4444':'#9ca3af'};height:16px">${d}</div>`).join('')}</div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${gridCells.replace(/class="week-cell/g,'style="border-radius:5px;display:flex;align-items:center;justify-content:center;height:34px;font-size:10px;font-weight:700" class="week-cell')}</div>
     <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:7px">
       <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#6b7280"><div style="width:9px;height:9px;border-radius:2px;background:#186637"></div>全完成</div>
@@ -3775,7 +3776,7 @@ function generateReport(){
   ${disclaimer}`;
 
   // ── P2：體組成 ─────────────────────────────────────────
-  const bodyColHdr=`<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 0.8fr;padding:7px 12px;background:#f9fafb;border-bottom:1px solid #f3f4f6">
+  const bodyColHdr=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;padding:7px 12px;background:#f9fafb;border-bottom:1px solid #f3f4f6">
     <div style="font-size:11px;font-weight:700;color:#9ca3af">項目</div>
     <div style="font-size:11px;font-weight:700;color:#4a2a7a;text-align:center">前測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.pretestDate)}</span></div>
     <div style="font-size:11px;font-weight:700;color:#186637;text-align:center">後測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.posttestDate)}</span></div>
@@ -3791,7 +3792,7 @@ function generateReport(){
   ${disclaimer}`;
 
   // ── P3：體檢 ──────────────────────────────────────────
-  const examColHdr=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;padding:7px 12px;background:#f9fafb;border-radius:10px;margin-bottom:6px">
+  const examColHdr=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;padding:7px 12px;background:#f9fafb;border-bottom:1px solid #f3f4f6">
     <div style="font-size:11px;font-weight:700;color:#9ca3af">項目</div>
     <div style="font-size:11px;font-weight:700;color:#4a2a7a;text-align:center">前測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.pretestDate)}</span></div>
     <div style="font-size:11px;font-weight:700;color:#186637;text-align:center">後測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.posttestDate)}</span></div>
@@ -3805,7 +3806,7 @@ function generateReport(){
       <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280"><div style="width:10px;height:10px;border-radius:2px;background:#d97706;flex-shrink:0"></div>留意</div>
       <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280"><div style="width:10px;height:10px;border-radius:2px;background:#dc2626;flex-shrink:0"></div>異常</div>
     </div>
-    ${hasExamData?`${examColHdr}<div style="background:white;border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)">${examHtml}</div>`:'<div style="color:#9ca3af;font-size:14px;text-align:center;padding:20px">尚未填入體檢數據</div>'}
+    ${hasExamData?`<div style="background:white;border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)">${examColHdr}${examHtml}</div>`:'<div style="color:#9ca3af;font-size:14px;text-align:center;padding:20px">尚未填入體檢數據</div>'}
   </div>
   ${disclaimer}`;
 
