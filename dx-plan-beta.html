@@ -804,7 +804,6 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <div class="new-header-title">指南</div>
     <div></div>
   </div>
-  </div>
   <div class="sub-tab-bar">
     <button class="sub-tab-btn active" id="guide-tab-menu" onclick="switchGuideTab('menu')">菜單</button>
     <button class="sub-tab-btn" id="guide-tab-notes" onclick="switchGuideTab('notes')">須知</button>
@@ -2172,10 +2171,8 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
   const consultantName = clientConsultantMap[p.id] ? (_adminConsultants.find(c=>c.id===clientConsultantMap[p.id])?.display_name || '') : '';
   const coachTag = consultantName ? `<span style="font-size:11px;padding:2px 7px;border-radius:99px;background:var(--gray-100);color:var(--gray-500);white-space:nowrap">👤 ${consultantName}</span>` : '';
 
-  // 快速開通按鈕（待審核才顯示）
-  const quickBtn = !p.is_invited && !p.delete_requested_at
-    ? `<button onclick="event.stopPropagation();adminToggleInvite('${p.id}',false,this)" style="flex-shrink:0;padding:6px 11px;border-radius:99px;background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-200);font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="var(--gray-500)" stroke-width="1.8"/><path d="M12 8V12.5" stroke="var(--gray-500)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1" fill="var(--gray-500)"/></svg>待開通</button>`
-    : '';
+  // 快速開通按鈕移除，統一在展開後操作
+  const quickBtn = '';
 
   // 展開後：角色 segmented、進階 toggle、指派教練
   const roles = ['client','consultant','admin'];
@@ -2190,7 +2187,7 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
 
   const inviteToggle = !p.delete_requested_at ? `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:var(--font-sm);color:var(--gray-700);font-weight:500">開通狀態</span>
+      <span style="font-size:12px;font-weight:700;color:var(--gray-500)">開通狀態</span>
       <button onclick="adminToggleInvite('${p.id}',${!!p.is_invited},this)" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none;background:${p.is_invited?'var(--green-bg)':'var(--red-bg)'};color:${p.is_invited?'var(--green)':'var(--red)'}">${p.is_invited?'✅ 已開通':'🔒 待審核'}</button>
     </div>` : '';
 
@@ -2225,7 +2222,7 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
       <div style="display:flex;background:var(--gray-100);border-radius:10px;padding:3px;gap:2px;flex:1">${roleBtns}</div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0">
-      <span style="font-size:var(--font-sm);color:var(--gray-700);font-weight:500;display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3L14.09 8.26L19.82 8.63L15.64 12.14L17.18 17.74L12 14.77L6.82 17.74L8.36 12.14L4.18 8.63L9.91 8.26L12 3Z" stroke="#d97706" stroke-width="1.6" stroke-linejoin="round"/></svg>進階</span>
+      <span style="font-size:12px;font-weight:700;color:var(--gray-500);display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 3L14.09 8.26L19.82 8.63L15.64 12.14L17.18 17.74L12 14.77L6.82 17.74L8.36 12.14L4.18 8.63L9.91 8.26L12 3Z" stroke="#d97706" stroke-width="1.6" stroke-linejoin="round"/></svg>進階</span>
       ${toggleVip}
     </div>
     ${assignBtn}`;
@@ -2266,8 +2263,8 @@ function adminToggleCard(id) {
   const body = document.getElementById(`admin-card-body-${id}`);
   const chevron = document.getElementById(`admin-card-chevron-${id}`);
   if (!body) return;
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
   if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
