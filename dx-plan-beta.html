@@ -279,11 +279,12 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .admin-invite-on{background:var(--green-bg);color:var(--green)}
 .admin-invite-off{background:var(--red-bg);color:var(--red)}
 #nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#f5efe7;border-top:0.5px solid #ddd6cc;display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:9999}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;cursor:pointer;padding:5px 0;position:relative}
-.nav-icon{font-size:20px;transition:all .15s}
-.nav-label{font-size:10px;font-weight:500;color:var(--gray-500)}
-.nav-btn.active .nav-label{color:#2e4a2e;font-weight:700}
-.nav-btn.active .nav-icon{transform:scale(1.15)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;cursor:pointer;padding:5px 0;position:relative;color:var(--gray-400)}
+.nav-icon{display:flex;align-items:center;justify-content:center;transition:all .15s}
+.nav-label{font-size:10px;font-weight:500;color:var(--gray-400)}
+.nav-btn.active{color:#186637}
+.nav-btn.active .nav-label{color:#186637;font-weight:700}
+.nav-btn.active .nav-icon{transform:scale(1.1)}
 .nav-indicator{position:absolute;bottom:0;width:28px;height:3px;border-radius:3px 3px 0 0;background:#c8922a;opacity:0}
 .nav-btn.active .nav-indicator{opacity:1}
 
@@ -1198,12 +1199,12 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 <!-- NAV -->
 <div id="nav-bar" style="display:none">
-  <button class="nav-btn" id="nav-today" onclick="goToToday()"><div class="nav-icon">✅</div><div class="nav-label">今日</div><div class="nav-indicator"></div></button>
-  <button class="nav-btn" id="nav-calendar" onclick="showCalendar()"><div class="nav-icon">📅</div><div class="nav-label">行程</div><div class="nav-indicator"></div></button>
-  <button class="nav-btn" id="nav-records" onclick="showRecords()"><div class="nav-icon">📊</div><div class="nav-label">紀錄</div><div class="nav-indicator"></div></button>
-  <button class="nav-btn" id="nav-supply" onclick="showSupply()"><div class="nav-icon">📦</div><div class="nav-label">備品</div><div class="nav-indicator"></div></button>
-  <button class="nav-btn" id="nav-guide" onclick="showGuide()"><div class="nav-icon">📖</div><div class="nav-label">指南</div><div class="nav-indicator"></div></button>
-  <button class="nav-btn" id="nav-account" onclick="showAccountMenu()" style="position:relative"><div class="nav-icon">👤</div><div class="nav-label">帳號</div><span id="nav-account-badge" style="display:none;position:absolute;top:2px;right:calc(50% - 18px);min-width:18px;height:18px;border-radius:99px;background:#c8922a;border:2px solid #f5efe7;font-size:11px;font-weight:700;color:white;align-items:center;justify-content:center;padding:0 4px;line-height:1"></span></button>
+  <button class="nav-btn" id="nav-today" onclick="goToToday()"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M3 10H21" stroke="currentColor" stroke-width="1.7"/><path d="M8 3V7M16 3V7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M7.5 14.5L10 17L16.5 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nav-label">今日</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-calendar" onclick="showCalendar()"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M3 10H21" stroke="currentColor" stroke-width="1.7"/><path d="M8 3V7M16 3V7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="7" y="13" width="3" height="3" rx="0.8" fill="currentColor"/><rect x="11" y="13" width="3" height="3" rx="0.8" fill="currentColor"/><rect x="15" y="13" width="3" height="3" rx="0.8" fill="currentColor" opacity=".4"/></svg></div><div class="nav-label">行程</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-records" onclick="showRecords()"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V7L8 4L12 7L16 4L20 7V19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 19C4 19 6 18 12 18C18 18 20 19 20 19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M8 10V14M12 11V14M16 9V14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="nav-label">紀錄</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-supply" onclick="showSupply()"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 8H19L18 20H6L5 8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M3 8H21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 4H14C14.552 4 15 4.448 15 5V8H9V5C9 4.448 9.448 4 10 4Z" stroke="currentColor" stroke-width="1.7"/><path d="M10 12H14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="nav-label">備品</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-guide" onclick="showGuide()"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 4C4 4 6 3 12 3C18 3 20 4 20 4V20C20 20 18 19 12 19C6 19 4 20 4 20V4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 3V19" stroke="currentColor" stroke-width="1.7"/><path d="M7 8H10M7 11H10M7 14H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="nav-label">指南</div><div class="nav-indicator"></div></button>
+  <button class="nav-btn" id="nav-account" onclick="showAccountMenu()" style="position:relative"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 20C4 16.686 7.134 14 11 14H13C16.866 14 20 16.686 20 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="nav-label">帳號</div><span id="nav-account-badge" style="display:none;position:absolute;top:2px;right:calc(50% - 18px);min-width:18px;height:18px;border-radius:99px;background:#c8922a;border:2px solid #f5efe7;font-size:11px;font-weight:700;color:white;align-items:center;justify-content:center;padding:0 4px;line-height:1"></span></button>
 </div>
 
 <!-- ACCOUNT MENU MODAL -->
