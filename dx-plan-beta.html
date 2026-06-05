@@ -8,8 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --purple:#2e4a2e;--purple-dark:#1e3d1a;--purple-light:#eef5ed;--purple-mid:#a5c4a5;
-  --bg:#faf8f5;--white:#ffffff;
+  --purple:#186637;--purple-dark:#0d3d20;--purple-light:#e8f5ee;--purple-mid:#81BD48;
+  --bg:#f5f9f5;--white:#ffffff;
   --accent:#c8922a;
   --gray-100:#f3f4f6;--gray-300:#d1d5db;--gray-500:#6b7280;--gray-700:#374151;
   --green:#16a34a;--green-bg:#c8e2cc;
@@ -20,15 +20,15 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;color:var(--gray-700);font-size:var(--font-md);padding-bottom:80px}
 .screen{display:none;min-height:100vh}.screen.active{display:block}#screen-calendar{min-height:auto}
-.header{background:#2e4a2e;color:white;padding:16px 20px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.header{background:#186637;color:white;padding:16px 20px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
 .header-title{font-size:var(--font-lg);font-weight:700;flex:1}
 .back-btn{background:rgba(255,255,255,.2);border:none;color:white;height:36px;border-radius:10px;font-size:var(--font-md);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 12px;white-space:nowrap;gap:4px}
-.setup-hero{background:linear-gradient(135deg,#1e3d1a 0%,#2e4a2e 60%,#4a7a4a 100%);color:white;padding:36px 24px 28px;text-align:center}
+.setup-hero{background:linear-gradient(135deg,#0d3d20 0%,#186637 60%,#4a7a4a 100%);color:white;padding:36px 24px 28px;text-align:center}
 .setup-hero .emoji{font-size:52px;margin-bottom:12px}
 .setup-hero h1{font-size:28px;font-weight:900;margin-bottom:6px}
 .setup-hero p{font-size:var(--font-sm);opacity:.8;line-height:1.6}
 .setup-body{padding:24px 20px 100px}
-.section-title{font-size:var(--font-sm);font-weight:700;color:#2e4a2e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;margin-top:24px}
+.section-title{font-size:var(--font-sm);font-weight:700;color:#186637;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;margin-top:24px}
 .field-group{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
 .field-row{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--gray-100);gap:12px}
 .field-row:last-child{border-bottom:none}
@@ -39,9 +39,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh
 input[type=date].field-input{width:145px;overflow:hidden}
 .notice-box{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:var(--font-sm);color:#9a3412;line-height:1.7}
 .notice-box strong{display:block;margin-bottom:4px}
-.big-btn{width:100%;background:#2e4a2e;color:white;border:none;border-radius:16px;padding:18px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s,transform .1s}
-.big-btn:active{transform:scale(.97);background:#1e3d1a}
-.cal-summary{background:#2e4a2e;color:white;padding:16px 20px;display:flex;gap:16px}
+.big-btn{width:100%;background:#186637;color:white;border:none;border-radius:16px;padding:18px;font-size:var(--font-lg);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s,transform .1s}
+.big-btn:active{transform:scale(.97);background:#0d3d20}
+.cal-summary{background:#186637;color:white;padding:16px 20px;display:flex;gap:16px}
 .cal-stat{flex:1;text-align:center}
 .cal-stat-num{font-size:var(--font-2xl);font-weight:900}
 .cal-stat-label{font-size:var(--font-xs);opacity:.75;margin-top:2px}
@@ -90,29 +90,29 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .item-row:last-child{border-bottom:none}
 .item-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
 .item-text{flex:1;color:var(--gray-700)}
-.item-amount-input{width:46px;text-align:center;font-size:var(--font-md);font-weight:700;color:#2e4a2e;border:1.5px solid #d0c5b8;border-radius:8px;padding:4px 2px;outline:none;font-family:'Noto Sans TC',sans-serif;background:#f7f2eb}
+.item-amount-input{width:46px;text-align:center;font-size:var(--font-md);font-weight:700;color:#186637;border:1.5px solid #d0c5b8;border-radius:8px;padding:4px 2px;outline:none;font-family:'Noto Sans TC',sans-serif;background:#f7f2eb}
 .item-amount-input:focus{border-color:var(--purple);background:white}
 .item-amount-input:disabled{background:var(--gray-100);color:var(--gray-500);border-color:var(--gray-300);cursor:not-allowed}
 .stats-body{padding:16px 16px 100px}
 .stat-card{background:white;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .stat-card-title{font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:14px}
-.big-stat{font-size:44px;font-weight:900;color:#2e4a2e}
+.big-stat{font-size:44px;font-weight:900;color:#186637}
 .big-stat-unit{font-size:var(--font-lg);font-weight:500;color:var(--gray-500);margin-left:4px}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .bar-label{font-size:var(--font-sm);color:var(--gray-500);width:60px;flex-shrink:0;text-align:right}
 .bar-track{flex:1;height:10px;background:var(--gray-100);border-radius:99px;overflow:hidden}
-.bar-fill{height:100%;border-radius:99px;background:#2e4a2e;transition:width .4s}
-.bar-val{font-size:var(--font-sm);font-weight:700;color:#2e4a2e;width:36px}
+.bar-fill{height:100%;border-radius:99px;background:#186637;transition:width .4s}
+.bar-val{font-size:var(--font-sm);font-weight:700;color:#186637;width:36px}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .week-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
-.week-cell.done{background:#2e4a2e;color:white}
+.week-cell.done{background:#186637;color:white}
 .week-cell.partial{background:var(--yellow-bg);color:var(--yellow)}
 .week-cell.missed{background:var(--gray-100);color:var(--gray-300)}
 .week-cell.missed-past{background:var(--red-bg);color:var(--red)}
-.week-cell.future{background:#eef5ed;color:#a5c4a5}
+.week-cell.future{background:#e8f5ee;color:#81BD48}
 .supply-body{padding:16px 16px 100px}
 .supply-warning{background:var(--red-bg);border:1px solid #fecaca;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:var(--font-sm);color:var(--red);line-height:1.7}
-.supply-total-card{background:linear-gradient(135deg,#1e3d1a,#2e4a2e);color:white;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center}
+.supply-total-card{background:linear-gradient(135deg,#0d3d20,#186637);color:white;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center}
 .supply-total-label{font-size:var(--font-sm);opacity:.8;margin-bottom:4px}
 .supply-total-num{font-size:38px;font-weight:900}
 .supply-total-sub{font-size:var(--font-xs);opacity:.7;margin-top:4px}
@@ -152,7 +152,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .supply-modal-qty{color:var(--gray-500);font-size:var(--font-xs);white-space:nowrap}
 .supply-modal-price{font-weight:700;color:var(--purple-dark);white-space:nowrap;font-size:var(--font-sm)}
 .add-stock-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-.add-stock-btn{background:#2e4a2e;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap}
+.add-stock-btn{background:#186637;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap}
 .add-note-input{flex:1;min-width:80px;border:1.5px solid var(--purple-light);border-radius:8px;padding:6px 8px;font-size:var(--font-sm);outline:none;font-family:'Noto Sans TC',sans-serif}
 .optional-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:var(--font-sm);color:var(--gray-700)}
 .optional-toggle input{width:18px;height:18px;accent-color:var(--purple)}
@@ -166,7 +166,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .note-ul li::before{content:"•";color:#c8922a;font-weight:700;flex-shrink:0}
 .warning-card{background:var(--red-bg);border:1px solid #fecaca;border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:var(--font-sm);color:var(--red);line-height:1.7}
 .task-card{background:white;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start}
-.task-num{width:30px;height:30px;border-radius:50%;background:#2e4a2e;color:white;display:flex;align-items:center;justify-content:center;font-size:var(--font-md);font-weight:900;flex-shrink:0;margin-top:1px}
+.task-num{width:30px;height:30px;border-radius:50%;background:#186637;color:white;display:flex;align-items:center;justify-content:center;font-size:var(--font-md);font-weight:900;flex-shrink:0;margin-top:1px}
 .task-content{flex:1;font-size:var(--font-md);line-height:1.75;color:var(--gray-700)}
 .task-content strong{font-weight:700;color:#111827;display:block;margin-bottom:4px}
 .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -299,14 +299,14 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .blog-field-label{font-size:11px;font-weight:700;color:var(--gray-500)}
 .blog-field-input{border:1.5px solid var(--purple-light);border-radius:10px;padding:9px 10px;font-size:var(--font-md);font-weight:600;color:var(--purple-dark);outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light);text-align:center;width:100%;min-width:0;box-sizing:border-box}
 .blog-field-input:focus{border-color:var(--purple);background:white}
-.blog-save-btn{width:100%;background:#2e4a2e;color:white;border:none;border-radius:12px;padding:13px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.blog-save-btn{width:100%;background:#186637;color:white;border:none;border-radius:12px;padding:13px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
 .blog-chart-card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .blog-chart-title{font-size:var(--font-sm);font-weight:700;color:#111827;margin-bottom:4px}
 .blog-chart-wrap{overflow-x:auto;padding-bottom:4px}
 .blog-chart-svg{display:block}
 .blog-metric-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .blog-metric-tab{padding:5px 12px;border-radius:20px;border:1.5px solid var(--purple-light);background:white;font-size:var(--font-sm);font-weight:600;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
-.blog-metric-tab.active{background:#2e4a2e;border-color:#2e4a2e;color:white}
+.blog-metric-tab.active{background:#186637;border-color:#186637;color:white}
 .blog-log-card{background:white;border-radius:14px;padding:0;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
 .blog-log-header{display:flex;align-items:center;padding:12px 14px;gap:10px;border-bottom:1px solid var(--gray-100)}
 .blog-log-date{font-size:var(--font-sm);font-weight:700;color:var(--purple-dark);background:var(--purple-light);padding:3px 10px;border-radius:20px;flex-shrink:0}
@@ -340,7 +340,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .history-plan-body.open{display:block}
 .history-tab-row{display:flex;border-bottom:1px solid var(--gray-100)}
 .history-tab-btn{flex:1;padding:10px;border:none;background:transparent;font-size:var(--font-sm);font-weight:600;color:var(--gray-500);cursor:pointer;font-family:'Noto Sans TC',sans-serif;border-bottom:2px solid transparent;transition:all .15s}
-.history-tab-btn.active{color:#2e4a2e;border-bottom-color:#c8922a}
+.history-tab-btn.active{color:#186637;border-bottom-color:#c8922a}
 .history-panel{display:none;padding:16px}
 .history-panel.active{display:block}
 .history-stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:var(--font-sm)}
@@ -374,20 +374,20 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .delete-confirm-desc{font-size:var(--font-sm);color:var(--gray-500);line-height:1.6;margin-bottom:16px}
 
 /* ── 新版視覺 CSS ─────────────────────────────────── */
-.new-header{background:#2e4a2e;padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.new-header{background:#186637;padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
 .new-header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#f0f7f0;flex:1}
 .new-acct-btn{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:20px;position:relative}
 .sub-tab-bar{display:flex;background:#f2ede6;border-bottom:0.5px solid #ddd6cc}
 .sub-tab-btn{flex:1;padding:10px 4px;font-size:var(--font-sm);color:var(--gray-500);text-align:center;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;font-family:'Noto Sans TC',sans-serif;font-weight:500;min-height:48px}
-.sub-tab-btn.active{color:#2e4a2e;border-bottom-color:#c8922a;font-weight:700;background:#faf8f5}
+.sub-tab-btn.active{color:#186637;border-bottom-color:#c8922a;font-weight:700;background:#f5f9f5}
 .new-cal-kpi{display:grid;grid-template-columns:1fr 1fr;border-bottom:0.5px solid #ddd6cc}
 .new-cal-stat{padding:11px 14px;border-right:0.5px solid #ddd6cc}
 .new-cal-stat:last-child{border-right:none}
-.new-cal-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#2e4a2e;line-height:1}
+.new-cal-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#186637;line-height:1}
 .new-cal-lbl{font-size:10px;color:#9a8a72;margin-top:3px}
 .new-cal-prog{padding:10px 16px;border-bottom:0.5px solid #ddd6cc;display:flex;align-items:center;gap:8px}
 .new-cal-prog-track{flex:1;height:5px;background:#e8e0d4;border-radius:99px;overflow:hidden}
-.new-cal-prog-fill{height:100%;background:#2e4a2e;border-radius:99px;transition:width .4s}
+.new-cal-prog-fill{height:100%;background:#186637;border-radius:99px;transition:width .4s}
 .new-cal-prog-lbl{font-size:11px;color:#9a8a72;white-space:nowrap}
 .guide-today-hint{background:#fef9ee;border-bottom:0.5px solid #e8d9b8;padding:8px 16px;display:flex;align-items:center;gap:6px}
 .guide-today-dot{width:8px;height:8px;border-radius:50%;background:#c8922a;flex-shrink:0}
@@ -657,7 +657,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <div id="screen-calendar" class="screen">
   <div class="new-header">
     <div class="new-header-title">行程</div>
-    <button onclick="showSettings()" style="background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:20px;padding:6px 12px;font-size:13px;color:#a5c4a5;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:36px">✏️ 修改計畫</button>
+    <button onclick="showSettings()" style="background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:20px;padding:6px 12px;font-size:13px;color:#81BD48;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:36px">✏️ 修改計畫</button>
   </div>
   <div class="new-cal-kpi">
     <div class="new-cal-stat"><div class="new-cal-num" id="cal-kpi-day">— / 45</div><div class="new-cal-lbl">計畫進度（天）</div></div>
@@ -690,17 +690,17 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 <!-- DAY -->
 <div id="screen-day" class="screen">
-  <div id="day-hero" style="background:linear-gradient(135deg,#1a2e1a,#2e4a2e);position:sticky;top:0;z-index:100">
+  <div id="day-hero" style="background:linear-gradient(135deg,#0d3d20,#186637);position:sticky;top:0;z-index:100">
     <div style="padding:14px 16px 12px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
         <div>
-          <div style="font-size:9px;color:#a5c4a5;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px">DX 45-Day Plan</div>
+          <div style="font-size:9px;color:#81BD48;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px">DX 45-Day Plan</div>
           <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#f0f7f0;line-height:1.15">健康管理計畫</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <div id="day-num-box" style="display:none;text-align:center;background:rgba(255,255,255,.1);border:0.5px solid rgba(165,196,165,.25);border-radius:6px;padding:5px 10px">
             <div id="day-num-display" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1">1</div>
-            <div style="font-size:9px;color:#a5c4a5;margin-top:1px;letter-spacing:.04em">DAY</div>
+            <div style="font-size:9px;color:#81BD48;margin-top:1px;letter-spacing:.04em">DAY</div>
           </div>
         </div>
       </div>
@@ -715,18 +715,18 @@ input[type=date].field-input{width:145px;overflow:hidden}
         <div style="flex:1;height:3px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden">
           <div id="new-prog-fill" style="height:100%;background:#c8922a;border-radius:99px;width:0%;transition:width .4s"></div>
         </div>
-        <span id="new-prog-label" style="font-size:9px;color:#a5c4a5;white-space:nowrap">0 / 45 天</span>
+        <span id="new-prog-label" style="font-size:9px;color:#81BD48;white-space:nowrap">0 / 45 天</span>
       </div>
     </div>
     <div id="day-kpi-row" style="display:none;align-items:center;justify-content:space-between;padding:10px 16px;background:#f7f2eb;border-bottom:0.5px solid #ddd6cc">
       <div>
         <div style="display:flex;align-items:baseline;gap:4px">
-          <span id="day-kpi-done" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#2e4a2e;line-height:1">0</span>
+          <span id="day-kpi-done" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#186637;line-height:1">0</span>
           <span id="day-kpi-total" style="font-size:13px;color:#9a8a72">/ 0 時間點</span>
         </div>
         <div style="font-size:10px;color:#9a8a72;margin-top:2px">今日完成</div>
       </div>
-      <button id="day-checkall-btn" onclick="checkAllToday()" style="display:flex;align-items:center;gap:5px;background:#2e4a2e;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;color:#f0f7f0;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:44px">✓ 一鍵全勾</button>
+      <button id="day-checkall-btn" onclick="checkAllToday()" style="display:flex;align-items:center;gap:5px;background:#186637;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;color:#f0f7f0;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:44px">✓ 一鍵全勾</button>
     </div>
     <div style="display:none">
       <div id="day-badge"></div><div id="day-title"></div><div id="day-date"></div>
@@ -2724,7 +2724,7 @@ function openDay(dayIdx){
   currentDayIdx=dayIdx;const ti=TYPE_INFO[DAY_TYPES[dayIdx]];
   if(!ti){console.warn('openDay: unknown type for dayIdx',dayIdx);showCalendar();return;}
   // Hero Header 背景
-  document.getElementById('day-hero').style.background=`linear-gradient(135deg,#1a2e1a,${ti.heroBg})`;
+  document.getElementById('day-hero').style.background=`linear-gradient(135deg,#0d3d20,${ti.heroBg})`;
   // 舊版欄位（保留供 openTestDay 使用）
   document.getElementById('day-badge').innerHTML=`${ti.emoji} ${ti.label}`;
   document.getElementById('day-title').textContent=`第 ${dayIdx+1} 天`;
@@ -2760,7 +2760,7 @@ function openDay(dayIdx){
   if(filmEl && state.startDate){
     filmEl.innerHTML=Array.from({length:45},(_,i)=>{
       const iso=addDays(state.startDate,i);
-      const cls=iso===today?'background:#c8922a':iso<today?'background:#2e4a2e':'background:#e0d8ce';
+      const cls=iso===today?'background:#c8922a':iso<today?'background:#186637':'background:#e0d8ce';
       return`<div style="flex:1;height:5px;border-radius:2px;min-width:0;${cls}"></div>`;
     }).join('');
   }
