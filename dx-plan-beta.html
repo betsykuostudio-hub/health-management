@@ -774,7 +774,11 @@ input[type=date].field-input{width:145px;overflow:hidden}
         <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;line-height:1.15;color:#5a5030" id="day-hero-title">健康管理計畫</div>
       </div>
       <div style="text-align:right;padding-right:4px">
-        <div id="day-day-label" style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;white-space:nowrap;color:#5a5030"></div>
+        <div id="day-day-badge" style="display:flex;align-items:baseline;justify-content:flex-end;gap:1px;background:rgba(255,255,255,.25);border:0.5px solid rgba(255,255,255,.4);border-radius:10px;padding:6px 10px;white-space:nowrap">
+          <span id="day-day-pre" style="font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;color:#5a5030">第</span>
+          <span id="day-day-num" style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1;margin:0 2px;color:#5a5030"></span>
+          <span id="day-day-post" style="font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;color:#5a5030">天</span>
+        </div>
       </div>
     </div>
     <!-- 下列：日型 chip + 日期 + 進度條 -->
@@ -2997,8 +3001,16 @@ function openDay(dayIdx){
     const el=document.getElementById(id);if(el)el.style.color=ti.calTxt;
   });
   // 右上角「第 X 天」
-  const dayLbl=document.getElementById('day-day-label');
-  if(dayLbl){dayLbl.textContent=`第 ${dayIdx+1} 天`;dayLbl.style.color=ti.calTxt;}
+  // 右上角「第 X 天」badge
+  const dayNum=document.getElementById('day-day-num');
+  const dayPre=document.getElementById('day-day-pre');
+  const dayPost=document.getElementById('day-day-post');
+  if(dayNum){dayNum.textContent=dayIdx+1;dayNum.style.color=ti.calTxt;}
+  if(dayPre) dayPre.style.color=ti.calTxt;
+  if(dayPost) dayPost.style.color=ti.calTxt;
+  // badge 框色跟日型
+  const dayBadge=document.getElementById('day-day-badge');
+  if(dayBadge){dayBadge.style.background='rgba(255,255,255,.25)';dayBadge.style.borderColor='rgba(255,255,255,.35)';}
   // 舊版欄位（保留供 openTestDay 使用）
   document.getElementById('day-badge').innerHTML=`${ti.emoji} ${ti.label}`;
   document.getElementById('day-title').textContent=`第 ${dayIdx+1} 天`;
