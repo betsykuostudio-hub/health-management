@@ -404,7 +404,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <div id="screen-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--purple-dark) 0%,var(--purple) 50%,var(--purple-mid) 100%)">
   <div style="font-size:52px;margin-bottom:16px">🎯</div>
   <div style="font-size:20px;font-weight:900;color:white;margin-bottom:8px">DX 健康管理計畫</div>
-  <div style="font-size:14px;color:rgba(255,255,255,.7);margin-top:8px">載入中...</div>
+  <div id="loading-status" style="font-size:14px;color:rgba(255,255,255,.7);margin-top:8px">載入中...</div>
 </div>
 
 <!-- SETUP -->
@@ -1629,6 +1629,8 @@ async function doLogout() {
 
 // ── 登入後處理 ────────────────────────────────────────
 async function handleAuthSuccess(user) {
+  const setStatus = (msg) => { const el = document.getElementById('loading-status'); if(el) el.textContent = msg; };
+  setStatus('驗證帳號中...');
   currentUser = user;
   // 取得 profile
   const { data: profile, error } = await sb.from('profiles').select('*').eq('id', user.id).single();
@@ -1661,7 +1663,15 @@ async function handleAuthSuccess(user) {
   sb.rpc('update_last_seen').then(({ error }) => {
     if (error) console.warn('last_seen_at 寫入失敗:', error.message);
   });
+  // 安全網：10秒後若還在載入就強制繼續
+  const loadingTimeout = setTimeout(() => {
+    hideLoading();
+    showAppMain();
+  }, 10000);
+
+  setStatus('載入計畫資料...');
   await loadStateFromSupabase();
+  clearTimeout(loadingTimeout);
   hideLoading();
   showAppMain();
 }
@@ -1819,25 +1829,31 @@ function closeAccountModal() {
 // ── Supabase 資料讀寫 ──────────────────────────────────
 async function loadStateFromSupabase() {
   if (!currentUser) return;
-  const { data, error } = await sb.from('dx_plans')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .is('archived_at', null)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-  if (error || !data) {
+  try {
+    const { data, error } = await sb.from('dx_plans')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .is('archived_at', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+    if (error || !data) {
+      state = {...DEFAULT_STATE};
+      _currentPlanId = null;
+      return;
+    }
+    _currentPlanId = data.id;
+    const loadedState = { ...DEFAULT_STATE, ...data.plan_state };
+    // vip/admin：解密 bodyLogs
+    if (isVip() && _encryptionKey && isEncrypted(loadedState.bodyLogs)) {
+      loadedState.bodyLogs = await decryptData(loadedState.bodyLogs, _encryptionKey) || [];
+    }
+    state = loadedState;
+  } catch(e) {
+    console.warn('loadStateFromSupabase error:', e);
     state = {...DEFAULT_STATE};
     _currentPlanId = null;
-    return;
   }
-  _currentPlanId = data.id;
-  const loadedState = { ...DEFAULT_STATE, ...data.plan_state };
-  // vip/admin：解密 bodyLogs
-  if (isVip() && _encryptionKey && isEncrypted(loadedState.bodyLogs)) {
-    loadedState.bodyLogs = await decryptData(loadedState.bodyLogs, _encryptionKey) || [];
-  }
-  state = loadedState;
 }
 
 let _currentPlanId = null;
