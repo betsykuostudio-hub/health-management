@@ -374,21 +374,23 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .delete-confirm-desc{font-size:var(--font-sm);color:var(--gray-500);line-height:1.6;margin-bottom:16px}
 
 /* ── 新版視覺 CSS ─────────────────────────────────── */
-.new-header{background:#186637;padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.new-header{background:#186637;padding:0 16px;height:56px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
 .new-header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#f0f7f0;flex:1}
 .new-acct-btn{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:20px;position:relative}
 .sub-tab-bar{display:flex;background:#f2ede6;border-bottom:0.5px solid #ddd6cc}
 .sub-tab-btn{flex:1;padding:10px 4px;font-size:var(--font-sm);color:var(--gray-500);text-align:center;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;font-family:'Noto Sans TC',sans-serif;font-weight:500;min-height:48px}
 .sub-tab-btn.active{color:#186637;border-bottom-color:#c8922a;font-weight:700;background:#f5f9f5}
-.new-cal-kpi{display:grid;grid-template-columns:1fr 1fr;border-bottom:0.5px solid #ddd6cc}
-.new-cal-stat{padding:11px 14px;border-right:0.5px solid #ddd6cc}
-.new-cal-stat:last-child{border-right:none}
-.new-cal-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#186637;line-height:1}
-.new-cal-lbl{font-size:10px;color:#9a8a72;margin-top:3px}
-.new-cal-prog{padding:10px 16px;border-bottom:0.5px solid #ddd6cc;display:flex;align-items:center;gap:8px}
-.new-cal-prog-track{flex:1;height:5px;background:#e8e0d4;border-radius:99px;overflow:hidden}
+.new-cal-kpi{background:white;margin:14px 14px 0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.new-cal-kpi-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;gap:8px}
+.new-cal-stat{display:flex;align-items:center;gap:7px}
+.new-cal-lbl{font-size:12px;color:var(--gray-400);white-space:nowrap}
+.new-cal-num{font-size:16px;font-weight:700;color:#186637;white-space:nowrap}
+.new-cal-divider{width:1px;height:20px;background:var(--gray-200);flex-shrink:0}
+.new-cal-prog{padding:8px 16px 13px;border-top:1px solid var(--gray-100);display:flex;align-items:center;gap:10px}
+.new-cal-prog-label{font-size:12px;color:var(--gray-400);white-space:nowrap;flex-shrink:0}
+.new-cal-prog-track{flex:1;height:5px;background:var(--gray-100);border-radius:99px;overflow:hidden}
 .new-cal-prog-fill{height:100%;background:#186637;border-radius:99px;transition:width .4s}
-.new-cal-prog-lbl{font-size:11px;color:#9a8a72;white-space:nowrap}
+.new-cal-prog-lbl{font-size:12px;color:var(--gray-400);white-space:nowrap;min-width:28px;text-align:right}
 .guide-today-hint{background:#fef9ee;border-bottom:0.5px solid #e8d9b8;padding:8px 16px;display:flex;align-items:center;gap:6px}
 .guide-today-dot{width:8px;height:8px;border-radius:50%;background:#c8922a;flex-shrink:0}
 .guide-today-text{font-size:var(--font-sm);color:#7a5c2e;font-weight:600}
@@ -657,15 +659,25 @@ input[type=date].field-input{width:145px;overflow:hidden}
 <div id="screen-calendar" class="screen">
   <div class="new-header">
     <div class="new-header-title">行程</div>
-    <button onclick="showSettings()" style="background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:20px;padding:6px 12px;font-size:13px;color:#81BD48;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:36px">✏️ 修改計畫</button>
+    <button onclick="showSettings()" style="background:rgba(255,255,255,.12);border:0.5px solid rgba(165,196,165,.2);border-radius:20px;padding:6px 12px;font-size:13px;color:#81BD48;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;min-height:32px">✏️ 修改計畫</button>
   </div>
   <div class="new-cal-kpi">
-    <div class="new-cal-stat"><div class="new-cal-num" id="cal-kpi-day">— / 45</div><div class="new-cal-lbl">計畫進度（天）</div></div>
-    <div class="new-cal-stat"><div class="new-cal-num" id="cal-kpi-left">—</div><div class="new-cal-lbl">剩餘天數</div></div>
-  </div>
-  <div class="new-cal-prog">
-    <div class="new-cal-prog-track"><div class="new-cal-prog-fill" id="cal-kpi-prog" style="width:0%"></div></div>
-    <span class="new-cal-prog-lbl" id="cal-kpi-pct">0%</span>
+    <div class="new-cal-kpi-row">
+      <div class="new-cal-stat">
+        <span class="new-cal-lbl">計畫進度（天）</span>
+        <span class="new-cal-num" id="cal-kpi-day">— / 45</span>
+      </div>
+      <div class="new-cal-divider"></div>
+      <div class="new-cal-stat">
+        <span class="new-cal-lbl">剩餘天數</span>
+        <span class="new-cal-num" id="cal-kpi-left">—</span>
+      </div>
+    </div>
+    <div class="new-cal-prog">
+      <span class="new-cal-prog-label">進度</span>
+      <div class="new-cal-prog-track"><div class="new-cal-prog-fill" id="cal-kpi-prog" style="width:0%"></div></div>
+      <span class="new-cal-prog-lbl" id="cal-kpi-pct">0%</span>
+    </div>
   </div>
   <div id="cal-summary" style="display:none"></div>
   <div id="cal-warning" style="display:none" class="cal-warning"></div>
@@ -2660,14 +2672,16 @@ function renderCalendar(){
     const isPre=state.pretestDate&&iso===state.pretestDate;
     const isPost=state.posttestDate&&iso===state.posttestDate;
     const isInPlan=dayIdx>=0&&dayIdx<45;
-    if(!isInPlan&&!isPre&&!isPost){html+=`<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300)">${cur.getDate()}</div></div>`;}
-    else if(isPre){html+=`<div class="cal-day type-pretest${iso===today?' today':''}" onclick="openTestDay('pre')"><div class="day-num">${cur.getDate()}</div><div class="day-type">🩸</div></div>`;}
-    else if(isPost){html+=`<div class="cal-day type-posttest${iso===today?' today':''}" onclick="openTestDay('post')"><div class="day-num">${cur.getDate()}</div><div class="day-type">🔬</div></div>`;}
+    if(!isInPlan&&!isPre&&!isPost){const isFirst=cur.getDate()===1;html+=`<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300);font-size:${isFirst?'10px':'13px'}">${isFirst?(cur.getMonth()+1)+'/1':cur.getDate()}</div></div>`;}
+    else if(isPre){const isFirst=cur.getDate()===1;html+=`<div class="cal-day type-pretest${iso===today?' today':''}" onclick="openTestDay('pre')"><div class="day-num" style="${isFirst?'font-size:10px':''}">${isFirst?(cur.getMonth()+1)+'/1':cur.getDate()}</div><div class="day-type">🩸</div></div>`;}
+    else if(isPost){const isFirst=cur.getDate()===1;html+=`<div class="cal-day type-posttest${iso===today?' today':''}" onclick="openTestDay('post')"><div class="day-num" style="${isFirst?'font-size:10px':''}">${isFirst?(cur.getMonth()+1)+'/1':cur.getDate()}</div><div class="day-type">🔬</div></div>`;}
     else{
       const ti=TYPE_INFO[DAY_TYPES[dayIdx]]||{color:'type-empty',emoji:'—'};
       const{done,total}=getDayProgress(dayIdx);
       const full=done===total&&total>0,partial=done>0&&done<total,isPast=iso<today,isMissed=isPast&&done<total;
-      html+=`<div class="cal-day ${ti.color}${iso===today?' today':''}${full?' done':''}${partial&&!isPast?' partial':''}${isMissed?' missed-past':''}" onclick="openDay(${dayIdx})"><div class="day-num">${cur.getDate()}</div><div class="day-type">${ti.emoji}</div>${full?'<div class="check">✅</div>':(partial&&!isPast?'<div class="check">🔶</div>':'')}</div>`;
+      const isFirst=cur.getDate()===1;
+      const dayLabel=isFirst?`<div class="day-num" style="font-size:10px">${cur.getMonth()+1}/1</div>`:`<div class="day-num">${cur.getDate()}</div>`;
+      html+=`<div class="cal-day ${ti.color}${iso===today?' today':''}${full?' done':''}${partial&&!isPast?' partial':''}${isMissed?' missed-past':''}" onclick="openDay(${dayIdx})">${dayLabel}<div class="day-type">${ti.emoji}</div>${full?'<div class="check">✅</div>':(partial&&!isPast?'<div class="check">🔶</div>':'')}</div>`;
     }
     cur.setDate(cur.getDate()+1);
   }
