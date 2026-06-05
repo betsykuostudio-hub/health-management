@@ -3760,11 +3760,17 @@ function generateReport(){
     </div>
     <div style="height:2px;background:linear-gradient(90deg,transparent,#c8922a,transparent);width:50px;border-radius:2px;margin:12px auto 0"></div>
   </div>
-  <div style="padding:14px 16px 8px">
+  <div style="padding:10px 14px 6px">
     ${secTitle('45 天打卡總覽')}
-    <div class="cal-week-header"><div class="cal-week-label">一</div><div class="cal-week-label">二</div><div class="cal-week-label">三</div><div class="cal-week-label">四</div><div class="cal-week-label">五</div><div class="cal-week-label" style="color:#ef4444">六</div><div class="cal-week-label" style="color:#ef4444">日</div></div>
-    <div class="week-grid">${gridCells}</div>
-    ${gridLegend}
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px">${['一','二','三','四','五','六','日'].map((d,i)=>`<div style="text-align:center;font-size:10px;font-weight:700;color:${i>=5?'#ef4444':'#9ca3af'};padding:2px 0">${d}</div>`).join('')}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${gridCells.replace(/class="week-cell/g,'style="border-radius:5px;display:flex;align-items:center;justify-content:center;height:34px;font-size:10px;font-weight:700" class="week-cell')}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:7px">
+      <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#6b7280"><div style="width:9px;height:9px;border-radius:2px;background:#186637"></div>全完成</div>
+      <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#6b7280"><div style="width:9px;height:9px;border-radius:2px;background:#f8e0b0;border:1px solid #d4a04a"></div>部分</div>
+      <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#6b7280"><div style="width:9px;height:9px;border-radius:2px;background:#f3f4f6;border:1px solid #d1d5db"></div>未打卡</div>
+      <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#6b7280"><div style="width:9px;height:9px;border-radius:2px;background:#f0c8b8;border:1px solid #dc2626"></div>未完成</div>
+      <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#6b7280"><div style="width:9px;height:9px;border-radius:2px;background:#e8f5ee;border:1px solid #81BD48"></div>未到</div>
+    </div>
   </div>
   ${disclaimer}`;
 
