@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>DX 健康管理計畫</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Playfair+Display:wght@400;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -23,12 +23,20 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);min-height:100vh
 .header{background:#186637;color:white;padding:16px 20px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
 .header-title{font-size:var(--font-lg);font-weight:700;flex:1}
 .back-btn{background:rgba(255,255,255,.2);border:none;color:white;height:36px;border-radius:10px;font-size:var(--font-md);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 12px;white-space:nowrap;gap:4px}
-.setup-hero{background:linear-gradient(135deg,#0d3d20 0%,#186637 60%,#4a7a4a 100%);color:white;padding:36px 24px 28px;text-align:center}
-.setup-hero .emoji{font-size:52px;margin-bottom:12px}
-.setup-hero h1{font-size:28px;font-weight:900;margin-bottom:6px}
-.setup-hero p{font-size:var(--font-sm);opacity:.8;line-height:1.6}
-.setup-body{padding:24px 20px 100px}
-.section-title{font-size:var(--font-sm);font-weight:700;color:#186637;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;margin-top:24px}
+.setup-hero-large{background:linear-gradient(165deg,#186637 0%,#2d9e5a 100%);color:white;padding:32px 24px 26px;text-align:center;position:relative;overflow:hidden}
+.setup-hero-large .hero-deco{position:absolute;top:0;right:0;width:180px;height:100%;pointer-events:none;opacity:.08}
+.setup-hero-large .hero-leaf-ring{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.setup-hero-large .hero-title{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:6px;color:#f0f7f0}
+.setup-hero-large .hero-sub{font-size:var(--font-sm);opacity:.75;line-height:1.6}
+.setup-hero-large .hero-gold{height:2px;background:linear-gradient(90deg,transparent,#c8922a,transparent);width:48px;border-radius:2px;margin:12px auto 0}
+.setup-hero-small{background:linear-gradient(165deg,#186637 0%,#2d9e5a 100%);color:white;padding:14px 20px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+.setup-hero-small .hero-deco{position:absolute;top:0;right:0;width:120px;height:100%;pointer-events:none;opacity:.08}
+.setup-hero-small .hero-leaf-ring{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.setup-hero-small .hero-title{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400;color:#f0f7f0;line-height:1.2}
+.setup-hero-small .hero-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px}
+.setup-body{padding:20px 16px 100px}
+.section-title{font-size:11px;font-weight:700;color:#186637;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;margin-top:24px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:'';display:block;width:3px;height:14px;background:#c8922a;border-radius:2px;flex-shrink:0}
 .field-group{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
 .field-row{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--gray-100);gap:12px}
 .field-row:last-child{border-bottom:none}
@@ -96,7 +104,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .stats-body{padding:16px 16px 100px}
 .stat-card{background:white;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .stat-card-title{font-size:var(--font-sm);font-weight:700;color:var(--gray-500);margin-bottom:14px}
-.big-stat{font-size:44px;font-weight:900;color:#186637}
+.big-stat{font-family:'DM Serif Display',serif;font-size:44px;font-weight:400;color:#186637}
 .big-stat-unit{font-size:var(--font-lg);font-weight:500;color:var(--gray-500);margin-left:4px}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .bar-label{font-size:var(--font-sm);color:var(--gray-500);width:60px;flex-shrink:0;text-align:right}
@@ -380,7 +388,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 /* ── 新版視覺 CSS ─────────────────────────────────── */
 .new-header{background:#186637;padding:0 16px;height:56px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;position:sticky;top:0;z-index:100}
-.new-header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#f0f7f0;text-align:center}
+.new-header-title{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400;color:#f0f7f0;text-align:center}
 .new-header-back{background:none;border:none;color:rgba(255,255,255,.9);cursor:pointer;font-size:32px;font-weight:300;padding:0;line-height:1;font-family:sans-serif;display:flex;align-items:center;justify-content:center;width:44px;height:44px}
 .new-acct-btn{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:20px;position:relative}
 .sub-tab-bar{display:flex;background:#f2ede6;border-bottom:0.5px solid #ddd6cc}
@@ -392,7 +400,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .new-cal-stat+.new-cal-stat{border-left:1px solid var(--gray-100);align-items:flex-end}
 .new-cal-lbl{font-size:13px;color:var(--gray-400);font-weight:500}
 .new-cal-numrow{display:flex;align-items:baseline;gap:3px}
-.new-cal-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#186637;line-height:1.1}
+.new-cal-num{font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;color:#186637;line-height:1.1}
 .new-cal-unit{font-size:14px;font-weight:700;color:var(--gray-400);font-family:'Noto Sans TC',sans-serif}
 .new-cal-of{font-size:16px;color:var(--gray-400);font-family:'Noto Sans TC',sans-serif}
 .new-cal-prog{padding:0 16px 16px;border-top:1px solid var(--gray-100)}
@@ -400,7 +408,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .new-cal-prog-label{font-size:13px;color:var(--gray-400);white-space:nowrap;flex-shrink:0}
 .new-cal-prog-track{height:8px;background:var(--gray-100);border-radius:99px;overflow:hidden}
 .new-cal-prog-fill{height:100%;background:#186637;border-radius:99px;transition:width .4s}
-.new-cal-prog-lbl{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#186637}
+.new-cal-prog-lbl{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:#186637}
 .guide-today-hint{background:#fef9ee;border-bottom:0.5px solid #e8d9b8;padding:8px 16px;display:flex;align-items:center;gap:6px}
 .guide-today-dot{width:8px;height:8px;border-radius:50%;background:#c8922a;flex-shrink:0}
 .guide-today-text{font-size:var(--font-sm);color:#7a5c2e;font-weight:600}
@@ -676,10 +684,22 @@ input[type=date].field-input{width:145px;overflow:hidden}
 </div>
 
 <div id="screen-setup" class="screen">
-  <div class="setup-hero">
-    <div class="emoji">🎯</div>
-    <h1>DX 健康管理計畫</h1>
-    <p>45 天完整計畫追蹤<br/>設定一次，每天跟著走</p>
+  <!-- 初始設定 Hero（大） -->
+  <div class="setup-hero-large" id="setup-hero-large">
+    <svg class="hero-deco" viewBox="0 0 180 130" fill="none"><ellipse cx="160" cy="20" rx="100" ry="60" fill="white" transform="rotate(-15 160 20)"/><circle cx="140" cy="110" r="60" fill="white"/></svg>
+    <div class="hero-leaf-ring"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3C12 3 5 7 5 14C5 18 8.5 21 12 21C15.5 21 19 18 19 14C19 7 12 3 12 3Z" fill="#81BD48"/><path d="M12 21V13" stroke="#f0f7f0" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="hero-title">DX 健康管理計畫</div>
+    <div class="hero-sub">45 天完整計畫追蹤<br/>設定一次，每天跟著走</div>
+    <div class="hero-gold"></div>
+  </div>
+  <!-- 修改計畫 Hero（小，左對齊） -->
+  <div class="setup-hero-small" id="setup-hero-small" style="display:none">
+    <svg class="hero-deco" viewBox="0 0 120 70" fill="none"><ellipse cx="110" cy="10" rx="70" ry="40" fill="white" transform="rotate(-15 110 10)"/></svg>
+    <div class="hero-leaf-ring"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3C12 3 5 7 5 14C5 18 8.5 21 12 21C15.5 21 19 18 19 14C19 7 12 3 12 3Z" fill="#81BD48"/><path d="M12 21V13" stroke="#f0f7f0" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div>
+      <div class="hero-title">修改計畫設定</div>
+      <div class="hero-sub">執行中可隨時調整</div>
+    </div>
   </div>
   <div class="setup-body">
     <div class="section-title">計畫日期設定</div>
@@ -709,8 +729,20 @@ input[type=date].field-input{width:145px;overflow:hidden}
     </div>
     <div class="section-title">選配補充品</div>
     <div class="field-group">
-      <div class="field-row"><span class="field-label">使用易孅菌膠囊（瘦瘦菌）？</span><select class="field-input" id="use-slim" style="width:60px"><option value="yes">有</option><option value="no">無</option></select></div>
-      <div class="field-row"><span class="field-label">使用活悅益生菌膠囊？</span><select class="field-input" id="use-probio" style="width:60px"><option value="yes">有</option><option value="no">無</option></select></div>
+      <div class="field-row" style="justify-content:space-between">
+        <span class="field-label">易孅菌膠囊（瘦瘦菌）</span>
+        <button id="toggle-slim" onclick="toggleSetup('slim')" style="position:relative;width:48px;height:28px;border-radius:99px;border:none;cursor:pointer;transition:background .2s;background:#d1d5db;flex-shrink:0">
+          <span id="toggle-slim-dot" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s;display:block"></span>
+        </button>
+        <input type="hidden" id="use-slim" value="no"/>
+      </div>
+      <div class="field-row" style="justify-content:space-between">
+        <span class="field-label">活悅益生菌膠囊</span>
+        <button id="toggle-probio" onclick="toggleSetup('probio')" style="position:relative;width:48px;height:28px;border-radius:99px;border:none;cursor:pointer;transition:background .2s;background:#d1d5db;flex-shrink:0">
+          <span id="toggle-probio-dot" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s;display:block"></span>
+        </button>
+        <input type="hidden" id="use-probio" value="no"/>
+      </div>
     </div>
     <div id="setup-cancel-row" style="display:none;margin-bottom:10px">
       <button onclick="cancelSettings()" style="width:100%;padding:14px;border:2px solid var(--gray-300);border-radius:16px;background:white;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--gray-700)">← 取消，返回計畫</button>
@@ -782,12 +814,12 @@ input[type=date].field-input{width:145px;overflow:hidden}
       <button onclick="goToCalendar()" style="background:none;border:none;cursor:pointer;font-size:44px;font-weight:300;padding:0;line-height:1;font-family:sans-serif;display:flex;align-items:center;justify-content:center;width:56px;height:56px;color:#5a5030" id="day-back-btn">‹</button>
       <div style="text-align:center">
         <div style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:.5;margin-bottom:2px;color:#5a5030" id="day-hero-eyebrow">DX 45-Day Plan</div>
-        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;line-height:1.15;color:#5a5030" id="day-hero-title">健康管理計畫</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;line-height:1.15;color:#5a5030" id="day-hero-title">健康管理計畫</div>
       </div>
       <div style="text-align:right;padding-right:4px">
         <div id="day-day-badge" style="display:flex;align-items:baseline;justify-content:flex-end;gap:1px;background:rgba(255,255,255,.25);border:0.5px solid rgba(255,255,255,.4);border-radius:10px;padding:6px 10px;white-space:nowrap">
           <span id="day-day-pre" style="font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;color:#5a5030">第</span>
-          <span id="day-day-num" style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1;margin:0 2px;color:#5a5030"></span>
+          <span id="day-day-num" style="font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;line-height:1;margin:0 2px;color:#5a5030"></span>
           <span id="day-day-post" style="font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;color:#5a5030">天</span>
         </div>
       </div>
@@ -809,8 +841,8 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <div id="day-kpi-row" style="display:none;align-items:center;justify-content:space-between;padding:10px 16px;background:#f7f2eb;border-bottom:0.5px solid #ddd6cc">
       <div>
         <div style="display:flex;align-items:baseline;gap:4px">
-          <span id="day-kpi-done" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#186637;line-height:1">0</span>
-          <span id="day-kpi-total" style="font-size:13px;color:#9a8a72">/ 0 時間點</span>
+          <span id="day-kpi-done" style="font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;color:#186637;line-height:1">0</span>
+          <span id="day-kpi-total" style="font-size:16px;color:#9a8a72">/ 0 時間點</span>
         </div>
         <div style="font-size:10px;color:#9a8a72;margin-top:2px">今日完成</div>
       </div>
@@ -2840,6 +2872,23 @@ function updateGuideTodayHint(){
 function goToCalendar(){showCalendar();}
 function showStats(){renderStats();showScreen('screen-records','nav-records');}
 function showSupply(){renderSupply();showScreen('screen-supply','nav-supply');}
+function toggleSetup(key){
+  const btn=document.getElementById('toggle-'+key);
+  const dot=document.getElementById('toggle-'+key+'-dot');
+  const inp=document.getElementById('use-'+key);
+  const isOn=inp.value==='yes';
+  inp.value=isOn?'no':'yes';
+  btn.style.background=isOn?'#d1d5db':'#186637';
+  dot.style.transform=isOn?'translateX(0)':'translateX(20px)';
+}
+function syncToggles(){
+  ['slim','probio'].forEach(function(key){
+    const val=document.getElementById('use-'+key).value;
+    const btn=document.getElementById('toggle-'+key);
+    const dot=document.getElementById('toggle-'+key+'-dot');
+    if(btn&&dot){btn.style.background=val==='yes'?'#186637':'#d1d5db';dot.style.transform=val==='yes'?'translateX(20px)':'translateX(0)';}
+  });
+}
 function showSettings(){
   document.getElementById('nav-bar').style.display='none';
   if(state.startDate)document.getElementById('start-date').value=state.startDate;
@@ -2853,20 +2902,17 @@ function showSettings(){
   if(d.c)document.getElementById('dose-c').value=d.c;
   document.getElementById('use-slim').value=state.useSlim===false?'no':'yes';
   document.getElementById('use-probio').value=state.useProbio===false?'no':'yes';
-  // 修改設定模式：顯示返回按鈕
-  const setupHero=document.querySelector('#screen-setup .setup-hero');
-  if(setupHero&&state.startDate){
-    setupHero.innerHTML='<div class="emoji">⚙️</div><h1>修改計畫設定</h1><p>修改後按下方按鈕儲存</p>';
-  }
+  syncToggles();
+  document.getElementById('setup-hero-large').style.display='none';
+  document.getElementById('setup-hero-small').style.display='flex';
   document.getElementById('setup-cancel-row').style.display='block';
-  document.getElementById('setup-submit-btn').textContent='💾 儲存設定';
+  document.getElementById('setup-submit-btn').textContent='儲存設定';
   showScreen('screen-setup',null);
 }
 
 function cancelSettings(){
-  // 重設設定頁外觀
-  const setupHero=document.querySelector('#screen-setup .setup-hero');
-  if(setupHero) setupHero.innerHTML='<div class="emoji">🎯</div><h1>DX 健康管理計畫</h1><p>45 天完整計畫追蹤<br/>設定一次，每天跟著走</p>';
+  document.getElementById('setup-hero-large').style.display='block';
+  document.getElementById('setup-hero-small').style.display='none';
   document.getElementById('setup-cancel-row').style.display='none';
   document.getElementById('setup-submit-btn').textContent='🚀 開始計畫';
   document.getElementById('nav-bar').style.display='flex';
@@ -2875,7 +2921,6 @@ function cancelSettings(){
 
 // 新計畫用的設定頁：沿用劑量，清空日期
 function showNewPlanSetup(){
-  // 沿用劑量
   const d=state.doses||{};
   document.getElementById('start-date').value='';
   document.getElementById('pretest-date').value='';
@@ -2887,11 +2932,9 @@ function showNewPlanSetup(){
   if(d.c)document.getElementById('dose-c').value=d.c;
   document.getElementById('use-slim').value=state.useSlim===false?'no':'yes';
   document.getElementById('use-probio').value=state.useProbio===false?'no':'yes';
-  // 新計畫模式：更新標題
-  const setupHero=document.querySelector('#screen-setup .setup-hero');
-  if(setupHero){
-    setupHero.innerHTML='<div class="emoji">🆕</div><h1>新一輪計畫設定</h1><p>日期請重新填寫，劑量已沿用上次設定</p>';
-  }
+  syncToggles();
+  document.getElementById('setup-hero-large').style.display='block';
+  document.getElementById('setup-hero-small').style.display='none';
   document.getElementById('setup-cancel-row').style.display='none';
   document.getElementById('setup-submit-btn').textContent='🚀 開始計畫';
   document.getElementById('nav-bar').style.display='none';
