@@ -387,16 +387,20 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .sub-tab-btn{flex:1;padding:10px 4px;font-size:var(--font-sm);color:var(--gray-500);text-align:center;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;font-family:'Noto Sans TC',sans-serif;font-weight:500;min-height:48px}
 .sub-tab-btn.active{color:#186637;border-bottom-color:#c8922a;font-weight:700;background:#f5f9f5}
 .new-cal-kpi{background:white;margin:14px 14px 0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.new-cal-kpi-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;gap:8px}
-.new-cal-stat{display:flex;align-items:center;gap:7px}
-.new-cal-lbl{font-size:12px;color:var(--gray-400);white-space:nowrap}
-.new-cal-num{font-size:16px;font-weight:700;color:#186637;white-space:nowrap}
-.new-cal-divider{width:1px;height:20px;background:var(--gray-200);flex-shrink:0}
-.new-cal-prog{padding:8px 16px 13px;border-top:1px solid var(--gray-100);display:flex;align-items:center;gap:10px}
-.new-cal-prog-label{font-size:12px;color:var(--gray-400);white-space:nowrap;flex-shrink:0}
-.new-cal-prog-track{flex:1;height:5px;background:var(--gray-100);border-radius:99px;overflow:hidden}
+.new-cal-kpi-row{display:flex;align-items:stretch}
+.new-cal-stat{flex:1;padding:18px 16px 14px;display:flex;flex-direction:column;gap:4px}
+.new-cal-stat+.new-cal-stat{border-left:1px solid var(--gray-100);align-items:flex-end}
+.new-cal-lbl{font-size:13px;color:var(--gray-400);font-weight:500}
+.new-cal-numrow{display:flex;align-items:baseline;gap:3px}
+.new-cal-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#186637;line-height:1.1}
+.new-cal-unit{font-size:14px;font-weight:700;color:var(--gray-400);font-family:'Noto Sans TC',sans-serif}
+.new-cal-of{font-size:16px;color:var(--gray-400);font-family:'Noto Sans TC',sans-serif}
+.new-cal-prog{padding:0 16px 16px;border-top:1px solid var(--gray-100)}
+.new-cal-prog-header{display:flex;align-items:center;justify-content:space-between;padding:10px 0 7px}
+.new-cal-prog-label{font-size:13px;color:var(--gray-400);white-space:nowrap;flex-shrink:0}
+.new-cal-prog-track{height:8px;background:var(--gray-100);border-radius:99px;overflow:hidden}
 .new-cal-prog-fill{height:100%;background:#186637;border-radius:99px;transition:width .4s}
-.new-cal-prog-lbl{font-size:12px;color:var(--gray-400);white-space:nowrap;min-width:28px;text-align:right}
+.new-cal-prog-lbl{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#186637}
 .guide-today-hint{background:#fef9ee;border-bottom:0.5px solid #e8d9b8;padding:8px 16px;display:flex;align-items:center;gap:6px}
 .guide-today-dot{width:8px;height:8px;border-radius:50%;background:#c8922a;flex-shrink:0}
 .guide-today-text{font-size:var(--font-sm);color:#7a5c2e;font-weight:600}
@@ -728,18 +732,25 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <div class="new-cal-kpi-row">
       <div class="new-cal-stat">
         <span class="new-cal-lbl">計畫進度（天）</span>
-        <span class="new-cal-num" id="cal-kpi-day">— / 45</span>
+        <div class="new-cal-numrow">
+          <span class="new-cal-num" id="cal-kpi-day">—</span>
+          <span class="new-cal-of">/ 45 天</span>
+        </div>
       </div>
-      <div class="new-cal-divider"></div>
       <div class="new-cal-stat">
         <span class="new-cal-lbl">剩餘天數</span>
-        <span class="new-cal-num" id="cal-kpi-left">—</span>
+        <div class="new-cal-numrow">
+          <span class="new-cal-num" id="cal-kpi-left">—</span>
+          <span class="new-cal-unit">天</span>
+        </div>
       </div>
     </div>
     <div class="new-cal-prog">
-      <span class="new-cal-prog-label">進度</span>
+      <div class="new-cal-prog-header">
+        <span class="new-cal-prog-label">完成進度</span>
+        <span class="new-cal-prog-lbl" id="cal-kpi-pct">0%</span>
+      </div>
       <div class="new-cal-prog-track"><div class="new-cal-prog-fill" id="cal-kpi-prog" style="width:0%"></div></div>
-      <span class="new-cal-prog-lbl" id="cal-kpi-pct">0%</span>
     </div>
   </div>
   <div id="cal-summary" style="display:none"></div>
@@ -2912,7 +2923,7 @@ function renderCalendar(){
   const calKpiLeft=document.getElementById('cal-kpi-left');
   const calKpiProg=document.getElementById('cal-kpi-prog');
   const calKpiPct=document.getElementById('cal-kpi-pct');
-  if(calKpiDay) calKpiDay.textContent=(planDay||'—')+' / 45';
+  if(calKpiDay) calKpiDay.textContent=(planDay||'—');
   if(calKpiLeft) calKpiLeft.textContent=daysLeft;
   if(calKpiProg) calKpiProg.style.width=pct+'%';
   if(calKpiPct) calKpiPct.textContent=pct+'%';
