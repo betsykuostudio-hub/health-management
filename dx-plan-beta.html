@@ -3706,15 +3706,12 @@ function generateReport(){
         diffColor=isGood?'#16a34a':'#dc2626';
         diffText=diff<0?`▼ ${Math.abs(diff)}`:`▲ ${Math.abs(diff)}`;
       }
+      const preValColor=preLevel==='normal'?'#16a34a':preLevel==='warn'?'#d97706':'#dc2626';
       const postValColor=postLevel==='normal'?'#16a34a':postLevel==='warn'?'#d97706':'#dc2626';
-      grpHtml+=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;gap:4px;align-items:center;padding:8px 12px;border-bottom:1px solid #f3f4f6">
+      grpHtml+=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;gap:4px;align-items:center;padding:7px 12px;border-bottom:1px solid #f3f4f6">
         <div><div style="font-size:13px;font-weight:700;color:#374151">${item.label}</div><div style="font-size:10px;color:#9ca3af;margin-top:1px">${item.unit}　${item.range}</div></div>
-        <div style="text-align:center">
-          ${pre!==null?`<div style="font-size:14px;font-weight:700;color:#6b7280">${pre}</div><span style="display:inline-flex;align-items:center;justify-content:center;padding:1px 6px;border-radius:99px;font-size:10px;font-weight:700;margin-top:2px;${preLevel==='normal'?'background:#dcfce7;color:#166534':preLevel==='warn'?'background:#fef9c3;color:#a16207':'background:#fee2e2;color:#dc2626'}">${BADGE_TEXT[preLevel]}</span>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
-        </div>
-        <div style="text-align:center">
-          ${post!==null?`<div style="font-size:14px;font-weight:700;color:${postValColor}">${post}</div><span style="display:inline-flex;align-items:center;justify-content:center;padding:1px 6px;border-radius:99px;font-size:10px;font-weight:700;margin-top:2px;${postLevel==='normal'?'background:#dcfce7;color:#166534':postLevel==='warn'?'background:#fef9c3;color:#a16207':'background:#fee2e2;color:#dc2626'}">${BADGE_TEXT[postLevel]}</span>`:'<div style="color:#9ca3af;font-size:13px">—</div>'}
-        </div>
+        <div style="text-align:center;font-size:15px;font-weight:700;color:${pre!==null?preValColor:'#9ca3af'}">${pre!==null?pre:'—'}</div>
+        <div style="text-align:center;font-size:15px;font-weight:700;color:${post!==null?postValColor:'#9ca3af'}">${post!==null?post:'—'}</div>
         <div style="text-align:center;font-size:12px;font-weight:700;color:${diffColor}">${diffText}</div>
       </div>`;
     });
@@ -3797,6 +3794,11 @@ function generateReport(){
   const p3=`${bandHtml(3)}
   <div style="padding:12px 14px 10px">
     ${secTitle('體檢結果對比')}
+    <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280"><div style="width:10px;height:10px;border-radius:2px;background:#16a34a;flex-shrink:0"></div>正常</div>
+      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280"><div style="width:10px;height:10px;border-radius:2px;background:#d97706;flex-shrink:0"></div>留意</div>
+      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280"><div style="width:10px;height:10px;border-radius:2px;background:#dc2626;flex-shrink:0"></div>異常</div>
+    </div>
     ${hasExamData?`${examColHdr}<div style="background:white;border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)">${examHtml}</div>`:'<div style="color:#9ca3af;font-size:14px;text-align:center;padding:20px">尚未填入體檢數據</div>'}
   </div>
   ${disclaimer}`;
@@ -3805,7 +3807,7 @@ function generateReport(){
   const pageNav=`<div style="display:flex;gap:8px;padding:10px 16px;background:white;border-bottom:1px solid #e5e7eb;position:sticky;top:56px;z-index:9">
     <button onclick="switchReportPage(1)" id="rp-btn1" style="flex:1;padding:7px;border-radius:20px;border:1.5px solid #186637;background:#186637;color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">封面</button>
     <button onclick="switchReportPage(2)" id="rp-btn2" style="flex:1;padding:7px;border-radius:20px;border:1.5px solid #d1d5db;background:white;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">體組成</button>
-    <button onclick="switchReportPage(3)" id="rp-btn3" style="flex:1;padding:7px;border-radius:20px;border:1.5px solid #d1d5db;background:white;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">體檢</button>
+    <button onclick="switchReportPage(3)" id="rp-btn3" style="flex:1;padding:7px;border-radius:20px;border:1.5px solid #d1d5db;background:white;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">體檢結果</button>
   </div>
   <div id="rp1">${p1}</div>
   <div id="rp2" style="display:none">${p2}</div>
@@ -3820,9 +3822,19 @@ function generateReport(){
 }
 
 function downloadPDF(){
-  const content=document.getElementById('report-content');
+  const rp1=document.getElementById('rp1');
+  const rp2=document.getElementById('rp2');
+  const rp3=document.getElementById('rp3');
+  if(!rp1){return;}
+  // 合併三頁內容，各頁之間加分頁線
+  const combined=
+    (rp1?rp1.innerHTML:'')+
+    '<div style="page-break-before:always;border-top:2px dashed #e5e7eb;margin:24px 0"></div>'+
+    (rp2?rp2.innerHTML:'')+
+    '<div style="page-break-before:always;border-top:2px dashed #e5e7eb;margin:24px 0"></div>'+
+    (rp3?rp3.innerHTML:'');
   const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>DX 完成報告</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Noto Sans TC',sans-serif;max-width:480px;margin:0 auto;padding:20px;background:white}${document.querySelector('style').textContent}</style></head><body>${content.innerHTML}<script>window.onload=function(){window.print();}<\/script></body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>DX 完成報告</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Noto Sans TC',sans-serif;max-width:480px;margin:0 auto;background:white}@media print{.no-print{display:none!important}@page{margin:0;size:390px auto}}${document.querySelector('style').textContent}</style></head><body>${combined}<script>window.onload=function(){window.print();}<\/script></body></html>`);
   win.document.close();
 }
 
