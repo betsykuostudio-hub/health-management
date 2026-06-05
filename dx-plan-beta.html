@@ -1784,6 +1784,7 @@ async function updatePendingBadge() {
 // ── 帳號選單 ──────────────────────────────────────────
 function showAccountMenu() {
   if (!currentProfile) return;
+  document.getElementById('nav-bar').style.display = 'flex';
   // 姓名
   document.getElementById('account-modal-name-display').textContent = currentProfile.display_name || '（未設定姓名）';
   document.getElementById('account-modal-email').textContent = currentProfile.email;
