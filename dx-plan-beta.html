@@ -594,10 +594,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
     <button class="back-btn" onclick="showAccountMenu()">← 返回</button>
   </div>
   <div style="padding:24px 20px">
-    <div id="change-pw-vip-warning" style="display:none;background:#fef3c7;border:1.5px solid #fde68a;border-radius:14px;padding:16px;margin-bottom:20px;font-size:var(--font-sm);color:#92400e;line-height:1.7">
-      ⚠️ <strong>進階使用者請注意：</strong><br/>
-      修改密碼後，已儲存的體組成紀錄與體檢數值將<strong>永久無法讀取</strong>，此為加密設計限制，無法還原，也無法由管理者或教練協助解密。請確認後再繼續。
-    </div>
+    <div id="change-pw-vip-warning" style="display:none"></div>
     <div id="change-pw-msg" class="auth-msg"></div>
     <div class="auth-field">
       <label class="auth-field-label">新密碼（至少 6 位）</label>
@@ -1706,8 +1703,6 @@ function showChangePassword() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-change-password').classList.add('active');
   document.getElementById('nav-bar').style.display = 'none';
-  // 進階使用者顯示警告
-  document.getElementById('change-pw-vip-warning').style.display = isVip() ? 'block' : 'none';
   document.getElementById('change-pw-new').value = '';
   document.getElementById('change-pw-new2').value = '';
   const msg = document.getElementById('change-pw-msg');
@@ -1961,9 +1956,16 @@ async function loadStateFromSupabase() {
     }
     _currentPlanId = data.id;
     const loadedState = { ...DEFAULT_STATE, ...data.plan_state };
-    // vip/admin：解密 bodyLogs
-    if (isVip() && _encryptionKey && isEncrypted(loadedState.bodyLogs)) {
-      loadedState.bodyLogs = await decryptData(loadedState.bodyLogs, _encryptionKey) || [];
+    // 若 bodyLogs 仍是舊版加密格式，解密後以明文覆存（一次性 migration）
+    if (isEncrypted(loadedState.bodyLogs)) {
+      if (_encryptionKey) {
+        loadedState.bodyLogs = await decryptData(loadedState.bodyLogs, _encryptionKey) || [];
+        // 解密成功後立即以明文覆存，完成 migration
+        await sb.from('dx_plans').update({ plan_state: { ...loadedState } }).eq('id', _currentPlanId);
+      } else {
+        // 無金鑰無法解密，重置為空陣列避免顯示異常
+        loadedState.bodyLogs = [];
+      }
     }
     state = loadedState;
   } catch(e) {
@@ -1980,11 +1982,8 @@ async function saveState() {
   if (!currentUser) return;
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
-    // vip/admin：加密 bodyLogs 後再存
+    // bodyLogs 以明文儲存，靠 Supabase RLS 保護
     let stateToSave = { ...state };
-    if (isVip() && _encryptionKey && state.bodyLogs?.length > 0) {
-      stateToSave = { ...state, bodyLogs: await encryptData(state.bodyLogs, _encryptionKey) };
-    }
     if (_currentPlanId) {
       await sb.from('dx_plans')
         .update({ plan_state: stateToSave })
@@ -2000,31 +1999,34 @@ async function saveState() {
 }
 
 async function saveReportData(body, exam) {
-  // 只有 vip / admin 才存雲端
   if (!isVip()) return;
   if (!currentUser || !_currentPlanId) return;
   const { data: cur } = await sb.from('dx_plans').select('report_data').eq('id', _currentPlanId).single();
   const existing = cur?.report_data || {};
-  if (body !== undefined) existing.body = body;
-  if (exam !== undefined) existing.exam = exam;
-  // vip/admin 加密後存雲端
-  const dataToSave = _encryptionKey
-    ? await encryptData(existing, _encryptionKey)
-    : existing;
-  await sb.from('dx_plans').update({ report_data: dataToSave }).eq('id', _currentPlanId);
+  // 若舊資料是加密格式，先解密再合併
+  const base = (isEncrypted(existing) && _encryptionKey)
+    ? (await decryptData(existing, _encryptionKey) || {})
+    : (isEncrypted(existing) ? {} : existing);
+  if (body !== undefined) base.body = body;
+  if (exam !== undefined) base.exam = exam;
+  // 以明文儲存，靠 Supabase RLS 保護
+  await sb.from('dx_plans').update({ report_data: base }).eq('id', _currentPlanId);
 }
 
 async function getReportData() {
-  // 只有 vip / admin 才從雲端讀取
   if (!isVip()) return {};
   if (!currentUser || !_currentPlanId) return {};
   const { data } = await sb.from('dx_plans').select('report_data').eq('id', _currentPlanId).single();
   const raw = data?.report_data;
   if (!raw) return {};
-  // 若資料是加密格式，解密後回傳
-  if (isEncrypted(raw) && _encryptionKey) {
-    const decrypted = await decryptData(raw, _encryptionKey);
-    return decrypted || {};
+  // 若舊資料是加密格式，解密後明文覆存（migration）
+  if (isEncrypted(raw)) {
+    if (_encryptionKey) {
+      const decrypted = await decryptData(raw, _encryptionKey) || {};
+      await sb.from('dx_plans').update({ report_data: decrypted }).eq('id', _currentPlanId);
+      return decrypted;
+    }
+    return {};
   }
   return raw;
 }
