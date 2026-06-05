@@ -2119,64 +2119,6 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
   }
   html += `</div>`;
 
-  // ── 待審核區塊
-  if (pendingUsers.length > 0) {
-    const pOpen = _adminSections.pending;
-    html += `<div style="margin-bottom:4px">
-      <div onclick="adminToggleSection('pending')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${pOpen?'2px solid var(--red-bg)':'none'};margin-bottom:${pOpen?'12px':'0'}">
-        <span style="font-size:var(--font-sm);font-weight:700;color:var(--red);flex:1">⚠️ 待審核帳號（${pendingUsers.length} 人）</span>
-        <span style="font-size:13px;color:var(--gray-500);transform:${pOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
-      </div>`;
-    if (pOpen) {
-      pendingUsers.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
-      html += `<div style="height:1px;background:var(--gray-100);margin:4px 0 16px"></div>`;
-    }
-    html += `</div>`;
-  }
-
-  // ── 申請刪除區塊
-  if (deleteRequested.length > 0) {
-    const dOpen = _adminSections.deleteReq;
-    html += `<div style="margin-bottom:4px">
-      <div onclick="adminToggleSection('deleteReq')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${dOpen?'2px solid var(--red-bg)':'none'};margin-bottom:${dOpen?'12px':'0'}">
-        <span style="font-size:var(--font-sm);font-weight:700;color:var(--red);flex:1">🗑️ 申請刪除帳號（${deleteRequested.length} 人）</span>
-        <span style="font-size:13px;color:var(--gray-500);transform:${dOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
-      </div>`;
-    if (dOpen) {
-      // 處理步驟（可收合）
-      html += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;margin-bottom:10px;overflow:hidden">
-        <div onclick="adminToggleDeleteSteps()" style="display:flex;align-items:center;padding:10px 14px;cursor:pointer;gap:8px">
-          <span style="font-size:12px;font-weight:700;color:#92400e;flex:1">📋 處理步驟</span>
-          <span style="font-size:11px;color:#92400e;transform:${_adminDeleteStepsOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
-        </div>
-        ${_adminDeleteStepsOpen?`<div style="padding:0 14px 12px;font-size:12px;color:#92400e;line-height:1.8;border-top:1px solid #fecaca">
-          1. 至 Supabase Dashboard → Authentication → Users<br>
-          2. 搜尋下方使用者的 email<br>
-          3. 點擊 ⋯ → Delete user 完成刪除<br>
-          （刪除後所有資料將自動串聯清除）
-        </div>`:''}
-      </div>`;
-      deleteRequested.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
-      html += `<div style="height:1px;background:var(--gray-100);margin:4px 0 16px"></div>`;
-    }
-    html += `</div>`;
-  }
-
-  // ── 已開通區塊
-  const aOpen = _adminSections.active;
-  html += `<div>
-    <div onclick="adminToggleSection('active')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${aOpen?'2px solid var(--gray-100)':'none'};margin-bottom:${aOpen?'12px':'0'}">
-      <span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">✅ 已開通帳號（${activeUsers.length} 人）</span>
-      <span style="font-size:13px;color:var(--gray-500);transform:${aOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
-    </div>`;
-  if (aOpen) {
-    activeUsers.forEach(p => { html += renderAdminUserCard(p, roleMap, clientConsultantMap); });
-  }
-  html += `</div>`;
-
-  if (filtered.length === 0) html += '<div style="padding:40px 0;text-align:center;color:var(--gray-500)">找不到符合的使用者</div>';
-  body.innerHTML = html;
-}
 
 function adminToggleSection(key) {
   _adminSections[key] = !_adminSections[key];
