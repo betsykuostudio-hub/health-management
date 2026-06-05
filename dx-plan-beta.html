@@ -1672,7 +1672,8 @@ function showAppMain() {
   document.getElementById('nav-bar').style.display = 'flex';
   // 備份匯入匯出只對 admin 顯示
   document.getElementById('history-backup-btns').style.display = isAdmin() ? 'flex' : 'none';
-  document.getElementById('account-modal-import-btn').style.display = isAdmin() ? 'block' : 'none';
+  const importBtn = document.getElementById('account-modal-import-btn');
+  if (importBtn) importBtn.style.display = isAdmin() ? 'block' : 'none';
   // 待審核 badge（管理者 & 教練）
   if (isAdmin() || isConsultant()) updatePendingBadge();
   if (state.startDate) {
