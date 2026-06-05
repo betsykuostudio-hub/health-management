@@ -2433,38 +2433,49 @@ function renderConsultantBody(searchQuery) {
   const pending = filtered.filter(p => !p.is_invited && !p.delete_requested_at);
   const active = filtered.filter(p => p.is_invited && !p.delete_requested_at);
 
+  const icoExclaim = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><circle cx="12" cy="12" r="8.5" stroke="var(--red)" stroke-width="1.6"/><path d="M12 8V12.5" stroke="var(--red)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1" fill="var(--red)"/></svg>`;
+  const icoCheck = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><circle cx="12" cy="12" r="8.5" stroke="var(--gray-500)" stroke-width="1.6"/><path d="M8.5 12L11 14.5L15.5 9.5" stroke="var(--gray-500)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const icoTrash = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M4 7H20M9 7V5H15V7M10 11V17M14 11V17M5 7L6 19C6 19.552 6.448 20 7 20H17C17.552 20 18 19.552 18 19L19 7" stroke="var(--gray-500)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const chevron = (open) => `<span style="font-size:12px;color:var(--gray-400);transition:transform .2s;display:inline-block;transform:${open?'rotate(0deg)':'rotate(-90deg)'}">▼</span>`;
+
   // 待開通區塊
   if (pending.length > 0) {
     const pOpen = _consultantSections.pending;
     html += `<div style="margin-bottom:4px">
-      <div onclick="consultantToggleSection('pending')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${pOpen?'2px solid var(--red-bg)':'none'};margin-bottom:${pOpen?'12px':'0'}">
-        <span style="font-size:var(--font-sm);font-weight:700;color:var(--red);flex:1">⚠️ 待開通（${pending.length} 人）</span>
-        <span style="font-size:13px;color:var(--gray-500);transform:${pOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+      <div onclick="consultantToggleSection('pending')" style="display:flex;align-items:center;gap:8px;padding:11px 2px;cursor:pointer;user-select:none">
+        ${icoExclaim}<span style="font-size:var(--font-sm);font-weight:700;color:var(--red);flex:1">待開通</span>
+        <span style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--red-bg);color:var(--red)">${pending.length} 人</span>
+        ${chevron(pOpen)}
       </div>`;
     if (pOpen) {
+      html += `<div style="height:1px;background:var(--gray-100);margin:2px 0 10px"></div>`;
       pending.forEach(p => { html += renderConsultantClientCard(p); });
-      html += `<div style="height:1px;background:var(--gray-100);margin:4px 0 12px"></div>`;
     }
     html += `</div>`;
   }
 
   // 已開通區塊
   const aOpen = _consultantSections.active;
-  html += `<div style="margin-bottom:4px">
-    <div onclick="consultantToggleSection('active')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${aOpen?'2px solid var(--gray-100)':'none'};margin-bottom:${aOpen?'12px':'0'}">
-      <span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">✅ 已開通（${active.length} 人）</span>
-      <span style="font-size:13px;color:var(--gray-500);transform:${aOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+  html += `<div style="margin-top:4px;margin-bottom:4px">
+    <div onclick="consultantToggleSection('active')" style="display:flex;align-items:center;gap:8px;padding:11px 2px;cursor:pointer;user-select:none">
+      ${icoCheck}<span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">已開通</span>
+      <span style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--gray-100);color:var(--gray-500)">${active.length} 人</span>
+      ${chevron(aOpen)}
     </div>`;
-  if (aOpen) { active.forEach(p => { html += renderConsultantClientCard(p); }); }
+  if (aOpen) {
+    html += `<div style="height:1px;background:var(--gray-100);margin:2px 0 10px"></div>`;
+    active.forEach(p => { html += renderConsultantClientCard(p); });
+  }
   html += `</div>`;
 
   // 已申請刪除區塊
   if (deleteRequested.length > 0) {
     const dOpen = _consultantSections.deleteReq;
-    html += `<div style="margin-top:8px">
-      <div onclick="consultantToggleSection('deleteReq')" style="display:flex;align-items:center;gap:8px;padding:12px 4px;cursor:pointer;user-select:none;border-bottom:${dOpen?'2px solid var(--gray-100)':'none'};margin-bottom:${dOpen?'12px':'0'}">
-        <span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-400);flex:1">🗑️ 已申請刪除（${deleteRequested.length} 人）</span>
-        <span style="font-size:13px;color:var(--gray-400);transform:${dOpen?'rotate(180deg)':'rotate(0deg)'};transition:transform .2s;display:inline-block">▼</span>
+    html += `<div style="margin-top:4px">
+      <div onclick="consultantToggleSection('deleteReq')" style="display:flex;align-items:center;gap:8px;padding:11px 2px;cursor:pointer;user-select:none">
+        ${icoTrash}<span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">申請刪除</span>
+        <span style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--gray-100);color:var(--gray-500)">${deleteRequested.length} 人</span>
+        ${chevron(dOpen)}
       </div>`;
     if (dOpen) {
       deleteRequested.forEach(p => {
@@ -2498,26 +2509,30 @@ function consultantSearch(q) {
 
 function renderConsultantClientCard(p) {
   const isInvited = p.is_invited;
-  const vipTag = p.is_vip ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--yellow-bg);color:var(--yellow);border:1px solid #fcd34d;white-space:nowrap">⭐ 進階</span>` : '';
-  const inviteStatus = isInvited
-    ? `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--green-bg);color:var(--green);white-space:nowrap">✅ 已開通</span>`
-    : `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--red-bg);color:var(--red);white-space:nowrap">🔒 待開通</span>`;
-  return `<div class="admin-user-card" style="padding:0;cursor:pointer" id="cc-card-${p.id}">
+  const vipTag = p.is_vip ? `<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--yellow-bg);color:var(--yellow);white-space:nowrap">⭐ 進階</span>` : '';
+  const deleteTag = p.delete_requested_at ? `<span style="font-size:11px;background:#fef2f2;color:var(--red);border:1px solid #fecaca;padding:2px 7px;border-radius:99px;white-space:nowrap">申請刪除 ${p.delete_requested_at.slice(5,10)}</span>` : '';
+  const roleBg = isInvited ? '#dbeafe' : 'var(--gray-100)';
+  const roleColor = isInvited ? '#1d4ed8' : 'var(--gray-500)';
+
+  return `<div class="admin-user-card" id="cc-card-${p.id}" style="padding:0;cursor:pointer">
     <div onclick="consultantToggleCard('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:11px 14px">
-      <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+      <div style="flex:1;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:5px">
         <span style="font-size:var(--font-sm);font-weight:700;color:#111827;white-space:nowrap">${p.display_name||'（未填姓名）'}</span>
-        ${vipTag}
+        <span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:${roleBg};color:${roleColor};white-space:nowrap">學員</span>
+        ${vipTag}${deleteTag}
       </div>
-      ${inviteStatus}
       <span id="cc-card-chevron-${p.id}" style="font-size:11px;color:var(--gray-300);flex-shrink:0;transform:rotate(0deg);transition:transform .2s;display:inline-block">▼</span>
     </div>
-    <div id="cc-card-body-${p.id}" style="display:none;border-top:1px solid var(--gray-100);padding:12px 16px 14px">
-      <div style="font-size:13px;color:var(--gray-500);margin-bottom:2px">${p.email}・${p.created_at?p.created_at.slice(0,10):''} 加入</div>
-      <div style="font-size:12px;color:var(--gray-300);margin-bottom:12px">最近開啟：<span style="color:var(--gray-500)">${formatLastSeen(p.last_seen_at)}</span></div>
-      <button class="admin-invite-btn ${isInvited?'admin-invite-on':'admin-invite-off'}"
-        onclick="consultantToggleInvite('${p.id}',${isInvited},this)">
-        ${isInvited?'✅ 已開通　點此關閉':'🔒 待開通　點此開通'}
-      </button>
+    <div id="cc-card-body-${p.id}" style="display:none;border-top:1px solid var(--gray-100);padding:12px 14px 14px">
+      <div style="font-size:13px;color:var(--gray-700);margin-bottom:2px">${p.email}</div>
+      <div style="font-size:12px;color:var(--gray-400);margin-bottom:12px">${p.created_at?p.created_at.slice(0,10):''} 加入・最近開啟：${formatLastSeen(p.last_seen_at)}</div>
+      <div style="height:1px;background:var(--gray-100);margin-bottom:10px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;font-weight:700;color:var(--gray-500)">開通狀態</span>
+        <button onclick="consultantToggleInvite('${p.id}',${isInvited},this)" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none;background:${isInvited?'var(--green-bg)':'var(--red-bg)'};color:${isInvited?'var(--green)':'var(--red)'}">
+          ${isInvited?'✅ 已開通':'🔒 待開通'}
+        </button>
+      </div>
     </div>
   </div>`;
 }
@@ -2526,7 +2541,7 @@ function consultantToggleCard(id) {
   const body = document.getElementById(`cc-card-body-${id}`);
   const chevron = document.getElementById(`cc-card-chevron-${id}`);
   if (!body) return;
-  const isOpen = body.style.display !== 'none';
+  const isOpen = body.style.display === 'block';
   body.style.display = isOpen ? 'none' : 'block';
   if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
@@ -2558,11 +2573,16 @@ async function consultantToggleInvite(userId, currentVal, btn) {
     new_value: !currentVal
   });
   if (!error) {
-    const newVal = !currentVal;
-    btn.textContent = newVal ? '✅ 已開通' : '🔒 待開通';
-    btn.className = `admin-invite-btn ${newVal ? 'admin-invite-on' : 'admin-invite-off'}`;
-    btn.onclick = () => consultantToggleInvite(userId, newVal, btn);
-    btn.disabled = false;
+    // 更新本地資料並重新 render
+    const p = _consultantClientList.find(p => p.id === userId);
+    if (p) p.is_invited = !currentVal;
+    const q = document.getElementById('consultant-search')?.value || '';
+    renderConsultantBody(q);
+    // 重新展開同一張卡片
+    const body = document.getElementById(`cc-card-body-${userId}`);
+    const chevron = document.getElementById(`cc-card-chevron-${userId}`);
+    if (body) body.style.display = 'block';
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
   } else {
     btn.disabled = false;
     alert('開通失敗：' + error.message);
