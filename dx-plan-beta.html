@@ -482,6 +482,40 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700
 .g-hero-consultant{background:linear-gradient(165deg,#061f0f 0%,var(--green-dark) 45%,var(--green) 100%)}
 .g-hero-admin{background:linear-gradient(165deg,#030e06 0%,#061f0f 40%,var(--green-dark) 100%)}
 
+/* ── 指南額外 CSS（admin/consultant 專用）── */
+.g-func-table{width:100%;border-collapse:collapse}
+.g-func-table tr{border-bottom:1px solid var(--g100)}
+.g-func-table tr:last-child{border-bottom:none}
+.g-func-table td{padding:11px 4px;font-size:13px;line-height:1.55;vertical-align:top}
+.g-func-table td:first-child{width:36%;font-weight:700;color:var(--green-dark)}
+.g-func-table td:last-child{color:var(--g500)}
+
+.g-invite-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.g-invite-step{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--green-light);border-radius:10px}
+.g-invite-step-num{width:22px;height:22px;flex-shrink:0;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.g-invite-step-text{font-size:13px;color:var(--g700);line-height:1.6}
+.g-rule-box{background:#f8faff;border:1.5px solid var(--g200);border-radius:10px;padding:12px 14px}
+.g-rule-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--g500);line-height:1.6;padding:4px 0}
+.g-rule-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px}
+.g-mgmt-block{margin-bottom:16px}
+.g-mgmt-title{font-size:13px;font-weight:700;color:var(--green-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.g-mgmt-desc{font-size:13px;color:var(--g500);line-height:1.7;padding-left:9px}
+.g-status-demo{display:flex;gap:8px;margin-top:8px;padding-left:9px}
+.g-status-btn-on{padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--green-light);color:var(--green);border:1.5px solid var(--green)}
+.g-status-btn-off{padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--green);color:#fff;border:none}
+.g-status-arrow{font-size:14px;color:var(--g500);align-self:center}
+.g-also-box{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:var(--r);padding:16px 18px;margin-bottom:12px}
+.g-also-label{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:10px}
+.g-also-tags{display:flex;flex-wrap:wrap;gap:8px}
+.g-also-tag{background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:700;padding:5px 12px;border-radius:99px}
+.g-feat-note{margin-top:10px;background:var(--green-light);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--green-dark);line-height:1.6}
+.g-func-list{display:flex;flex-direction:column;gap:10px}
+.g-func-item{display:flex;align-items:flex-start;gap:12px;background:var(--green-light);border-radius:var(--r2);padding:14px}
+.g-func-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.g-func-title{font-size:15px;font-weight:700;color:var(--green-dark);margin-bottom:3px}
+.g-func-desc{font-size:13px;color:var(--g500);line-height:1.6}
+
+
 </style>
 </head>
 <body>
@@ -697,9 +731,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700
 <div class="g-section">
   <div class="g-sec-title">開始使用（3 步驟）</div>
   <div class="g-steps">
-    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">📩 用邀請碼完成註冊</div><div class="g-step-desc">在登入頁點「用邀請碼註冊」，填入邀請碼、姓名、Email 與密碼。邀請碼由教練或管理者提供。</div></div></div>
-    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">✅ 完成註冊後直接登入</div><div class="g-step-desc">帳號自動開通，直接用 Email 與密碼登入即可。App 不會主動發送通知。</div></div></div>
-    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">📅 設定日期與劑量，開始計畫</div><div class="g-step-desc">填入前測日、第 1 天、後測日，依教練指示填寫劑量，點「開始計畫」。</div></div></div>
+    <div class="g-step"><div class="g-step-num">1</div><div><div class="g-step-title">📩 用邀請碼完成註冊</div><div class="g-step-desc">在登入頁點「用邀請碼註冊」，填入邀請碼、姓名、Email 與密碼。邀請碼由教練或管理者提供。</div></div></div>
+    <div class="g-step"><div class="g-step-num">2</div><div><div class="g-step-title">✅ 完成註冊後直接登入</div><div class="g-step-desc">帳號自動開通，直接用 Email 與密碼登入即可。App 不會主動發送通知。</div></div></div>
+    <div class="g-step"><div class="g-step-num">3</div><div><div class="g-step-title">📅 設定日期與劑量，開始計畫</div><div class="g-step-desc">填入前測日、第 1 天、後測日，依教練指示填寫劑量，點「開始計畫」。</div></div></div>
   </div>
 </div>
 <div class="g-section">
@@ -793,17 +827,17 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700
 <div class="g-section">
   <div class="g-sec-title">開始使用（3 步驟）</div>
   <div class="g-steps">
-    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">管理者提供邀請碼給你</div><div class="g-step-desc">教練帳號透過邀請碼自行註冊，邀請碼由管理者產生並提供。</div></div></div>
-    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">用邀請碼完成註冊，直接登入</div><div class="g-step-desc">在登入頁點「用邀請碼註冊」完成註冊，帳號自動開通，直接登入即可。</div></div></div>
-    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">從帳號選單進入管理功能</div><div class="g-step-desc">帳號選單包含「我的邀請碼」與「我的學員」。</div></div></div>
+    <div class="g-step"><div class="g-step-num">1</div><div><div class="g-step-title">管理者提供邀請碼給你</div><div class="g-step-desc">教練帳號透過邀請碼自行註冊，邀請碼由管理者產生並提供。</div></div></div>
+    <div class="g-step"><div class="g-step-num">2</div><div><div class="g-step-title">用邀請碼完成註冊，直接登入</div><div class="g-step-desc">在登入頁點「用邀請碼註冊」完成註冊，帳號自動開通，直接登入即可。</div></div></div>
+    <div class="g-step"><div class="g-step-num">3</div><div><div class="g-step-title">從帳號選單進入管理功能</div><div class="g-step-desc">帳號選單包含「我的邀請碼」與「我的學員」。</div></div></div>
   </div>
 </div>
 <div class="g-section">
   <div class="g-sec-title">帶學員加入（3 步驟）</div>
   <div class="g-steps">
-    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">🎟️ 產生邀請碼</div><div class="g-step-desc">帳號 → 我的邀請碼，可填備註名稱（選填）→ 點產生。格式 DX-XXXXXX，有效期 7 天，每組僅能使用一次。</div></div></div>
-    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">📨 把邀請碼傳給學員</div><div class="g-step-desc">學員在登入頁點「用邀請碼註冊」，填入邀請碼、姓名、Email 與密碼完成註冊。</div></div></div>
-    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">✅ 學員自動開通</div><div class="g-step-desc">完成註冊後帳號自動開通，可直接登入使用。App 不會主動通知，可視情況告知學員。</div></div></div>
+    <div class="g-step"><div class="g-step-num">1</div><div><div class="g-step-title">🎟️ 產生邀請碼</div><div class="g-step-desc">帳號 → 我的邀請碼，可填備註名稱（選填）→ 點產生。格式 DX-XXXXXX，有效期 7 天，每組僅能使用一次。</div></div></div>
+    <div class="g-step"><div class="g-step-num">2</div><div><div class="g-step-title">📨 把邀請碼傳給學員</div><div class="g-step-desc">學員在登入頁點「用邀請碼註冊」，填入邀請碼、姓名、Email 與密碼完成註冊。</div></div></div>
+    <div class="g-step"><div class="g-step-num">3</div><div><div class="g-step-title">✅ 學員自動開通</div><div class="g-step-desc">完成註冊後帳號自動開通，可直接登入使用。App 不會主動通知，可視情況告知學員。</div></div></div>
   </div>
 </div>
 <div class="g-section">
@@ -903,9 +937,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700
 <div class="g-section">
   <div class="g-sec-title">開始使用（3 步驟）</div>
   <div class="g-steps">
-    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">由開發者直接建立帳號</div><div class="g-step-desc">管理者帳號由開發者直接設定，無需邀請碼。</div></div></div>
-    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">用 Email 與密碼登入 App</div><div class="g-step-desc">帳號選單會顯示你的姓名與「管理者」身份。</div></div></div>
-    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">從帳號選單進入各項管理功能</div><div class="g-step-desc">包含成員管理、我的邀請碼、系統資訊等。</div></div></div>
+    <div class="g-step"><div class="g-step-num">1</div><div><div class="g-step-title">由開發者直接建立帳號</div><div class="g-step-desc">管理者帳號由開發者直接設定，無需邀請碼。</div></div></div>
+    <div class="g-step"><div class="g-step-num">2</div><div><div class="g-step-title">用 Email 與密碼登入 App</div><div class="g-step-desc">帳號選單會顯示你的姓名與「管理者」身份。</div></div></div>
+    <div class="g-step"><div class="g-step-num">3</div><div><div class="g-step-title">從帳號選單進入各項管理功能</div><div class="g-step-desc">包含成員管理、我的邀請碼、系統資訊等。</div></div></div>
   </div>
 </div>
 <div class="g-section">
