@@ -1992,16 +1992,17 @@ async function updatePendingBadge() {
   let count = 0;
   try {
     if (isAdmin()) {
-      // 管理者：顯示申請刪除人數
+      // 管理者：顯示申請刪除人數（排除自身）
       const { data } = await sb.from('profiles')
         .select('id')
-        .not('delete_requested_at', 'is', null);
+        .not('delete_requested_at', 'is', null)
+        .neq('id', currentUser.id);
       count = data?.length || 0;
     } else if (isConsultant()) {
       // 教練：顯示名下申請刪除人數
       const { data: ccRows } = await sb.from('consultant_clients')
         .select('client_id').eq('consultant_id', currentUser.id);
-      const ids = (ccRows || []).map(r => r.client_id);
+      const ids = (ccRows || []).map(r => r.client_id).filter(id => id !== currentUser.id);
       if (ids.length > 0) {
         const { data } = await sb.from('profiles')
           .select('id')
@@ -2539,7 +2540,7 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
   const inviteToggle = !p.delete_requested_at ? `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <span style="font-size:12px;font-weight:700;color:var(--gray-500)">開通狀態</span>
-      <button onclick="adminToggleInvite('${p.id}',${!!p.is_invited},this)" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none;background:${p.is_invited?'var(--green-bg)':'var(--red-bg)'};color:${p.is_invited?'var(--green)':'var(--red)'}">${p.is_invited?'✅ 已開通':'🔒 待審核'}</button>
+      <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;background:${p.is_invited?'var(--green-bg)':'var(--gray-100)'};color:${p.is_invited?'var(--green)':'var(--gray-500)'}">${p.is_invited?'✅ 已開通':'🔒 待審核'}</span>
     </div>` : '';
 
   let assignBtn = '';
@@ -2547,7 +2548,7 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
     const currentConsultantId = clientConsultantMap[p.id] || '';
     const options = `<option value="">（無）</option>` +
       _adminConsultants.filter(c => c.id !== p.id).map(c =>
-        `<option value="${c.id}" ${currentConsultantId===c.id?'selected':''}>${c.display_name||c.email}</option>`
+        `<option value="${c.id}" ${currentConsultantId===c.id?'selected':''}>${c.display_name||'（未設定）'} (${c.email})</option>`
       ).join('');
     assignBtn = `<div style="height:1px;background:var(--gray-100);margin:10px 0"></div>
       <div style="display:flex;align-items:center;gap:8px">
@@ -2938,7 +2939,12 @@ async function generateInviteCode(assignedTo = '', role = 'client', assignedCons
     alert('產生邀請碼失敗：' + error.message + '\ncode: ' + error.code + '\ndetails: ' + error.details + '\nhint: ' + error.hint);
     return;
   }
-  await showInviteCode();
+  // 管理者從後台產碼 → 回到後台；教練從邀請碼頁產碼 → 留在邀請碼頁
+  if (isAdmin() && document.getElementById('screen-admin')?.classList.contains('active')) {
+    await renderAdminPanel();
+  } else {
+    await showInviteCode();
+  }
 }
 
 async function regenerateInviteCode(id) {
