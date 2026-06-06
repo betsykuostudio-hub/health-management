@@ -135,7 +135,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .supply-row-label{color:var(--gray-500);width:80px;flex-shrink:0}
 .supply-row-val{font-weight:600;color:var(--gray-700);flex:1}
 .supply-stock-section{padding:10px 0 0}
-.supply-stock-title{font-size:var(--font-sm);font-weight:700;color:var(--purple);margin-bottom:8px}
+.supply-stock-title{font-size:11px;font-weight:700;color:#186637;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:6px}.supply-stock-title::before{content:'';display:block;width:3px;height:14px;background:#c8922a;border-radius:2px;flex-shrink:0}
 .supply-stock-row{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:var(--font-sm);border-bottom:1px solid var(--gray-100)}
 .supply-stock-row:last-child{border-bottom:none}
 .supply-stock-input{width:60px;text-align:center;font-size:var(--font-md);font-weight:700;color:var(--purple-dark);border:1.5px solid var(--purple-light);border-radius:8px;padding:5px;outline:none;font-family:'Noto Sans TC',sans-serif;background:var(--purple-light)}
@@ -166,7 +166,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .optional-toggle input{width:18px;height:18px;accent-color:var(--purple)}
 .notes-body,.menu-body{padding:0 0 130px}
 .notes-section{padding:16px 16px 0}
-.notes-section-title{font-size:var(--font-md);font-weight:900;color:var(--purple-dark);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.notes-section-title{font-size:11px;font-weight:700;color:#186637;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;margin-top:24px;display:flex;align-items:center;gap:6px}.notes-section-title::before{content:'';display:block;width:3px;height:14px;background:#c8922a;border-radius:2px;flex-shrink:0}
 .note-card{background:white;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:var(--font-md);line-height:1.8;color:var(--gray-700)}
 .note-card strong{font-weight:700;color:#111827}
 .note-ul{margin:6px 0 0 4px;display:flex;flex-direction:column;gap:4px;list-style:none}
@@ -588,10 +588,10 @@ input[type=date].field-input{width:145px;overflow:hidden}
 
 <!-- CHANGE PASSWORD -->
 <div id="screen-change-password" class="screen">
-  <div class="header">
-    <span style="font-size:22px">🔑</span>
-    <span class="header-title">修改密碼</span>
-    <button class="back-btn" onclick="showAccountMenu()">← 返回</button>
+  <div class="new-header">
+    <button class="new-header-back" onclick="showAccountMenu()">‹</button>
+    <div class="new-header-title">修改密碼</div>
+    <div></div>
   </div>
   <div style="padding:24px 20px">
     <div id="change-pw-vip-warning" style="display:none"></div>
