@@ -414,6 +414,74 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .guide-today-text{font-size:var(--font-sm);color:#7a5c2e;font-weight:600}
 @keyframes loadingSpin{to{transform:rotate(360deg)}}
 @keyframes loadingDot{0%,100%{opacity:.25}50%{opacity:1}}
+
+/* ── 使用指南嵌入 CSS ─────────────────────────────── */
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#186637;--green-dark:#0d3d20;--green-mid:#2d9e5a;--green-light:#e8f5ee;--gold:#c8922a;--bg:#f5f9f5;--white:#fff;--g100:#f3f4f6;--g200:#e5e7eb;--g500:#6b7280;--g700:#374151;--g900:#111827;--yellow:#d97706;--ybg:#fef3c7;--r:16px;--r2:12px}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700);font-size:15px;max-width:480px;margin:0 auto;min-height:100vh}
+.g-hero{background:linear-gradient(165deg,var(--green-dark) 0%,var(--green) 55%,var(--green-mid) 100%);color:#fff;padding:44px 24px 36px;text-align:center;position:relative;overflow:hidden}
+.g-hero-deco{position:absolute;top:0;right:0;width:200px;height:100%;pointer-events:none;opacity:.07}
+.g-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(200,146,42,.25);border:1px solid rgba(200,146,42,.5);color:#f5d08a;font-size:11px;font-weight:700;letter-spacing:.1em;padding:5px 14px;border-radius:99px;margin-bottom:18px;text-transform:uppercase}
+.g-hero-leaf{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.g-hero h1{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;margin-bottom:8px;line-height:1.25;color:#f0f7f0}
+.g-hero p{font-size:13px;color:rgba(255,255,255,.65);line-height:1.7}
+.g-hero-gold{height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);width:56px;border-radius:2px;margin:14px auto 0}
+.g-section{background:var(--white);margin:8px 0 0;padding:20px 20px 24px}
+.g-sec-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--g100)}
+.g-sec-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0}
+.g-steps{display:flex;flex-direction:column;gap:10px}
+.g-step{display:flex;align-items:flex-start;gap:12px;background:var(--green-light);border-radius:var(--r2);padding:14px}
+.g-step-num{width:26px;height:26px;flex-shrink:0;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;margin-top:1px}
+.g-step-title{font-size:15px;font-weight:700;color:var(--green-dark);margin-bottom:3px}
+.g-step-desc{font-size:13px;color:var(--g500);line-height:1.65}
+.g-daily-box{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:var(--r);padding:18px 20px;color:#fff;display:flex;align-items:center;gap:14px}
+.g-daily-icon{font-size:30px;flex-shrink:0}
+.g-daily-label{font-size:12px;opacity:.75;margin-bottom:4px}
+.g-daily-flow{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;line-height:1.5;color:#f0f7f0}
+.g-feat-table{width:100%;border-collapse:collapse}
+.g-feat-table tr{border-bottom:1px solid var(--g100)}
+.g-feat-table tr:last-child{border-bottom:none}
+.g-feat-table td{padding:10px 0;font-size:14px;line-height:1.55;vertical-align:top}
+.g-feat-table td:first-child{width:46%;color:var(--green-dark);font-weight:700;padding-right:8px}
+.g-feat-table td:last-child{color:var(--g500)}
+.g-faq{display:flex;flex-direction:column}
+.g-faq-item{border-bottom:1px solid var(--g100);padding:14px 0}
+.g-faq-item:last-child{border-bottom:none}
+.g-faq-q{font-size:15px;font-weight:700;color:var(--g900);margin-bottom:6px;display:flex;align-items:flex-start;gap:8px}
+.g-faq-q::before{content:'Q';background:var(--green);color:#fff;font-size:10px;font-weight:900;padding:2px 6px;border-radius:6px;flex-shrink:0;margin-top:3px}
+.g-faq-a{font-size:13px;color:var(--g500);line-height:1.75;padding-left:28px}
+.g-faq-a strong{color:var(--green-dark)}
+.g-pro-wrap{border:1.5px solid var(--g200);border-radius:var(--r);overflow:hidden}
+.g-pro-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--green-light);cursor:pointer;user-select:none}
+.g-pro-header-left{display:flex;align-items:center;gap:10px}
+.g-pro-badge{background:var(--gold);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px}
+.g-pro-header-title{font-size:15px;font-weight:700;color:var(--green-dark)}
+.g-pro-arrow{font-size:16px;color:var(--g500);transition:transform .2s;display:inline-block}
+.g-pro-body{display:none;padding:16px;border-top:1px solid var(--g200)}
+.g-pro-feat{display:flex;align-items:flex-start;gap:12px;background:var(--green-light);border-radius:10px;padding:12px;margin-bottom:10px}
+.g-pro-feat-icon{font-size:20px;flex-shrink:0}
+.g-pro-feat-title{font-size:14px;font-weight:700;color:var(--green-dark);margin-bottom:3px}
+.g-pro-feat-desc{font-size:13px;color:var(--g500);line-height:1.55}
+.g-info-box{background:var(--green-light);border-left:3px solid var(--green);border-radius:10px;padding:14px;margin-bottom:12px}
+.g-info-title{font-size:13px;font-weight:700;color:var(--green-dark);margin-bottom:6px}
+.g-info-text{font-size:13px;color:var(--g700);line-height:1.75}
+.g-limit-list{border:1.5px solid var(--g200);border-radius:10px;overflow:hidden;margin-top:4px}
+.g-limit-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--g100);background:var(--white)}
+.g-limit-item:last-child{border-bottom:none}
+.g-limit-icon{font-size:14px;flex-shrink:0;margin-top:2px}
+.g-limit-text{font-size:13px;color:var(--g700);line-height:1.6}
+.g-tips{display:flex;flex-direction:column;gap:8px}
+.g-tip{padding:12px 14px;border-radius:10px;background:var(--green-light);border-left:4px solid var(--green);font-size:14px;color:var(--g700);line-height:1.65}
+.tip strong{color:var(--green-dark)}
+.g-footer{background:linear-gradient(135deg,var(--green-dark),var(--green));padding:24px 20px;text-align:center;margin-top:8px}
+.g-footer-brand{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;color:#f0f7f0;margin-bottom:6px}
+.g-footer-text{font-size:12px;color:rgba(255,255,255,.55);line-height:1.7}
+
+.g-hero-user{background:linear-gradient(165deg,var(--green-dark) 0%,var(--green) 55%,var(--green-mid) 100%)}
+.g-hero-consultant{background:linear-gradient(165deg,#061f0f 0%,var(--green-dark) 45%,var(--green) 100%)}
+.g-hero-admin{background:linear-gradient(165deg,#030e06 0%,#061f0f 40%,var(--green-dark) 100%)}
+
 </style>
 </head>
 <body>
@@ -609,6 +677,346 @@ input[type=date].field-input{width:145px;overflow:hidden}
 </div>
 
 
+
+<!-- GUIDE USER -->
+<div id="screen-guide-user" class="screen">
+  <div class="new-header">
+    <button class="new-header-back" onclick="showAccountMenu()">‹</button>
+    <div class="new-header-title">使用者指南</div>
+    <div></div>
+  </div>
+  <div style="overflow-y:auto">
+<div class="g-hero g-hero-user">
+  <svg class="g-hero-deco" viewBox="0 0 200 300" fill="none"><ellipse cx="180" cy="40" rx="120" ry="80" fill="white" transform="rotate(-20 180 40)"/><circle cx="160" cy="240" r="90" fill="white"/></svg>
+  <div class="g-hero-badge">🌿 使用者指南</div>
+  <div class="g-hero-leaf"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3C12 3 5 7 5 14C5 18 8.5 21 12 21C15.5 21 19 18 19 14C19 7 12 3 12 3Z" fill="#81BD48"/><path d="M12 21V13" stroke="#f0f7f0" stroke-width="2" stroke-linecap="round"/></svg></div>
+  <h1>DX 45天<br/>健康管理計畫</h1>
+  <p>快速上手，輕鬆完成 45 天計畫</p>
+  <div class="g-hero-gold"></div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">開始使用（3 步驟）</div>
+  <div class="g-steps">
+    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">📩 用邀請碼完成註冊</div><div class="g-step-desc">在登入頁點「用邀請碼註冊」，填入邀請碼、姓名、Email 與密碼。邀請碼由教練或管理者提供。</div></div></div>
+    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">✅ 完成註冊後直接登入</div><div class="g-step-desc">帳號自動開通，直接用 Email 與密碼登入即可。App 不會主動發送通知。</div></div></div>
+    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">📅 設定日期與劑量，開始計畫</div><div class="g-step-desc">填入前測日、第 1 天、後測日，依教練指示填寫劑量，點「開始計畫」。</div></div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">每天只要做這件事</div>
+  <div class="g-daily-box">
+    <div class="g-daily-icon">📱</div>
+    <div><div class="g-daily-label">每日流程</div><div class="g-daily-flow">打開 App → 今日 → 逐項打卡 → 完成！</div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">功能速查</div>
+  <table class="g-feat-table">
+    <tr><td>✅ 今日</td><td>每日時間點逐項打卡</td></tr>
+    <tr><td>📅 行程</td><td>45 天日曆與各日型安排</td></tr>
+    <tr><td>📊 紀錄 → 統計</td><td>計畫完成率與進度總覽；計畫結束後開放匯出完成報告</td></tr>
+    <tr><td>📊 紀錄 → 歷史</td><td>歷史計畫回顧</td></tr>
+    <tr><td>📦 備品</td><td>庫存管理與補貨提醒</td></tr>
+    <tr><td>📖 指南 → 菜單</td><td>各日型飲食重點</td></tr>
+    <tr><td>📖 指南 → 須知</td><td>計畫說明與常見 QA</td></tr>
+  </table>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">常見問題</div>
+  <div class="g-faq">
+    <div class="g-faq-item"><div class="g-faq-q">忘記密碼怎麼辦？</div><div class="g-faq-a">登入頁點「忘記密碼？」，輸入 Email 收到重設連結後設定新密碼即可。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">換手機資料會不見嗎？</div><div class="g-faq-a">不會，資料存在雲端，重新登入即可看到所有紀錄。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">打卡漏打了怎麼辦？</div><div class="g-faq-a">可補打。進入「行程」點該天日期，找到漏打項目補勾即可。建議每天打卡讓庫存計算更準確。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">完成報告可以重新輸出嗎？</div><div class="g-faq-a"><strong>一般帳號：</strong>關閉報告頁後資料不保留，需重新填寫才能再次輸出。<br/><strong>進階帳號：</strong>資料存於雲端，可隨時重開並再次匯出。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">計畫結束可以再做一次嗎？</div><div class="g-faq-a">可以！在「紀錄 → 統計」點「開始新一輪計畫」，舊計畫自動封存至歷史。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">如何升級為進階使用者？</div><div class="g-faq-a">聯絡教練，由教練向管理者申請開通進階權限，開通後重新登入即可。</div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">進階使用者專區</div>
+  <div class="g-pro-wrap">
+    <div class="g-pro-header" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block';this.querySelector('.g-pro-arrow').style.transform=b.style.display==='block'?'rotate(180deg)':'rotate(0deg)'">
+      <div class="g-pro-header-left"><span class="g-pro-badge">⭐ 進階</span><span class="g-pro-header-title">升級後多了這些功能</span></div>
+      <span class="g-pro-arrow">▾</span>
+    </div>
+    <div class="g-pro-body">
+      <div class="g-pro-feat"><div class="g-pro-feat-icon">📈</div><div><div class="g-pro-feat-title">體組成記錄</div><div class="g-pro-feat-desc">隨時記錄體重、體脂、肌肉量，查看 45 天趨勢圖。</div></div></div>
+      <div class="g-pro-feat" style="margin-bottom:16px"><div class="g-pro-feat-icon">☁️</div><div><div class="g-pro-feat-title">體檢數值與報告雲端儲存</div><div class="g-pro-feat-desc">填入的體組成與體檢數值自動存雲端，可隨時重開報告頁繼續編輯並再次匯出 PDF。</div></div></div>
+      <div style="background:#fef3c7;border-left:3px solid #d97706;border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:#d97706;margin-bottom:8px">⚠️ 升級前請確認</div>
+        <div style="font-size:13px;color:#92400e;line-height:1.8">進階功能會將你的體組成數值與體檢結果自動儲存至雲端。這些屬於個人健康資料，請在申請前確認以下事項：<br/><br/>
+          ・我了解健康數值將儲存於第三方雲端平台<br/>
+          ・我了解雲端儲存存在資料外洩的潛在風險<br/>
+          ・我願意自行承擔使用雲端儲存的相關風險<br/>
+          ・如不願意，可繼續使用一般帳號的所有功能
+        </div>
+      </div>
+      <div class="g-info-box"><div class="g-info-title">🔐 資料存放說明</div><div class="g-info-text">健康數值儲存於 Supabase 雲端平台（伺服器位於日本東京），受存取控制保護，僅本人帳號可讀取，任何人（包含管理者）均無法存取你的資料。</div></div>
+      <div class="g-limit-list">
+        <div class="g-limit-item"><div class="g-limit-icon">⚠️</div><div class="g-limit-text">刪除帳號後，所有資料一併刪除，<strong>無法復原</strong></div></div>
+        <div class="g-limit-item"><div class="g-limit-icon">💡</div><div class="g-limit-text">忘記密碼可透過 Email 重設，<strong>不影響雲端資料</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">使用小提醒</div>
+  <div class="g-tips">
+    <div class="g-tip">🌿 <strong>每天打卡</strong>，備品庫存計算才會準確</div>
+    <div class="g-tip">🌿 一般帳號的<strong>完成報告關閉後不保留</strong>，請確認填寫完整再輸出</div>
+    <div class="g-tip">🌿 有任何問題，<strong>隨時聯絡你的教練</strong></div>
+  </div>
+</div>
+<div class="g-footer">
+  <div class="g-footer-brand">DX 45天健康管理計畫</div>
+  <div class="g-footer-text">⚠️ 本工具僅供健康管理輔助，所有內容不構成醫療建議或診斷依據</div>
+</div>
+  </div>
+</div>
+
+<!-- GUIDE CONSULTANT -->
+<div id="screen-guide-consultant" class="screen">
+  <div class="new-header">
+    <button class="new-header-back" onclick="showAccountMenu()">‹</button>
+    <div class="new-header-title">教練指南</div>
+    <div></div>
+  </div>
+  <div style="overflow-y:auto">
+<div class="g-hero g-hero-consultant">
+  <svg class="g-hero-deco" viewBox="0 0 200 300" fill="none"><ellipse cx="180" cy="40" rx="120" ry="80" fill="white" transform="rotate(-20 180 40)"/><circle cx="160" cy="240" r="90" fill="white"/></svg>
+  <div class="g-hero-badge">🏋️ 教練指南</div>
+  <div class="g-hero-leaf"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3C12 3 5 7 5 14C5 18 8.5 21 12 21C15.5 21 19 18 19 14C19 7 12 3 12 3Z" fill="#81BD48"/><path d="M12 21V13" stroke="#f0f7f0" stroke-width="2" stroke-linecap="round"/></svg></div>
+  <h1>DX 45天<br/>健康管理計畫</h1>
+  <p>掌握功能，輕鬆帶領學員完成計畫</p>
+  <div class="g-hero-gold"></div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">開始使用（3 步驟）</div>
+  <div class="g-steps">
+    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">管理者提供邀請碼給你</div><div class="g-step-desc">教練帳號透過邀請碼自行註冊，邀請碼由管理者產生並提供。</div></div></div>
+    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">用邀請碼完成註冊，直接登入</div><div class="g-step-desc">在登入頁點「用邀請碼註冊」完成註冊，帳號自動開通，直接登入即可。</div></div></div>
+    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">從帳號選單進入管理功能</div><div class="g-step-desc">帳號選單包含「我的邀請碼」與「我的學員」。</div></div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">帶學員加入（3 步驟）</div>
+  <div class="g-steps">
+    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">🎟️ 產生邀請碼</div><div class="g-step-desc">帳號 → 我的邀請碼，可填備註名稱（選填）→ 點產生。格式 DX-XXXXXX，有效期 7 天，每組僅能使用一次。</div></div></div>
+    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">📨 把邀請碼傳給學員</div><div class="g-step-desc">學員在登入頁點「用邀請碼註冊」，填入邀請碼、姓名、Email 與密碼完成註冊。</div></div></div>
+    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">✅ 學員自動開通</div><div class="g-step-desc">完成註冊後帳號自動開通，可直接登入使用。App 不會主動通知，可視情況告知學員。</div></div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">帳號選單功能說明</div>
+  <div class="g-func-list">
+    <div class="g-func-item"><div class="g-func-icon">🎟️</div><div><div class="g-func-title">我的邀請碼</div><div class="g-func-desc">產生邀請碼，可填備註名稱方便追蹤。7 天到期，可重新產生，舊碼自動失效。</div></div></div>
+    <div class="g-func-item"><div class="g-func-icon">👤</div><div><div class="g-func-title">我的學員</div><div class="g-func-desc">查看名下所有學員狀態（已開通 / 申請刪除）。</div></div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">你也可以執行自己的計畫</div>
+  <div class="g-also-box">
+    <div class="g-also-label">和學員一樣，你也可以使用以下所有功能：</div>
+    <div class="g-also-tags">
+      <span class="g-also-tag">✅ 今日</span><span class="g-also-tag">📅 行程</span><span class="g-also-tag">📊 紀錄</span><span class="g-also-tag">📦 備品</span><span class="g-also-tag">📖 指南</span>
+    </div>
+  </div>
+  <table class="g-feat-table">
+    <tr><td>✅ 今日</td><td>每日時間點逐項打卡</td></tr>
+    <tr><td>📅 行程</td><td>45 天日曆與各日型安排</td></tr>
+    <tr><td>📊 紀錄 → 統計</td><td>計畫完成率與進度總覽；計畫結束後開放匯出完成報告</td></tr>
+    <tr><td>📊 紀錄 → 歷史</td><td>歷史計畫回顧</td></tr>
+    <tr><td>📦 備品</td><td>庫存管理與補貨提醒</td></tr>
+    <tr><td>📖 指南 → 菜單</td><td>各日型飲食重點</td></tr>
+    <tr><td>📖 指南 → 須知</td><td>計畫說明與常見 QA</td></tr>
+  </table>
+  <div class="g-feat-note">💡 帳號選單另有管理功能（我的邀請碼、我的學員）</div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">常見問題</div>
+  <div class="g-faq">
+    <div class="g-faq-item"><div class="g-faq-q">邀請碼到期了怎麼辦？</div><div class="g-faq-a">在「我的邀請碼」點「重新產生」，新碼立即生效，舊碼自動失效。建議定期確認有效期。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">可以看到學員的健康數值嗎？</div><div class="g-faq-a">不行。學員所有健康資料僅本人可查看，「我的學員」只顯示姓名、Email 與帳號狀態。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">學員忘記密碼怎麼辦？</div><div class="g-faq-a">請學員自行在登入頁點「忘記密碼？」，不需要教練協助。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">如何升級為進階教練？</div><div class="g-faq-a">請聯絡管理者申請開通進階權限。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">可以管理多少學員？</div><div class="g-faq-a">無上限，所有透過你邀請碼註冊的學員都會顯示在「我的學員」。</div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">進階教練專區</div>
+  <div class="g-pro-wrap">
+    <div class="g-pro-header" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block';this.querySelector('.g-pro-arrow').style.transform=b.style.display==='block'?'rotate(180deg)':'rotate(0deg)'">
+      <div class="g-pro-header-left"><span class="g-pro-badge">⭐ 進階</span><span class="g-pro-header-title">升級後多了這些功能</span></div>
+      <span class="g-pro-arrow">▾</span>
+    </div>
+    <div class="g-pro-body">
+      <div class="g-pro-feat"><div class="g-pro-feat-icon">📈</div><div><div class="g-pro-feat-title">體組成記錄</div><div class="g-pro-feat-desc">隨時記錄體重、體脂、肌肉量，查看 45 天趨勢圖。</div></div></div>
+      <div class="g-pro-feat" style="margin-bottom:16px"><div class="g-pro-feat-icon">☁️</div><div><div class="g-pro-feat-title">體檢數值與報告雲端儲存</div><div class="g-pro-feat-desc">填入的體組成與體檢數值自動存雲端，可隨時重開報告頁繼續編輯並再次匯出 PDF。</div></div></div>
+      <div style="background:#fef3c7;border-left:3px solid #d97706;border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:#d97706;margin-bottom:8px">⚠️ 升級前請確認</div>
+        <div style="font-size:13px;color:#92400e;line-height:1.8">進階功能會將你的體組成數值與體檢結果自動儲存至雲端。這些屬於個人健康資料，請在申請前確認以下事項：<br/><br/>
+          ・我了解健康數值將儲存於第三方雲端平台<br/>
+          ・我了解雲端儲存存在資料外洩的潛在風險<br/>
+          ・我願意自行承擔使用雲端儲存的相關風險<br/>
+          ・如不願意，可繼續使用一般帳號的所有功能
+        </div>
+      </div>
+      <div class="g-info-box"><div class="g-info-title">🔐 資料存放說明</div><div class="g-info-text">健康數值儲存於 Supabase 雲端平台（伺服器位於日本東京），受存取控制保護，僅本人帳號可讀取，任何人（包含管理者）均無法存取你的資料。</div></div>
+      <div class="g-limit-list">
+        <div class="g-limit-item"><div class="g-limit-icon">⚠️</div><div class="g-limit-text">刪除帳號後，所有資料一併刪除，<strong>無法復原</strong></div></div>
+        <div class="g-limit-item"><div class="g-limit-icon">💡</div><div class="g-limit-text">忘記密碼可透過 Email 重設，<strong>不影響雲端資料</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">教練小提醒</div>
+  <div class="g-tips">
+    <div class="g-tip">🌿 <strong>邀請碼 7 天到期</strong>，記得定期更新</div>
+    <div class="g-tip">🌿 學員完成註冊後<strong>自動開通</strong>，App 不會主動通知，可視情況告知學員</div>
+    <div class="g-tip">🌿 有任何問題，<strong>請聯絡管理者</strong></div>
+  </div>
+</div>
+<div class="g-footer">
+  <div class="g-footer-brand">DX 45天健康管理計畫</div>
+  <div class="g-footer-text">⚠️ 本工具僅供健康管理輔助，所有內容不構成醫療建議或診斷依據</div>
+</div>
+  </div>
+</div>
+
+<!-- GUIDE ADMIN -->
+<div id="screen-guide-admin" class="screen">
+  <div class="new-header">
+    <button class="new-header-back" onclick="showAccountMenu()">‹</button>
+    <div class="new-header-title">管理者指南</div>
+    <div></div>
+  </div>
+  <div style="overflow-y:auto">
+<div class="g-hero g-hero-admin">
+  <svg class="g-hero-deco" viewBox="0 0 200 300" fill="none"><ellipse cx="180" cy="40" rx="120" ry="80" fill="white" transform="rotate(-20 180 40)"/><circle cx="160" cy="240" r="90" fill="white"/></svg>
+  <div class="g-hero-badge">⚙️ 管理者指南</div>
+  <div class="g-hero-leaf"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3C12 3 5 7 5 14C5 18 8.5 21 12 21C15.5 21 19 18 19 14C19 7 12 3 12 3Z" fill="#81BD48"/><path d="M12 21V13" stroke="#f0f7f0" stroke-width="2" stroke-linecap="round"/></svg></div>
+  <h1>DX 45天<br/>健康管理計畫</h1>
+  <p>系統管理與成員控制完整說明</p>
+  <div class="g-hero-gold"></div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">開始使用（3 步驟）</div>
+  <div class="g-steps">
+    <div class="step"><div class="g-step-num">1</div><div><div class="g-step-title">由開發者直接建立帳號</div><div class="g-step-desc">管理者帳號由開發者直接設定，無需邀請碼。</div></div></div>
+    <div class="step"><div class="g-step-num">2</div><div><div class="g-step-title">用 Email 與密碼登入 App</div><div class="g-step-desc">帳號選單會顯示你的姓名與「管理者」身份。</div></div></div>
+    <div class="step"><div class="g-step-num">3</div><div><div class="g-step-title">從帳號選單進入各項管理功能</div><div class="g-step-desc">包含成員管理、我的邀請碼、系統資訊等。</div></div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">帳號選單功能說明</div>
+  <table class="g-func-table">
+    <tr><td>🏢 成員管理</td><td>查看所有教練與學員、指派教練、開通/停用帳號、處理刪除申請</td></tr>
+    <tr><td>🎟️ 我的邀請碼</td><td>產生邀請碼邀請教練或學員，學員可指定歸屬教練</td></tr>
+    <tr><td>📥 匯入備份</td><td>從舊版本匯入本機備份資料（與「紀錄 → 歷史」備份功能相同）</td></tr>
+    <tr><td>ℹ️ 系統資訊</td><td>查看目前版本號、更新日期與版本歷程</td></tr>
+  </table>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">邀請碼管理（4 步驟）</div>
+  <div class="invite-g-steps">
+    <div class="g-invite-step"><div class="invite-g-step-num">1</div><div class="g-invite-step-text">帳號 → 我的邀請碼 → 產生新邀請碼</div></div>
+    <div class="g-invite-step"><div class="invite-g-step-num">2</div><div class="g-invite-step-text">選擇角色（<strong>教練</strong> 或 <strong>學員</strong>）；邀請學員時可指定歸屬教練，不選則歸屬自己</div></div>
+    <div class="g-invite-step"><div class="invite-g-step-num">3</div><div class="g-invite-step-text">填入備註名稱（選填，如：王小明）方便日後追蹤</div></div>
+    <div class="g-invite-step"><div class="invite-g-step-num">4</div><div class="g-invite-step-text">複製邀請碼傳給對方，完成註冊後<strong>自動開通</strong>。App 不會主動通知，請視情況告知。</div></div>
+  </div>
+  <div class="g-rule-box">
+    <div class="g-rule-item"><div class="g-rule-dot"></div><div>格式 DX-XXXXXX，有效期 <strong>7 天</strong></div></div>
+    <div class="g-rule-item"><div class="g-rule-dot"></div><div>每組只能使用一次，使用後標記「已使用」</div></div>
+    <div class="g-rule-item"><div class="g-rule-dot"></div><div>到期或使用後可重新產生，舊碼自動失效</div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">成員管理說明</div>
+  <div class="g-mgmt-block">
+    <div class="g-mgmt-title">教練管理</div>
+    <div class="g-mgmt-desc">查看所有教練帳號狀態，可手動開通或撤銷（雙向切換）。</div>
+  </div>
+  <div class="g-mgmt-block">
+    <div class="g-mgmt-title">所有學員總覽</div>
+    <div class="g-mgmt-desc">跨教練查看所有學員，可依歸屬教練篩選，顯示每位學員的所屬教練與帳號狀態。</div>
+  </div>
+  <div class="g-mgmt-block">
+    <div class="g-mgmt-title">開通狀態控制</div>
+    <div class="g-mgmt-desc">點擊狀態按鈕可雙向切換。撤銷開通後學員將立即無法登入，請謹慎操作。</div>
+    <div class="g-status-demo">
+      <span class="g-status-btn-on">✅ 已開通</span>
+      <span class="g-status-arrow">⇄</span>
+      <span class="g-status-btn-off">開通帳號</span>
+    </div>
+  </div>
+  <div class="g-mgmt-block" style="margin-bottom:0">
+    <div class="g-mgmt-title">處理刪除申請</div>
+    <div class="g-mgmt-desc">有申請刪除時，帳號選單角標顯示待處理數量。在成員管理找到申請者，確認後執行刪除。</div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">你也可以執行自己的計畫</div>
+  <div class="g-also-box">
+    <div class="g-also-label">和學員一樣，你也可以使用以下所有功能：</div>
+    <div class="g-also-tags">
+      <span class="g-also-tag">✅ 今日</span><span class="g-also-tag">📅 行程</span><span class="g-also-tag">📊 紀錄</span><span class="g-also-tag">📦 備品</span><span class="g-also-tag">📖 指南</span>
+    </div>
+  </div>
+  <table class="g-feat-table">
+    <tr><td>✅ 今日</td><td>每日時間點逐項打卡</td></tr>
+    <tr><td>📅 行程</td><td>45 天日曆與各日型安排</td></tr>
+    <tr><td>📊 紀錄 → 統計</td><td>計畫完成率與進度總覽；計畫結束後開放匯出完成報告</td></tr>
+    <tr><td>📊 紀錄 → 歷史</td><td>歷史計畫回顧；可從此頁或帳號選單備份／還原資料</td></tr>
+    <tr><td>📦 備品</td><td>庫存管理與補貨提醒</td></tr>
+    <tr><td>📖 指南 → 菜單</td><td>各日型飲食重點</td></tr>
+    <tr><td>📖 指南 → 須知</td><td>計畫說明與常見 QA</td></tr>
+  </table>
+  <div class="g-feat-note">💡 帳號選單另有管理功能（成員管理、我的邀請碼、系統資訊等）</div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">常見問題</div>
+  <div class="g-faq">
+    <div class="g-faq-item"><div class="g-faq-q">邀請碼到期了怎麼辦？</div><div class="g-faq-a">在「我的邀請碼」點「重新產生」，新碼立即生效，舊碼自動失效。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">可以不用邀請碼直接建立帳號嗎？</div><div class="g-faq-a">目前架構下一般帳號需透過邀請碼註冊。如需直接建立，請聯絡開發者在 Supabase 手動處理。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">如何查看某位教練的所有學員？</div><div class="g-faq-a">在「成員管理 → 所有學員總覽」，使用教練篩選下拉選單即可。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">學員要轉給另一位教練怎麼辦？</div><div class="g-faq-a">在「成員管理」找到該學員，展開後在「指派教練」選單重新選擇即可，立即生效。</div></div>
+    <div class="g-faq-item"><div class="g-faq-q">帳號選單角標數字代表什麼？</div><div class="g-faq-a">代表目前有多少筆「申請刪除」待處理。</div></div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">進階使用者專區</div>
+  <div class="g-pro-wrap">
+    <div class="g-pro-header" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block';this.querySelector('.g-pro-arrow').style.transform=b.style.display==='block'?'rotate(180deg)':'rotate(0deg)'">
+      <div class="g-pro-header-left"><span class="g-pro-badge">⭐ 進階</span><span class="g-pro-header-title">升級後多了這些功能</span></div>
+      <span class="g-pro-arrow">▾</span>
+    </div>
+    <div class="g-pro-body">
+      <div class="g-pro-feat"><div class="g-pro-feat-icon">📈</div><div><div class="g-pro-feat-title">體組成記錄</div><div class="g-pro-feat-desc">隨時記錄體重、體脂、肌肉量，查看 45 天趨勢圖。</div></div></div>
+      <div class="g-pro-feat" style="margin-bottom:16px"><div class="g-pro-feat-icon">☁️</div><div><div class="g-pro-feat-title">體檢數值與報告雲端儲存</div><div class="g-pro-feat-desc">填入的體組成與體檢數值自動存雲端，可隨時重開報告頁繼續編輯並再次匯出 PDF。</div></div></div>
+      <div class="g-info-box"><div class="g-info-title">🔐 資料存放說明</div><div class="g-info-text">健康數值儲存於 Supabase 雲端平台（伺服器位於日本東京），受存取控制保護，僅本人帳號可讀取，任何人（包含管理者）均無法存取你的資料。</div></div>
+      <div class="g-limit-list">
+        <div class="g-limit-item"><div class="g-limit-icon">⚠️</div><div class="g-limit-text">刪除帳號後，所有資料一併刪除，<strong>無法復原</strong></div></div>
+        <div class="g-limit-item"><div class="g-limit-icon">💡</div><div class="g-limit-text">忘記密碼可透過 Email 重設，<strong>不影響雲端資料</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="g-section">
+  <div class="g-sec-title">管理者小提醒</div>
+  <div class="g-tips">
+    <div class="g-tip">🌿 <strong>邀請碼 7 天到期</strong>，代邀時留意有效期</div>
+    <div class="g-tip">🌿 對方完成註冊後自動開通，<strong>App 不會主動通知</strong>，請視情況告知</div>
+    <div class="g-tip">🌿 撤銷開通會<strong>立即阻止登入</strong>，請謹慎操作</div>
+    <div class="g-tip">🌿 有系統問題請聯絡開發者：<strong><a href="mailto:betsykuostudio@gmail.com" style="color:var(--green-dark)">betsykuostudio@gmail.com</a></strong></div>
+  </div>
+</div>
+<div class="g-footer">
+  <div class="g-footer-brand">DX 45天健康管理計畫</div>
+  <div class="g-footer-text">⚠️ 本工具僅供健康管理輔助，所有內容不構成醫療建議或診斷依據</div>
+</div>
+  </div>
+</div>
 <!-- SYSTEM INFO -->
 <div id="screen-system-info" class="screen">
   <div class="new-header">
@@ -1844,10 +2252,13 @@ function toggleSysHistory() {
 
 // ── 使用指南 ──────────────────────────────────────────
 function openGuide() {
-  const url = isConsultant()
-    ? 'https://betsykuostudio-hub.github.io/health-management/dx-plan/guide-consultant.html'
-    : 'https://betsykuostudio-hub.github.io/health-management/dx-plan/guide-user.html';
-  window.open(url, '_blank');
+  if (isAdmin()) {
+    showScreen('screen-guide-admin', null);
+  } else if (isConsultant()) {
+    showScreen('screen-guide-consultant', null);
+  } else {
+    showScreen('screen-guide-user', null);
+  }
 }
 
 // ── 修改密碼 ──────────────────────────────────────────
