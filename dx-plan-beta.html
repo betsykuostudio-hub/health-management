@@ -2540,7 +2540,7 @@ function renderAdminUserCard(p, roleMap, clientConsultantMap = {}) {
   const inviteToggle = !p.delete_requested_at ? `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <span style="font-size:12px;font-weight:700;color:var(--gray-500)">開通狀態</span>
-      <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;background:${p.is_invited?'var(--green-bg)':'var(--gray-100)'};color:${p.is_invited?'var(--green)':'var(--gray-500)'}">${p.is_invited?'✅ 已開通':'🔒 待審核'}</span>
+      ${p.is_invited ? '<button onclick="adminToggleInvite(\''+p.id+'\',true,this)" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Noto Sans TC\',sans-serif;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green)">✅ 已開通</button>' : '<button onclick="adminToggleInvite(\''+p.id+'\',false,this)" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Noto Sans TC\',sans-serif;border:none;background:var(--green);color:white">開通帳號</button>'}
     </div>` : '';
 
   let assignBtn = '';
