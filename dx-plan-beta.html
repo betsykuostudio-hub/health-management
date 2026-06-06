@@ -510,8 +510,8 @@ input[type=date].field-input{width:145px;overflow:hidden}
         <input type="password" id="register-password2" class="auth-field-input" placeholder="••••••••" autocomplete="new-password"/>
       </div>
       <div class="auth-field">
-        <label class="auth-field-label">邀請碼（選填）</label>
-        <input type="text" id="register-invite-code" class="auth-field-input" placeholder="由教練提供" autocomplete="off" style="text-transform:uppercase"/>
+        <label class="auth-field-label">邀請碼</label>
+        <input type="text" id="register-invite-code" class="auth-field-input" placeholder="格式：DX-XXXXXX" autocomplete="off" style="text-transform:uppercase"/>
       </div>
       <div class="privacy-wrap">
         <button class="privacy-toggle" onclick="togglePrivacy()">📋 隱私說明（點此展開）</button>
@@ -1657,13 +1657,14 @@ async function doRegister() {
   if (pw.length < 6) { setAuthMsg('register-msg','error','密碼至少需要 6 位'); return; }
   if (pw !== pw2) { setAuthMsg('register-msg','error','兩次密碼不一致'); return; }
   if (!privacyChecked) { setAuthMsg('register-msg','error','請閱讀並同意隱私說明後再註冊'); return; }
+  if (!inviteCode) { setAuthMsg('register-msg','error','請輸入邀請碼'); return; }
   setAuthLoading('register-btn', true, '註冊');
   try {
-    // ── 先驗證邀請碼（改用 RPC，不直接查 invite_codes 表）
+    // ── 驗證邀請碼
     let consultantId = null;
     let inviteRole = 'client';
     let assignedConsultantId = null;
-    if (inviteCode) {
+    {
       const { data: rpcData, error: rpcErr } = await sb.rpc('verify_invite_code', { p_code: inviteCode });
       if (rpcErr) {
         setAuthMsg('register-msg','error','邀請碼驗證失敗，請稍後再試');
@@ -1678,9 +1679,9 @@ async function doRegister() {
       }
       if (!result.valid) {
         const msg = result.reason === 'expired'
-          ? '邀請碼已過期，請向教練索取新的邀請碼'
+          ? '邀請碼已過期，請向邀請你的人索取新的邀請碼'
           : result.reason === 'used'
-          ? '此邀請碼已被使用，請向教練索取新的邀請碼'
+          ? '此邀請碼已被使用，請向邀請你的人索取新的邀請碼'
           : '邀請碼無效，請確認後重試';
         setAuthMsg('register-msg','error', msg);
         return;
@@ -1711,9 +1712,7 @@ async function doRegister() {
         if (ccErr) console.error('bind_consultant_on_register error:', ccErr);
       }
     }
-    const successMsg = consultantId
-      ? '✅ 註冊成功！請直接登入。'
-      : '✅ 註冊成功！請等待管理者開通權限後再登入。';
+    const successMsg = '✅ 註冊成功！請直接登入。';
     setAuthMsg('register-msg','success', successMsg);
     setTimeout(() => showAuthScreen('login'), 3000);
   } catch(e) {
@@ -2248,24 +2247,10 @@ async function renderAdminPanel() {
 }
 
 // 管理者後台區塊開合狀態
-let _adminSections = { inviteCodes: false, pending: true, deleteReq: true, active: false, allClients: false };
+let _adminSections = { pending: true, deleteReq: true, active: false, allClients: false };
 let _adminDeleteStepsOpen = false;
 let _adminInviteCodesData = [];
 let _adminClientConsultantMap = {};
-
-function adminToggleConsultantAssign() {
-  const role = document.getElementById('admin-ic-role')?.value;
-  const wrap = document.getElementById('admin-ic-assign-wrap');
-  if (wrap) wrap.style.display = role === 'client' ? 'block' : 'none';
-}
-
-async function adminGenerateInviteCode() {
-  const role = document.getElementById('admin-ic-role')?.value || 'client';
-  const assignedConsultantId = document.getElementById('admin-ic-consultant')?.value || null;
-  const note = document.getElementById('admin-ic-note')?.value.trim() || '';
-  await generateInviteCode(note, role, assignedConsultantId || null);
-  renderAdminPanel();
-}
 
 function adminFilterClients(consultantId) {
   document.querySelectorAll('.admin-client-row').forEach(row => {
@@ -2347,77 +2332,6 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
     }
     html += `</div>`;
   }
-
-  // ── 邀請碼區塊（預設收合）
-  const icOpen = _adminSections.inviteCodes;
-  const consultantOptions = profiles
-    .filter(p => p.role === 'consultant' || p.role === 'admin')
-    .map(p => `<option value="${p.id}">${p.display_name || '（未設定）'} (${p.email})</option>`)
-    .join('');
-  html += `<div style="margin-top:4px;margin-bottom:4px">
-    <div onclick="adminToggleSection('inviteCodes')" style="display:flex;align-items:center;gap:8px;padding:11px 2px;cursor:pointer;user-select:none">
-      ${icoInvite}<span style="font-size:var(--font-sm);font-weight:700;color:var(--gray-500);flex:1">邀請碼管理</span>
-      <span style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--gray-100);color:var(--gray-500)">${inviteCodes.length} 組</span>
-      ${chevron(icOpen)}
-    </div>`;
-  if (icOpen) {
-    html += `<div style="height:1px;background:var(--gray-100);margin:2px 0 10px"></div>`;
-    html += `
-      <div style="background:#f8faff;border:1.5px solid var(--gray-200);border-radius:14px;padding:16px;margin-bottom:14px">
-        <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-700);margin-bottom:10px">✨ 產生新邀請碼</div>
-        <div style="margin-bottom:8px">
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">邀請角色</div>
-          <select id="admin-ic-role" onchange="adminToggleConsultantAssign()"
-            style="width:100%;border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 10px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;outline:none;background:white">
-            <option value="client">學員</option>
-            <option value="consultant">教練</option>
-          </select>
-        </div>
-        <div id="admin-ic-assign-wrap" style="margin-bottom:8px">
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">歸屬教練（不選 = 歸屬我自己）</div>
-          <select id="admin-ic-consultant"
-            style="width:100%;border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 10px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;outline:none;background:white">
-            <option value="">— 歸屬我自己 —</option>
-            ${consultantOptions}
-          </select>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">備註名稱（選填）</div>
-          <input id="admin-ic-note" type="text" placeholder="例如：王小明"
-            style="width:100%;border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 10px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;outline:none"
-            onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--gray-200)'"/>
-        </div>
-        <button onclick="adminGenerateInviteCode()"
-          style="width:100%;padding:12px;background:var(--green);color:white;border:none;border-radius:10px;font-size:var(--font-sm);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
-          產生邀請碼
-        </button>
-      </div>`;
-    if (inviteCodes.length === 0) {
-      html += `<div style="font-size:var(--font-sm);color:var(--gray-500);padding:8px 0 12px;text-align:center">目前沒有任何邀請碼</div>`;
-    } else {
-      inviteCodes.forEach(ic => {
-        const expired = new Date(ic.expires_at) < new Date();
-        const used = ic.is_used;
-        const ownerName = ic.profiles?.display_name || ic.profiles?.email || '未知';
-        const roleLabel = ic.role === 'consultant' ? '教練' : '學員';
-        const statusColor = used ? 'var(--gray-400)' : expired ? 'var(--red)' : 'var(--green)';
-        const status = used ? '已使用' : expired ? '已過期' : '有效';
-        html += `<div style="background:${used||expired?'#f9fafb':'white'};border:1px solid ${expired&&!used?'#fecaca':'var(--gray-100)'};border-radius:12px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-              <span style="font-size:15px;font-weight:900;letter-spacing:3px;font-family:'Playfair Display',serif;color:${statusColor}">${ic.code}</span>
-              <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:${ic.role==='consultant'?'#ffedd5':'#dbeafe'};color:${ic.role==='consultant'?'#c2410c':'#1d4ed8'}">${roleLabel}</span>
-              <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--gray-100);color:${statusColor}">${status}</span>
-            </div>
-            <div style="font-size:11px;color:var(--gray-400)">${ownerName}${ic.assigned_to?'・'+ic.assigned_to:''}・到期 ${ic.expires_at.slice(0,10)}</div>
-          </div>
-          ${!used&&!expired?`<button onclick="navigator.clipboard.writeText('${ic.code}');showToast('已複製')" style="background:var(--green-bg);color:var(--green);border:1px solid #bbf7d0;border-radius:8px;padding:5px 8px;cursor:pointer;display:flex;align-items:center">${icoCopy}</button>`:''}
-          <button onclick="adminDeleteInviteCode('${ic.id}')" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7H20M9 7V5H15V7M10 11V17M14 11V17M5 7L6 19C6 19.552 6.448 20 7 20H17C17.552 20 18 19.552 18 19L19 7" stroke="var(--gray-300)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>`;
-      });
-    }
-  }
-  html += `</div>`;
 
   // ── 所有學員總覽（預設收合）
   const allClients = profiles.filter(p => p.role === 'client' && !p.delete_requested_at);
@@ -2702,27 +2616,68 @@ async function showInviteCode() {
   showScreen('screen-invite', null);
   const body = document.getElementById('invite-code-body');
   body.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gray-500)">載入中...</div>';
-  const { data: codes } = await sb.from('invite_codes').select('*')
-    .eq('consultant_id', currentUser.id)
-    .order('created_at', { ascending: false });
+
+  const admin = isAdmin();
+
+  // 管理者：載入所有邀請碼；教練：只載入自己的碼
+  let query = sb.from('invite_codes').select('*, profiles(display_name,email)').order('created_at', { ascending: false });
+  if (!admin) query = query.eq('consultant_id', currentUser.id);
+  const { data: codes } = await query;
   const list = codes || [];
   const now = new Date();
 
+  // 管理者：載入教練清單供產碼表單使用
+  let consultantOptions = '';
+  if (admin) {
+    const { data: consultants } = await sb.from('profiles')
+      .select('id,display_name,email')
+      .in('role', ['consultant', 'admin'])
+      .order('display_name');
+    consultantOptions = (consultants || [])
+      .map(c => `<option value="${c.id}">${c.display_name || '（未設定）'} (${c.email})</option>`)
+      .join('');
+  }
+
   const icoCopy = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="11" height="13" rx="2" stroke="var(--green)" stroke-width="1.6"/><rect x="10" y="7" width="11" height="13" rx="2" fill="white" stroke="var(--green)" stroke-width="1.6"/></svg>`;
 
-  // 產生新邀請碼的表單
-  let html = `
-    <div style="background:white;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-700);margin-bottom:10px">✨ 產生新邀請碼</div>
-      <input id="invite-note" type="text" placeholder="備註名稱（選填，例如：王小明）"
-        style="width:100%;border:1.5px solid var(--gray-200);border-radius:10px;padding:10px 12px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;outline:none;margin-bottom:10px"
-        onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--gray-200)'"/>
-      <button onclick="doGenerateInviteCode()" style="width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">產生邀請碼</button>
-    </div>`;
+  // ── 產碼表單
+  let html = `<div style="background:white;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+    <div style="font-size:var(--font-sm);font-weight:700;color:var(--gray-700);margin-bottom:10px">✨ 產生新邀請碼</div>`;
 
-  // 邀請碼清單
+  if (admin) {
+    html += `
+    <div style="margin-bottom:8px">
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">邀請角色</div>
+      <select id="invite-role" onchange="inviteToggleConsultantAssign()"
+        style="width:100%;border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 10px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;outline:none;background:white">
+        <option value="client">學員</option>
+        <option value="consultant">教練</option>
+      </select>
+    </div>
+    <div id="invite-assign-wrap" style="margin-bottom:8px">
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">歸屬教練（不選 = 歸屬我自己）</div>
+      <select id="invite-consultant"
+        style="width:100%;border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 10px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;outline:none;background:white">
+        <option value="">— 歸屬我自己 —</option>
+        ${consultantOptions}
+      </select>
+    </div>`;
+  }
+
+  html += `
+    <div style="margin-bottom:10px">
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">備註名稱（選填）</div>
+      <input id="invite-note" type="text" placeholder="例如：王小明"
+        style="width:100%;border:1.5px solid var(--gray-200);border-radius:10px;padding:10px 12px;font-size:var(--font-sm);font-family:'Noto Sans TC',sans-serif;outline:none"
+        onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--gray-200)'"/>
+    </div>
+    <button onclick="doGenerateInviteCode()" style="width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:12px;font-size:var(--font-md);font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">產生邀請碼</button>
+  </div>`;
+
+  // ── 邀請碼清單
+  const label = admin ? `全部邀請碼（${list.length} 組）` : `邀請碼清單（${list.length} 組）`;
   if (list.length > 0) {
-    html += `<div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">邀請碼清單（${list.length} 組）</div>`;
+    html += `<div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">${label}</div>`;
     list.forEach(ic => {
       const expired = new Date(ic.expires_at) < now;
       const used = ic.is_used;
@@ -2730,43 +2685,55 @@ async function showInviteCode() {
       const statusColor = used ? 'var(--gray-400)' : expired ? 'var(--red)' : 'var(--green)';
       const statusBg = used ? 'var(--gray-100)' : expired ? '#fef2f2' : 'var(--green-bg)';
       const cardBorder = used ? 'var(--gray-200)' : expired ? '#fecaca' : 'var(--green-border)';
-      html += `
-        <div style="background:white;border:1.5px solid ${cardBorder};border-radius:14px;padding:14px;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <div style="font-size:18px;font-weight:900;letter-spacing:4px;font-family:'Playfair Display',serif;color:${statusColor};flex:1">${ic.code}</div>
-            <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:${statusBg};color:${statusColor}">${status}</span>
-          </div>
-          <div style="font-size:12px;color:var(--gray-400);margin-bottom:${!used && !expired ? '10px' : '0'}">
-            ${ic.assigned_to ? `👤 ${ic.assigned_to}・` : ''}${used ? `已使用・` : ''}到期 ${ic.expires_at.slice(0,10)}
-          </div>
-          ${!used && !expired ? `
-          <div style="display:flex;gap:8px">
-            <button onclick="navigator.clipboard.writeText('${ic.code}').then(()=>showToast('已複製邀請碼'))"
-              style="flex:1;padding:8px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);border-radius:8px;font-size:var(--font-sm);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-              ${icoCopy} 複製
-            </button>
-            <button onclick="regenerateInviteCode('${ic.id}')"
-              style="flex:1;padding:8px;background:white;color:var(--gray-500);border:1px solid var(--gray-200);border-radius:8px;font-size:var(--font-sm);font-weight:700;cursor:pointer">
-              重新產生
-            </button>
-          </div>` : `
-          <button onclick="adminDeleteInviteCode('${ic.id}');showInviteCode()"
-            style="width:100%;padding:8px;background:white;color:var(--gray-400);border:1px solid var(--gray-200);border-radius:8px;font-size:var(--font-sm);cursor:pointer;margin-top:6px">
-            刪除
-          </button>`}
-        </div>`;
+      const roleLabel = ic.role === 'consultant' ? '教練' : '學員';
+      const ownerName = ic.profiles?.display_name || ic.profiles?.email || '';
+      const metaLine = admin
+        ? `${ownerName ? ownerName + '・' : ''}${ic.assigned_to ? '👤 ' + ic.assigned_to + '・' : ''}到期 ${ic.expires_at.slice(0,10)}`
+        : `${ic.assigned_to ? '👤 ' + ic.assigned_to + '・' : ''}到期 ${ic.expires_at.slice(0,10)}`;
+
+      html += `<div style="background:white;border:1.5px solid ${cardBorder};border-radius:14px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="font-size:18px;font-weight:900;letter-spacing:4px;font-family:'Playfair Display',serif;color:${statusColor};flex:1">${ic.code}</div>
+          ${admin ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:${ic.role==='consultant'?'#ffedd5':'#dbeafe'};color:${ic.role==='consultant'?'#c2410c':'#1d4ed8'}">${roleLabel}</span>` : ''}
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:${statusBg};color:${statusColor}">${status}</span>
+        </div>
+        <div style="font-size:12px;color:var(--gray-400);margin-bottom:${!used && !expired ? '10px' : '0'}">${metaLine}</div>
+        ${!used && !expired ? `
+        <div style="display:flex;gap:8px">
+          <button onclick="navigator.clipboard.writeText('${ic.code}').then(()=>showToast('已複製邀請碼'))"
+            style="flex:1;padding:8px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);border-radius:8px;font-size:var(--font-sm);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            ${icoCopy} 複製
+          </button>
+          <button onclick="regenerateInviteCode('${ic.id}')"
+            style="flex:1;padding:8px;background:white;color:var(--gray-500);border:1px solid var(--gray-200);border-radius:8px;font-size:var(--font-sm);font-weight:700;cursor:pointer">
+            重新產生
+          </button>
+        </div>` : `
+        <button onclick="adminDeleteInviteCode('${ic.id}');showInviteCode()"
+          style="width:100%;padding:8px;background:white;color:var(--gray-400);border:1px solid var(--gray-200);border-radius:8px;font-size:var(--font-sm);cursor:pointer;margin-top:6px">
+          刪除
+        </button>`}
+      </div>`;
     });
   } else {
     html += `<div style="text-align:center;padding:24px 0;color:var(--gray-400);font-size:var(--font-sm)">尚未產生任何邀請碼</div>`;
   }
 
-  html += `<div style="margin-top:16px;background:var(--purple-light);border-radius:12px;padding:14px;font-size:13px;color:var(--purple-dark);line-height:1.7">學員使用邀請碼完成註冊後，將<strong>自動開通</strong>並加入您的學員列表，無需手動審核。每組邀請碼有效期 <strong>7 天</strong>，且僅能使用一次。</div>`;
+  html += `<div style="margin-top:16px;background:var(--purple-light);border-radius:12px;padding:14px;font-size:13px;color:var(--purple-dark);line-height:1.7">完成註冊後帳號將<strong>自動開通</strong>，無需手動審核。每組邀請碼有效期 <strong>7 天</strong>，且僅能使用一次。</div>`;
   body.innerHTML = html;
+}
+
+function inviteToggleConsultantAssign() {
+  const role = document.getElementById('invite-role')?.value;
+  const wrap = document.getElementById('invite-assign-wrap');
+  if (wrap) wrap.style.display = role === 'client' ? 'block' : 'none';
 }
 
 async function doGenerateInviteCode() {
   const note = document.getElementById('invite-note')?.value.trim() || '';
-  await generateInviteCode(note, 'client', null);
+  const role = document.getElementById('invite-role')?.value || 'client';
+  const assignedConsultantId = document.getElementById('invite-consultant')?.value || null;
+  await generateInviteCode(note, role, assignedConsultantId || null);
 }
 
 async function showConsultantPanel() {
