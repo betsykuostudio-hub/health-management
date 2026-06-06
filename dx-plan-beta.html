@@ -608,6 +608,80 @@ input[type=date].field-input{width:145px;overflow:hidden}
   </div>
 </div>
 
+
+<!-- SYSTEM INFO -->
+<div id="screen-system-info" class="screen">
+  <div class="new-header">
+    <button class="new-header-back" onclick="showAccountMenu()">‹</button>
+    <div class="new-header-title">系統資訊</div>
+    <div></div>
+  </div>
+  <div style="padding:20px">
+
+    <!-- 版本卡片 -->
+    <div style="background:linear-gradient(165deg,var(--purple-dark),var(--purple));border-radius:18px;padding:22px 20px;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">DX 45天健康管理計畫</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:36px;color:#f0f7f0;margin-bottom:4px" id="sysinfo-version"></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.6)" id="sysinfo-date"></div>
+      <div style="height:1.5px;background:linear-gradient(90deg,transparent,#c8922a,transparent);margin:14px 0"></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.8" id="sysinfo-summary"></div>
+    </div>
+
+    <!-- 本版更新重點 -->
+    <div style="background:white;border-radius:14px;padding:16px 18px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+      <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+        <span style="display:block;width:3px;height:14px;background:var(--accent);border-radius:2px"></span>本版更新重點
+      </div>
+      <div id="sysinfo-changes"></div>
+    </div>
+
+    <!-- DB Migration 版本 -->
+    <div style="background:white;border-radius:14px;padding:16px 18px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+      <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+        <span style="display:block;width:3px;height:14px;background:var(--accent);border-radius:2px"></span>資料庫版本
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:14px;color:var(--gray-700)">Schema Migration</span>
+        <span style="font-size:14px;font-weight:700;color:var(--purple)" id="sysinfo-db-version"></span>
+      </div>
+    </div>
+
+    <!-- 版本歷程（收合） -->
+    <div style="background:white;border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+      <div onclick="toggleSysHistory()" style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none">
+        <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px">
+          <span style="display:block;width:3px;height:14px;background:var(--accent);border-radius:2px"></span>版本歷程
+        </div>
+        <span id="sysinfo-history-arrow" style="font-size:13px;color:var(--gray-400);transition:transform .2s;display:inline-block;transform:rotate(-90deg)">▼</span>
+      </div>
+      <div id="sysinfo-history-body" style="display:none;border-top:1px solid var(--gray-100);padding:4px 0 8px"></div>
+    </div>
+
+    <!-- 聯絡 / 回報問題 -->
+    <div style="background:white;border-radius:14px;padding:16px 18px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+      <div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+        <span style="display:block;width:3px;height:14px;background:var(--accent);border-radius:2px"></span>回報問題 / 聯絡開發者
+      </div>
+      <a href="mailto:betsykuostudio@gmail.com" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2.5" stroke="#186637" stroke-width="1.6"/><path d="M2 8L12 13L22 8" stroke="#186637" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--purple)">betsykuostudio@gmail.com</div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:1px">點擊開啟郵件</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- 免責聲明 -->
+    <div style="font-size:12px;color:var(--gray-400);text-align:center;line-height:1.7;padding:8px 0 20px">
+      本工具僅供健康管理輔助<br/>所有內容不構成醫療建議或診斷依據
+    </div>
+
+  </div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div id="screen-admin" class="screen">
   <div class="new-header">
@@ -1367,9 +1441,19 @@ input[type=date].field-input{width:145px;overflow:hidden}
           <span style="font-size:var(--font-sm);font-weight:500;color:var(--gray-700);flex:1">成員管理</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <button onclick="showImportFromLocalStorage()" style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;background:white;border:none;text-align:left;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
+        <button onclick="showInviteCode()" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--gray-100);width:100%;background:white;border-left:none;border-right:none;border-top:none;text-align:left;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
+          <div style="width:36px;height:36px;border-radius:10px;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="9" width="20" height="10" rx="2.5" stroke="#d97706" stroke-width="1.6"/><path d="M8 9V7C8 5.343 9.343 4 11 4H13C14.657 4 16 5.343 16 7V9" stroke="#d97706" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="14" r="1.5" fill="#d97706"/></svg></div>
+          <span style="font-size:var(--font-sm);font-weight:500;color:var(--gray-700);flex:1">我的邀請碼</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button onclick="showImportFromLocalStorage()" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--gray-100);width:100%;background:white;border-left:none;border-right:none;border-top:none;text-align:left;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
           <div style="width:36px;height:36px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3V15M12 15L8 11M12 15L16 11" stroke="#1d4ed8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17V19C4 20.105 4.895 21 6 21H18C19.105 21 20 20.105 20 19V17" stroke="#1d4ed8" stroke-width="1.6" stroke-linecap="round"/></svg></div>
           <span style="font-size:var(--font-sm);font-weight:500;color:var(--gray-700);flex:1">匯入備份</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button onclick="showSystemInfo()" style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;background:white;border:none;text-align:left;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#186637" stroke-width="1.6"/><path d="M12 8V12" stroke="#186637" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1" fill="#186637"/></svg></div>
+          <span style="font-size:var(--font-sm);font-weight:500;color:var(--gray-700);flex:1">系統資訊</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
@@ -1700,6 +1784,65 @@ async function doForgotPassword() {
   }
 }
 
+// ── 系統版本資訊 ────────────────────────────────────────
+const APP_VERSION = 'v2.6';
+const APP_UPDATE_DATE = '2026-06-06';
+const APP_DB_VERSION = 'v2.8';
+const APP_SUMMARY = '邀請碼架構全面升級：一人一碼、自動開通、管理者可代邀';
+const APP_CHANGES = [
+  '邀請碼改為一人一碼，使用後自動失效',
+  '學員、教練完成註冊後自動開通，不需人工審核',
+  '管理者可邀請教練與學員，支援代邀並指定歸屬教練',
+  '邀請碼有效期從 30 天縮短為 7 天',
+  '管理者後台新增所有學員總覽（跨教練）',
+  '管理者帳號選單新增「我的邀請碼」入口',
+  '新增系統資訊頁（本頁）',
+];
+const APP_HISTORY = [
+  { version: 'v2.6', date: '2026-06-06', desc: '邀請碼架構升級、系統資訊頁' },
+  { version: 'v2.5b', date: '2026-06-06', desc: '登入畫面、字型、完成報告三頁架構' },
+  { version: 'v2.5', date: '2026-06-04', desc: '全面視覺改版（Nutrilite 品牌色系）' },
+  { version: 'v2.4', date: '2026-06-03', desc: 'last_seen_at 寫入修復' },
+  { version: 'v2.3', date: '2026-06-03', desc: 'Loading 畫面、後台 UX 重設計、Toast' },
+  { version: 'v2.2', date: '2026-06-01', desc: '忘記密碼、修改密碼、使用指南' },
+  { version: 'v2.1', date: '2026-06-01', desc: '角色系統強化' },
+  { version: 'v2.0', date: '2026-06-01', desc: '初始完整版上線' },
+];
+
+function showSystemInfo() {
+  showScreen('screen-system-info', null);
+  // 填入版本資訊
+  document.getElementById('sysinfo-version').textContent = APP_VERSION;
+  document.getElementById('sysinfo-date').textContent = '最後更新：' + APP_UPDATE_DATE;
+  document.getElementById('sysinfo-summary').textContent = APP_SUMMARY;
+  document.getElementById('sysinfo-db-version').textContent = APP_DB_VERSION;
+  // 本版更新重點
+  const changesEl = document.getElementById('sysinfo-changes');
+  changesEl.innerHTML = APP_CHANGES.map(c =>
+    `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100)">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></span>
+      <span style="font-size:14px;color:var(--gray-700);line-height:1.6">${c}</span>
+    </div>`
+  ).join('').replace(/border-bottom:1px solid var\(--gray-100\)(?=<\/div>\s*$)/, 'border-bottom:none');
+  // 版本歷程
+  const historyEl = document.getElementById('sysinfo-history-body');
+  historyEl.innerHTML = APP_HISTORY.map((h, i) =>
+    `<div style="display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:${i < APP_HISTORY.length-1 ? '1px solid var(--gray-100)' : 'none'}">
+      <span style="font-size:13px;font-weight:700;color:${i===0?'var(--purple)':'var(--gray-500)'};min-width:44px">${h.version}</span>
+      <span style="font-size:12px;color:var(--gray-400);min-width:72px">${h.date}</span>
+      <span style="font-size:13px;color:var(--gray-700);flex:1">${h.desc}</span>
+    </div>`
+  ).join('');
+}
+
+function toggleSysHistory() {
+  const body = document.getElementById('sysinfo-history-body');
+  const arrow = document.getElementById('sysinfo-history-arrow');
+  const isOpen = body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+
 // ── 使用指南 ──────────────────────────────────────────
 function openGuide() {
   const url = isConsultant()
@@ -1849,12 +1992,13 @@ async function updatePendingBadge() {
   let count = 0;
   try {
     if (isAdmin()) {
+      // 管理者：顯示申請刪除人數
       const { data } = await sb.from('profiles')
-        .select('id', { count: 'exact' })
-        .eq('is_invited', false)
-        .is('delete_requested_at', null);
+        .select('id')
+        .not('delete_requested_at', 'is', null);
       count = data?.length || 0;
     } else if (isConsultant()) {
+      // 教練：顯示名下申請刪除人數
       const { data: ccRows } = await sb.from('consultant_clients')
         .select('client_id').eq('consultant_id', currentUser.id);
       const ids = (ccRows || []).map(r => r.client_id);
@@ -1862,8 +2006,7 @@ async function updatePendingBadge() {
         const { data } = await sb.from('profiles')
           .select('id')
           .in('id', ids)
-          .eq('is_invited', false)
-          .is('delete_requested_at', null);
+          .not('delete_requested_at', 'is', null);
         count = data?.length || 0;
       }
     }
@@ -2208,7 +2351,7 @@ function renderAdminBody(profiles, inviteCodes, clientConsultantMap, searchQuery
   const icOpen = _adminSections.inviteCodes;
   const consultantOptions = profiles
     .filter(p => p.role === 'consultant' || p.role === 'admin')
-    .map(p => `<option value="${p.id}">${p.display_name || p.email}</option>`)
+    .map(p => `<option value="${p.id}">${p.display_name || '（未設定）'} (${p.email})</option>`)
     .join('');
   html += `<div style="margin-top:4px;margin-bottom:4px">
     <div onclick="adminToggleSection('inviteCodes')" style="display:flex;align-items:center;gap:8px;padding:11px 2px;cursor:pointer;user-select:none">
@@ -2762,9 +2905,7 @@ function renderConsultantClientCard(p) {
       <div style="height:1px;background:var(--gray-100);margin-bottom:10px"></div>
       <div style="display:flex;align-items:center;justify-content:space-between">
         <span style="font-size:12px;font-weight:700;color:var(--gray-500)">開通狀態</span>
-        <button onclick="consultantToggleInvite('${p.id}',${isInvited},this)" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none;background:${isInvited?'var(--green-bg)':'var(--red-bg)'};color:${isInvited?'var(--green)':'var(--red)'}">
-          ${isInvited?'✅ 已開通':'🔒 待開通'}
-        </button>
+        <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;background:var(--green-bg);color:var(--green)">✅ 已開通</span>
       </div>
     </div>
   </div>`;
@@ -2802,8 +2943,10 @@ async function generateInviteCode(assignedTo = '', role = 'client', assignedCons
 
 async function regenerateInviteCode(id) {
   if (!confirm('重新產生後此邀請碼將失效，確認繼續？')) return;
+  // 先取出舊碼的備註與角色，新碼沿用
+  const { data: old } = await sb.from('invite_codes').select('assigned_to,role,assigned_consultant_id').eq('id', id).single();
   await sb.from('invite_codes').delete().eq('id', id);
-  await showInviteCode();
+  await generateInviteCode(old?.assigned_to || '', old?.role || 'client', old?.assigned_consultant_id || null);
 }
 
 async function consultantToggleInvite(userId, currentVal, btn) {
