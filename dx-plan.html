@@ -3704,13 +3704,14 @@ function getDayProgress(dayIdx){const s=buildSchedule(dayIdx,state.doses||{},sta
 let _calYear=0,_calMonth=0;
 
 function _calGetBounds(){
-  // 上下限：所有測量日與計畫日中最早/最晚的月份
+  const today=todayISO();
   const dates=[
     state.startDate,
-    addDays(state.startDate,44),
+    state.startDate?addDays(state.startDate,44):null,
     state.bloodtestDate?.pre,state.bloodtestDate?.post,
     state.bodytestDate?.pre,state.bodytestDate?.post
   ].filter(Boolean).sort();
+  if(!dates.length)return{min:today.slice(0,7),max:today.slice(0,7)};
   return{min:dates[0].slice(0,7),max:dates[dates.length-1].slice(0,7)};
 }
 
@@ -3724,7 +3725,16 @@ function calNextMonth(){
 }
 
 function renderCalendar(){
-  const today=todayISO(),start=state.startDate,todayIdx=daysBetween(start,today);
+  const today=todayISO(),start=state.startDate;
+  if(!start){// 尚未設定計畫，只顯示空月曆
+    if(!_calYear){const t=new Date(today+'T00:00:00');_calYear=t.getFullYear();_calMonth=t.getMonth()+1;}
+    const labelEl=document.getElementById('cal-month-label');
+    if(labelEl)labelEl.textContent=_calYear+'年'+_calMonth+'月';
+    const prevBtn=document.getElementById('cal-prev-btn'),nextBtn=document.getElementById('cal-next-btn');
+    if(prevBtn)prevBtn.disabled=true;if(nextBtn)nextBtn.disabled=true;
+    document.getElementById('cal-days').innerHTML='';return;
+  }
+  const todayIdx=daysBetween(start,today);
   // KPI
   let td=0,tp=0;
   for(let i=0;i<45;i++){if(addDays(start,i)<=today){const{done,total}=getDayProgress(i);td+=done;tp+=total;}}
