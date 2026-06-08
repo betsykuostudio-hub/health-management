@@ -68,6 +68,7 @@ input[type=date].field-input{width:145px;overflow:hidden}
 .cal-day.missed-past{opacity:.6;box-shadow:0 0 0 2px var(--red) inset}
 .type-pretest{background:#e4d8f0;color:#4a2a7a}
 .type-posttest{background:#c8b8e8;color:#3a1a6a}
+.type-test{background:#e4d8f0;color:#4a2a7a}
 .type-prep{background:#e8e4d8;color:#5a5030}
 .type-probio{background:#f0d0e2;color:#7a1a48}
 .type-fiber{background:#c8e2cc;color:#1a4a22}
@@ -1219,19 +1220,27 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700
     <div class="section-title">計畫日期設定</div>
     <div class="field-group">
       <div class="field-row">
-        <span class="field-label">🩸 前測日（抽血/體組成）</span>
-        <div style="overflow:hidden"><input type="date" class="field-input" id="pretest-date"/></div>
+        <span class="field-label">🩸 前測抽血日</span>
+        <div style="overflow:hidden"><input type="date" class="field-input" id="pre-blood-date"/></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">⚖️ 前測體組成日</span>
+        <div style="overflow:hidden"><input type="date" class="field-input" id="pre-body-date"/></div>
       </div>
       <div class="field-row">
         <span class="field-label">📅 第 1 天（準備日）</span>
         <div style="overflow:hidden"><input type="date" class="field-input" id="start-date"/></div>
       </div>
       <div class="field-row">
-        <span class="field-label">🔬 後測日（抽血/體組成）</span>
-        <div style="overflow:hidden"><input type="date" class="field-input" id="posttest-date"/></div>
+        <span class="field-label">🩸 後測抽血日</span>
+        <div style="overflow:hidden"><input type="date" class="field-input" id="post-blood-date"/></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">⚖️ 後測體組成日</span>
+        <div style="overflow:hidden"><input type="date" class="field-input" id="post-body-date"/></div>
       </div>
     </div>
-    <div class="notice-box"><strong>💡 日期說明</strong>前測日與後測日為抽血、拍照、體組成的量測日，與計畫天數不一定相鄰，可分開設定。</div>
+    <div class="notice-box"><strong>💡 日期說明</strong>抽血日與體組成日可分開設定，不需在同一天。</div>
     <div class="section-title">個人劑量設定</div>
     <div class="notice-box"><strong>💡 菜單空格說明</strong>蛋白素、卵磷脂粉基本 1 匙（可增加）；錠狀基本 1 顆。不確定可先留空，執行中可隨時修改。</div>
     <div class="field-group">
@@ -1302,6 +1311,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700
   <div id="cal-summary" style="display:none"></div>
   <div id="cal-warning" style="display:none" class="cal-warning"></div>
   <div class="cal-grid">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 2px 10px">
+      <button id="cal-prev-btn" onclick="calPrevMonth()" style="background:none;border:0.5px solid var(--gray-300);border-radius:10px;width:36px;height:36px;font-size:18px;color:var(--gray-500);cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+      <span id="cal-month-label" style="font-size:16px;font-weight:700;color:var(--gray-700)"></span>
+      <button id="cal-next-btn" onclick="calNextMonth()" style="background:none;border:0.5px solid var(--gray-300);border-radius:10px;width:36px;height:36px;font-size:18px;color:var(--gray-500);cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+    </div>
     <div class="cal-week-header">
       <div class="cal-week-label">一</div><div class="cal-week-label">二</div><div class="cal-week-label">三</div><div class="cal-week-label">四</div><div class="cal-week-label">五</div>
       <div class="cal-week-label" style="color:#ef4444">六</div><div class="cal-week-label" style="color:#ef4444">日</div>
@@ -1309,13 +1323,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--g700
     <div class="cal-days" id="cal-days"></div>
   </div>
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot type-pretest"></div>前測日</div>
-    <div class="legend-item"><div class="legend-dot type-posttest"></div>後測日</div>
+    <div class="legend-item"><div class="legend-dot type-test"></div>測量日</div>
     <div class="legend-item"><div class="legend-dot type-prep"></div>準備日</div>
     <div class="legend-item"><div class="legend-dot type-probio"></div>益菌蛋白日</div>
     <div class="legend-item"><div class="legend-dot type-fiber"></div>纖體日</div>
     <div class="legend-item"><div class="legend-dot type-protein"></div>蛋白日</div>
     <div class="legend-item"><div class="legend-dot type-meta"></div>新陳代謝日</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--gray-100);border:1px solid var(--gray-300)"></div>計畫外</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--red-bg);border:2px solid var(--red)"></div>未完成</div>
   </div>
 </div>
@@ -2399,11 +2413,17 @@ function showAppMain() {
   if (isAdmin() || isConsultant()) updatePendingBadge();
   if (state.startDate) {
     const today = todayISO();
-    if (state.pretestDate && today === state.pretestDate) {
-      openTestDay('pre');
+    if (state.bloodtestDate?.pre && today === state.bloodtestDate.pre) {
+      openTestDay('pre-blood');
       document.getElementById('nav-today')?.classList.add('active');
-    } else if (state.posttestDate && today === state.posttestDate) {
-      openTestDay('post');
+    } else if (state.bodytestDate?.pre && today === state.bodytestDate.pre) {
+      openTestDay('pre-body');
+      document.getElementById('nav-today')?.classList.add('active');
+    } else if (state.bloodtestDate?.post && today === state.bloodtestDate.post) {
+      openTestDay('post-blood');
+      document.getElementById('nav-today')?.classList.add('active');
+    } else if (state.bodytestDate?.post && today === state.bodytestDate.post) {
+      openTestDay('post-body');
       document.getElementById('nav-today')?.classList.add('active');
     } else {
       const di = daysBetween(state.startDate, today);
@@ -2567,6 +2587,11 @@ async function loadStateFromSupabase() {
         // 無金鑰無法解密，重置為空陣列避免顯示異常
         loadedState.bodyLogs = [];
       }
+    }
+    // 舊資料遷移：pretestDate/posttestDate → bloodtestDate/bodytestDate
+    if (loadedState.pretestDate && !loadedState.bloodtestDate?.pre) {
+      loadedState.bloodtestDate = { pre: loadedState.pretestDate, post: loadedState.posttestDate };
+      loadedState.bodytestDate  = { pre: loadedState.pretestDate, post: loadedState.posttestDate };
     }
     state = loadedState;
   } catch(e) {
@@ -3452,7 +3477,7 @@ async function doResetPassword() {
 // 以下為原有多筆計畫架構（localStorage → 改為 Supabase）
 // ══════════════════════════════════════════════════════
 
-const DEFAULT_STATE={startDate:null,pretestDate:null,posttestDate:null,doses:{},useSlim:true,useProbio:true,checks:{},amounts:{},stockLogs:{},optionalItems:{dx_box:false,shaker:false},bodyLogs:[]};
+const DEFAULT_STATE={startDate:null,pretestDate:null,posttestDate:null,bloodtestDate:{pre:null,post:null},bodytestDate:{pre:null,post:null},doses:{},useSlim:true,useProbio:true,checks:{},amounts:{},stockLogs:{},optionalItems:{dx_box:false,shaker:false},bodyLogs:[]};
 let state={...DEFAULT_STATE};
 
 function dateToISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -3479,9 +3504,10 @@ const PRODUCTS=[
 ];
 
 const DAY_TYPES=(()=>{const t=[];t.push('prep','prep','prep');t.push('probio','probio','probio');t.push('fiber','fiber','fiber','fiber');for(let w=0;w<3;w++)t.push('protein','fiber','fiber','fiber','fiber','fiber','fiber');t.push('protein','fiber','fiber','meta','meta','meta','meta');t.push('protein','meta','meta','meta','meta','meta','meta');return t;})();
-const TYPE_INFO={pretest:{label:'前測日',color:'type-pretest',emoji:'🩸',heroBg:'#4a2a7a',calBg:'#e4d8f0',calTxt:'#4a2a7a'},posttest:{label:'後測日',color:'type-posttest',emoji:'🔬',heroBg:'#3a1a6a',calBg:'#c8b8e8',calTxt:'#3a1a6a'},prep:{label:'準備日',color:'type-prep',emoji:'🌱',heroBg:'#5a5030',calBg:'#e8e4d8',calTxt:'#5a5030'},probio:{label:'益菌蛋白日',color:'type-probio',emoji:'🦠',heroBg:'#7a1a48',calBg:'#f0d0e2',calTxt:'#7a1a48'},fiber:{label:'纖體日',color:'type-fiber',emoji:'🥦',heroBg:'#1a4a22',calBg:'#c8e2cc',calTxt:'#1a4a22'},protein:{label:'蛋白日',color:'type-protein',emoji:'🥚',heroBg:'#7a4a08',calBg:'#f8e0b0',calTxt:'#7a4a08'},meta:{label:'新陳代謝日',color:'type-meta',emoji:'⚡',heroBg:'#1a3a52',calBg:'#b8d8e8',calTxt:'#1a3a52'}};
+const TYPE_INFO={bloodtest:{label:'抽血日',color:'type-test',emoji:'🩸',heroBg:'#4a2a7a',calBg:'#e4d8f0',calTxt:'#4a2a7a'},bodytest:{label:'體組成日',color:'type-test',emoji:'⚖️',heroBg:'#4a2a7a',calBg:'#e4d8f0',calTxt:'#4a2a7a'},prep:{label:'準備日',color:'type-prep',emoji:'🌱',heroBg:'#5a5030',calBg:'#e8e4d8',calTxt:'#5a5030'},probio:{label:'益菌蛋白日',color:'type-probio',emoji:'🦠',heroBg:'#7a1a48',calBg:'#f0d0e2',calTxt:'#7a1a48'},fiber:{label:'纖體日',color:'type-fiber',emoji:'🥦',heroBg:'#1a4a22',calBg:'#c8e2cc',calTxt:'#1a4a22'},protein:{label:'蛋白日',color:'type-protein',emoji:'🥚',heroBg:'#7a4a08',calBg:'#f8e0b0',calTxt:'#7a4a08'},meta:{label:'新陳代謝日',color:'type-meta',emoji:'⚡',heroBg:'#1a3a52',calBg:'#b8d8e8',calTxt:'#1a3a52'}};
 
-const TEST_TASKS=['🩸 抽血（總膽固醇、血糖、三酸甘油酯、GOT/GPT、腎絲球過濾率、尿酸、HbA1C）','📸 拍身形照（正面、側面、背面，穿貼身衣服）','📏 量腰圍','⚖️ 記錄體組成（體重、體脂、骨骼肌、基礎代謝、內臟脂肪、體年齡、BMI）'];
+const BLOOD_TASKS=['🩸 抽血（總膽固醇、血糖、三酸甘油酯、GOT/GPT、腎絲球過濾率、尿酸、HbA1C）'];
+const BODY_TASKS=['📸 拍身形照（正面、側面、背面，穿貼身衣服）','📏 量腰圍','⚖️ 記錄體組成（體重、體脂、骨骼肌、基礎代謝、內臟脂肪、體年齡、BMI）'];
 
 function buildSchedule(dayIdx,doses,useSlim,useProbio){
   const type=DAY_TYPES[dayIdx],dm=doses;
@@ -3605,8 +3631,10 @@ function syncToggles(){
 function showSettings(){
   document.getElementById('nav-bar').style.display='none';
   if(state.startDate)document.getElementById('start-date').value=state.startDate;
-  if(state.pretestDate)document.getElementById('pretest-date').value=state.pretestDate;
-  if(state.posttestDate)document.getElementById('posttest-date').value=state.posttestDate;
+  if(state.bloodtestDate?.pre)document.getElementById('pre-blood-date').value=state.bloodtestDate.pre;
+  if(state.bodytestDate?.pre)document.getElementById('pre-body-date').value=state.bodytestDate.pre;
+  if(state.bloodtestDate?.post)document.getElementById('post-blood-date').value=state.bloodtestDate.post;
+  if(state.bodytestDate?.post)document.getElementById('post-body-date').value=state.bodytestDate.post;
   const d=state.doses||{};
   if(d.protein_snack)document.getElementById('dose-protein-snack').value=d.protein_snack;
   if(d.lecithin_snack)document.getElementById('dose-lecithin-snack').value=d.lecithin_snack;
@@ -3636,8 +3664,10 @@ function cancelSettings(){
 function showNewPlanSetup(){
   const d=state.doses||{};
   document.getElementById('start-date').value='';
-  document.getElementById('pretest-date').value='';
-  document.getElementById('posttest-date').value='';
+  document.getElementById('pre-blood-date').value='';
+  document.getElementById('pre-body-date').value='';
+  document.getElementById('post-blood-date').value='';
+  document.getElementById('post-body-date').value='';
   if(d.protein_snack)document.getElementById('dose-protein-snack').value=d.protein_snack;
   if(d.lecithin_snack)document.getElementById('dose-lecithin-snack').value=d.lecithin_snack;
   if(d.b)document.getElementById('dose-b').value=d.b;
@@ -3658,8 +3688,10 @@ function startPlan(){
   const sd=document.getElementById('start-date').value;
   if(!sd){showToast('請先設定第 1 天（準備日）的日期');return;}
   state.startDate=sd;
-  state.pretestDate=document.getElementById('pretest-date').value||null;
-  state.posttestDate=document.getElementById('posttest-date').value||null;
+  state.pretestDate=document.getElementById('pre-blood-date').value||document.getElementById('pre-body-date').value||null;
+  state.posttestDate=document.getElementById('post-blood-date').value||document.getElementById('post-body-date').value||null;
+  state.bloodtestDate={pre:document.getElementById('pre-blood-date').value||null,post:document.getElementById('post-blood-date').value||null};
+  state.bodytestDate={pre:document.getElementById('pre-body-date').value||null,post:document.getElementById('post-body-date').value||null};
   state.doses={protein_snack:parseFloat(document.getElementById('dose-protein-snack').value)||null,lecithin_snack:parseFloat(document.getElementById('dose-lecithin-snack').value)||null,b:parseFloat(document.getElementById('dose-b').value)||null,ca:parseFloat(document.getElementById('dose-ca').value)||null,c:parseFloat(document.getElementById('dose-c').value)||null};
   state.useSlim=document.getElementById('use-slim').value==='yes';
   state.useProbio=document.getElementById('use-probio').value==='yes';
@@ -3669,8 +3701,31 @@ function startPlan(){
 
 function getDayProgress(dayIdx){const s=buildSchedule(dayIdx,state.doses||{},state.useSlim,state.useProbio);let done=0;s.forEach((_,bi)=>{if((state.checks||{})[`day${dayIdx}b${bi}`])done++;});return{done,total:s.length};}
 
+let _calYear=0,_calMonth=0;
+
+function _calGetBounds(){
+  // 上下限：所有測量日與計畫日中最早/最晚的月份
+  const dates=[
+    state.startDate,
+    addDays(state.startDate,44),
+    state.bloodtestDate?.pre,state.bloodtestDate?.post,
+    state.bodytestDate?.pre,state.bodytestDate?.post
+  ].filter(Boolean).sort();
+  return{min:dates[0].slice(0,7),max:dates[dates.length-1].slice(0,7)};
+}
+
+function calPrevMonth(){
+  _calMonth--;if(_calMonth<1){_calMonth=12;_calYear--;}
+  renderCalendar();
+}
+function calNextMonth(){
+  _calMonth++;if(_calMonth>12){_calMonth=1;_calYear++;}
+  renderCalendar();
+}
+
 function renderCalendar(){
   const today=todayISO(),start=state.startDate,todayIdx=daysBetween(start,today);
+  // KPI
   let td=0,tp=0;
   for(let i=0;i<45;i++){if(addDays(start,i)<=today){const{done,total}=getDayProgress(i);td+=done;tp+=total;}}
   const pct=tp>0?Math.round(td/tp*100):0,planDay=todayIdx>=0&&todayIdx<45?todayIdx+1:null;
@@ -3683,75 +3738,120 @@ function renderCalendar(){
   if(calKpiLeft) calKpiLeft.textContent=daysLeft;
   if(calKpiProg) calKpiProg.style.width=pct+'%';
   if(calKpiPct) calKpiPct.textContent=pct+'%';
+  // warning
   const missed=getMissedPastDays();
   const warnEl=document.getElementById('cal-warning');
   if(missed.length>0){warnEl.style.display='flex';warnEl.innerHTML=`⚠️ 第 ${missed.slice(0,5).join('、')}${missed.length>5?'…等':''}天有未完成的打卡，庫存計算可能不準確`;}
   else{warnEl.style.display='none';}
-  const startDt=new Date(start+'T00:00:00'),dow=(startDt.getDay()+6)%7,gridStart=new Date(startDt);gridStart.setDate(gridStart.getDate()-dow);
-  const endDt=new Date(addDays(start,44)+'T00:00:00'),endDow=(endDt.getDay()+6)%7,gridEnd=new Date(endDt);gridEnd.setDate(gridEnd.getDate()+(6-endDow));
-  let html='',cur=new Date(gridStart);
-  while(cur<=gridEnd){
-    const iso=dateToISO(cur),dayIdx=daysBetween(start,iso);
-    const isPre=state.pretestDate&&iso===state.pretestDate;
-    const isPost=state.posttestDate&&iso===state.posttestDate;
-    const isInPlan=dayIdx>=0&&dayIdx<45;
-    if(!isInPlan&&!isPre&&!isPost){const isFirst=cur.getDate()===1;html+=`<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300);font-size:${isFirst?'10px':'13px'}">${isFirst?(cur.getMonth()+1)+'/1':cur.getDate()}</div></div>`;}
-    else if(isPre){const isFirst=cur.getDate()===1;html+=`<div class="cal-day type-pretest${iso===today?' today':''}" onclick="openTestDay('pre')"><div class="day-num" style="${isFirst?'font-size:10px':''}">${isFirst?(cur.getMonth()+1)+'/1':cur.getDate()}</div><div class="day-type">🩸</div></div>`;}
-    else if(isPost){const isFirst=cur.getDate()===1;html+=`<div class="cal-day type-posttest${iso===today?' today':''}" onclick="openTestDay('post')"><div class="day-num" style="${isFirst?'font-size:10px':''}">${isFirst?(cur.getMonth()+1)+'/1':cur.getDate()}</div><div class="day-type">🔬</div></div>`;}
-    else{
-      const ti=TYPE_INFO[DAY_TYPES[dayIdx]]||{color:'type-empty',emoji:'—'};
-      const{done,total}=getDayProgress(dayIdx);
-      const full=done===total&&total>0,partial=done>0&&done<total,isPast=iso<today,isMissed=isPast&&done<total;
-      const isFirst=cur.getDate()===1;
-      const dayLabel=isFirst?`<div class="day-num" style="font-size:10px">${cur.getMonth()+1}/1</div>`:`<div class="day-num">${cur.getDate()}</div>`;
-      html+=`<div class="cal-day ${ti.color}${iso===today?' today':''}${full?' done':''}${partial&&!isPast?' partial':''}${isMissed?' missed-past':''}" onclick="openDay(${dayIdx})">${dayLabel}<div class="day-type">${ti.emoji}</div>${full?'<div class="check">✅</div>':(partial&&!isPast?'<div class="check">🔶</div>':'')}</div>`;
-    }
-    cur.setDate(cur.getDate()+1);
+  // 月份初始化：預設今天所在月份
+  if(!_calYear){const t=new Date(today+'T00:00:00');_calYear=t.getFullYear();_calMonth=t.getMonth()+1;}
+  // 月份導覽標題與上下限
+  const ym=_calYear+'-'+String(_calMonth).padStart(2,'0');
+  const {min,max}=_calGetBounds();
+  const labelEl=document.getElementById('cal-month-label');
+  const prevBtn=document.getElementById('cal-prev-btn');
+  const nextBtn=document.getElementById('cal-next-btn');
+  if(labelEl) labelEl.textContent=_calYear+'年'+_calMonth+'月';
+  if(prevBtn) prevBtn.disabled=ym<=min;
+  if(nextBtn) nextBtn.disabled=ym>=max;
+  // 測量日集合
+  const preBlood=state.bloodtestDate?.pre||null;
+  const postBlood=state.bloodtestDate?.post||null;
+  const preBody=state.bodytestDate?.pre||null;
+  const postBody=state.bodytestDate?.post||null;
+  // 月份格子渲染
+  const firstDow=(new Date(_calYear,_calMonth-1,1).getDay()+6)%7;
+  const daysInMonth=new Date(_calYear,_calMonth,0).getDate();
+  const prevDays=new Date(_calYear,_calMonth-1,0).getDate();
+  let html='';
+  // 前補空格（上月尾）
+  for(let i=0;i<firstDow;i++){
+    html+=`<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300);font-size:13px">${prevDays-firstDow+i+1}</div></div>`;
   }
+  for(let d=1;d<=daysInMonth;d++){
+    const iso=_calYear+'-'+String(_calMonth).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday=iso===today;
+    const isBlood=iso===preBlood||iso===postBlood;
+    const isBody=iso===preBody||iso===postBody;
+    const isPreBlood=iso===preBlood,isPostBlood=iso===postBlood;
+    const isPreBody=iso===preBody,isPostBody=iso===postBody;
+    const di=daysBetween(start,iso);
+    const inPlan=di>=0&&di<45;
+    const todayCls=isToday?' today':'';
+    if(isBlood||isBody){
+      let icons='';
+      if(isBlood&&isBody) icons='<div class="day-type">🩸⚖️</div>';
+      else if(isBlood)    icons='<div class="day-type">🩸</div>';
+      else                icons='<div class="day-type">⚖️</div>';
+      // 判斷點擊行為（可能同時開兩種，優先抽血）
+      let clickPre='',clickPost='';
+      if(isPreBlood||isPreBody) clickPre=isPreBlood?`openTestDay('pre-blood')`:`openTestDay('pre-body')`;
+      if(isPostBlood||isPostBody) clickPost=isPostBlood?`openTestDay('post-blood')`:`openTestDay('post-body')`;
+      const onclick=clickPre||clickPost;
+      html+=`<div class="cal-day type-test${todayCls}" onclick="${onclick}"><div class="day-num">${d}</div>${icons}</div>`;
+    } else if(inPlan){
+      const ti=TYPE_INFO[DAY_TYPES[di]]||{color:'type-empty',emoji:'—'};
+      const{done,total}=getDayProgress(di);
+      const full=done===total&&total>0,partial=done>0&&done<total,isPast=iso<today,isMissed=isPast&&done<total;
+      html+=`<div class="cal-day ${ti.color}${todayCls}${full?' done':''}${partial&&!isPast?' partial':''}${isMissed?' missed-past':''}" onclick="openDay(${di})"><div class="day-num">${d}</div><div class="day-type">${ti.emoji}</div>${full?'<div class="check">✅</div>':(partial&&!isPast?'<div class="check">🔶</div>':'')}</div>`;
+    } else {
+      html+=`<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300)">${d}</div></div>`;
+    }
+  }
+  // 後補空格（下月頭）
+  const remain=(7-(firstDow+daysInMonth)%7)%7;
+  for(let i=1;i<=remain;i++) html+=`<div class="cal-day empty type-empty"><div class="day-num" style="color:var(--gray-300)">${i}</div></div>`;
   document.getElementById('cal-days').innerHTML=html;
 }
 
 function goToToday(){
   const today=todayISO();
-  if(state.pretestDate&&today===state.pretestDate){openTestDay('pre');document.getElementById('nav-today').classList.add('active');return;}
-  if(state.posttestDate&&today===state.posttestDate){openTestDay('post');document.getElementById('nav-today').classList.add('active');return;}
+  const preBlood=state.bloodtestDate?.pre,postBlood=state.bloodtestDate?.post;
+  const preBody=state.bodytestDate?.pre,postBody=state.bodytestDate?.post;
+  if(preBlood&&today===preBlood){openTestDay('pre-blood');document.getElementById('nav-today').classList.add('active');return;}
+  if(preBody&&today===preBody){openTestDay('pre-body');document.getElementById('nav-today').classList.add('active');return;}
+  if(postBlood&&today===postBlood){openTestDay('post-blood');document.getElementById('nav-today').classList.add('active');return;}
+  if(postBody&&today===postBody){openTestDay('post-body');document.getElementById('nav-today').classList.add('active');return;}
   const dayIdx=daysBetween(state.startDate,today);
   if(dayIdx<0||dayIdx>=45){showToast('今天不在計畫範圍內');showCalendar();return;}
   openDay(dayIdx);document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('nav-today').classList.add('active');
 }
 
 function openTestDay(type){
-  const isPost=type==='post';
-  const iso=isPost?state.posttestDate:state.pretestDate;
-  const ti=TYPE_INFO[isPost?'posttest':'pretest'];
+  const isPost=type.startsWith('post');
+  const isBlood=type.endsWith('blood');
+  const tasks=isBlood?BLOOD_TASKS:BODY_TASKS;
+  const ti=TYPE_INFO[isBlood?'bloodtest':'bodytest'];
+  const iso=isBlood
+    ?(isPost?state.bloodtestDate?.post:state.bloodtestDate?.pre)
+    :(isPost?state.bodytestDate?.post:state.bodytestDate?.pre);
+  const prefix=type.replace('-','_');
   document.getElementById('day-hero').style.background=`linear-gradient(135deg,#1e293b,${ti.heroBg})`;
-  document.getElementById('day-badge').innerHTML=`${ti.emoji} ${ti.label}`;
-  document.getElementById('day-title').textContent=isPost?'計畫後量測':'計畫前量測';
+  document.getElementById('day-badge').innerHTML=`${ti.emoji} ${isPost?'後測':'前測'}${ti.label}`;
+  document.getElementById('day-title').textContent=isPost?`後測${ti.label}`:`前測${ti.label}`;
   document.getElementById('day-date').textContent=iso?formatDateLabel(iso):'';
-
-  const prefix=isPost?'post':'pre';
   const checks=state.checks||{};
-  const done=TEST_TASKS.filter((_,i)=>checks[prefix+i]).length;
-  updateProgress(done,TEST_TASKS.length);
-
+  const done=tasks.filter((_,i)=>checks[prefix+i]).length;
+  updateProgress(done,tasks.length);
   const notice=document.getElementById('test-day-notice');
   notice.style.display='block';
-  document.getElementById('test-day-title').innerHTML=`<span style="color:${ti.heroBg}">${ti.emoji} ${ti.label}</span>`;
-  document.getElementById('test-day-checklist').innerHTML=TEST_TASKS.map((t,i)=>`
+  document.getElementById('test-day-title').innerHTML=`<span style="color:${ti.heroBg}">${ti.emoji} ${isPost?'後測':'前測'}${ti.label}</span>`;
+  document.getElementById('test-day-checklist').innerHTML=tasks.map((t,i)=>`
     <div class="test-check-item">
-      <input type="checkbox" id="${prefix}${i}" ${checks[prefix+i]?'checked':''} onchange="saveTestCheck('${prefix}',${i},this.checked)"/>
+      <input type="checkbox" id="${prefix}${i}" ${checks[prefix+i]?'checked':''} onchange="saveTestCheck('${prefix}',${i},this.checked,'${type}')"/>
       <label for="${prefix}${i}">${t}</label>
     </div>`).join('');
   document.getElementById('checklist').innerHTML='';
   showScreen('screen-day',null);
 }
-function saveTestCheck(prefix,i,val){
+function saveTestCheck(prefix,i,val,type){
   if(!state.checks)state.checks={};
   state.checks[prefix+i]=val;
   saveState();
-  const type=prefix==='post'?'post':'pre';
-  const done=TEST_TASKS.filter((_,j)=>state.checks[prefix+j]).length;
-  updateProgress(done,TEST_TASKS.length);
+  const isBlood=type.endsWith('blood');
+  const tasks=isBlood?BLOOD_TASKS:BODY_TASKS;
+  const done=tasks.filter((_,j)=>state.checks[prefix+j]).length;
+  updateProgress(done,tasks.length);
 }
 
 let currentDayIdx=null;
@@ -4242,10 +4342,8 @@ async function showReportForm(){
       <div class="form-section-title">體組成數據</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;font-size:12px;font-weight:700;text-align:center">
         <div style="color:#6b7280">項目</div>
-        <div style="color:#7c3aed">前測${state.pretestDate?'<br><span style="font-size:10px;font-weight:500">'+state.pretestDate+'</span>':''}</div>
-        <div style="color:#16a34a">後測${state.posttestDate?'<br><span style="font-size:10px;font-weight:500">'+state.posttestDate+'</span>':''}</div>
-      </div>`;
-  BODY_FIELDS.forEach(f=>{
+        <div style="color:#7c3aed">前測體組成${state.bodytestDate?.pre?'<br><span style="font-size:10px;font-weight:500">'+state.bodytestDate.pre+'</span>':''}</div>
+        <div style="color:#16a34a">後測體組成${state.bodytestDate?.post?'<br><span style="font-size:10px;font-weight:500">'+state.bodytestDate.post+'</span>':''}</div>(f=>{
     const preVal=sb[f.id+'_pre']!==undefined?sb[f.id+'_pre']:'';
     const postVal=sb[f.id+'_post']!==undefined?sb[f.id+'_post']:'';
     html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;align-items:center">
@@ -4259,10 +4357,8 @@ async function showReportForm(){
       <div class="form-section-title">體檢結果數據</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;font-size:12px;font-weight:700;text-align:center">
         <div style="color:#6b7280">項目</div>
-        <div style="color:#7c3aed">前測${state.pretestDate?'<br><span style="font-size:10px;font-weight:500">'+state.pretestDate+'</span>':''}</div>
-        <div style="color:#16a34a">後測${state.posttestDate?'<br><span style="font-size:10px;font-weight:500">'+state.posttestDate+'</span>':''}</div>
-      </div>`;
-  EXAM_ITEMS.forEach(f=>{
+        <div style="color:#7c3aed">前測抽血${state.bloodtestDate?.pre?'<br><span style="font-size:10px;font-weight:500">'+state.bloodtestDate.pre+'</span>':''}</div>
+        <div style="color:#16a34a">後測抽血${state.bloodtestDate?.post?'<br><span style="font-size:10px;font-weight:500">'+state.bloodtestDate.post+'</span>':''}</div>(f=>{
     const preVal=se[f.id+'_pre']!==undefined?se[f.id+'_pre']:'';
     const postVal=se[f.id+'_post']!==undefined?se[f.id+'_post']:'';
     html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;align-items:center">
@@ -4359,10 +4455,12 @@ function generateReport(){
 
   // ── 日期標題 ─────────────────────────────────────────────
   const fmtDate=iso=>iso?iso.replace(/-/g,'/'):null;
-  const preDateStr=fmtDate(state.pretestDate);
-  const postDateStr=fmtDate(state.posttestDate);
-  const preHead=`前測${preDateStr?'<div style="font-size:10px;font-weight:500;margin-top:2px;opacity:.85">'+preDateStr+'</div>':''}`;
-  const postHead=`後測${postDateStr?'<div style="font-size:10px;font-weight:500;margin-top:2px;opacity:.85">'+postDateStr+'</div>':''}`;
+  const preBodyDateStr=fmtDate(state.bodytestDate?.pre);
+  const postBodyDateStr=fmtDate(state.bodytestDate?.post);
+  const preBloodDateStr=fmtDate(state.bloodtestDate?.pre);
+  const postBloodDateStr=fmtDate(state.bloodtestDate?.post);
+  const preHead=`前測${preBodyDateStr?'<div style="font-size:10px;font-weight:500;margin-top:2px;opacity:.85">'+preBodyDateStr+'</div>':''}`;
+  const postHead=`後測${postBodyDateStr?'<div style="font-size:10px;font-weight:500;margin-top:2px;opacity:.85">'+postBodyDateStr+'</div>':''}`;
 
   // ── 體組成對比 ────────────────────────────────────────────
   // 下降為好：weight, bodyfat, visceral, waist, bmi, bodyage
@@ -4435,7 +4533,7 @@ function generateReport(){
   const bandHtml=(pg)=>`<div style="background:#f5f9f5;border-bottom:1px solid #e5e7eb;padding:7px 16px;display:flex;align-items:center;justify-content:space-between">
     <div style="font-size:13px;font-weight:700;color:#186637">${name?name+'　':''}DX 45天健康管理計畫</div>
     <div style="display:flex;align-items:center;gap:8px">
-      <div style="font-size:11px;color:#9ca3af">${fmtShort(state.pretestDate)}–${fmtShort(state.posttestDate)}</div>
+      <div style="font-size:11px;color:#9ca3af">${fmtShort(state.bloodtestDate?.pre||state.bodytestDate?.pre)}–${fmtShort(state.bloodtestDate?.post||state.bodytestDate?.post)}</div>
       <div style="font-size:11px;font-weight:700;color:#c8922a;background:#fef9c3;padding:2px 8px;border-radius:99px">${pg} / 3</div>
     </div>
   </div>`;
@@ -4489,11 +4587,8 @@ function generateReport(){
   // ── P2：體組成 ─────────────────────────────────────────
   const bodyColHdr=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;padding:7px 12px;background:#f9fafb;border-bottom:1px solid #f3f4f6">
     <div style="font-size:11px;font-weight:700;color:#9ca3af">項目</div>
-    <div style="font-size:11px;font-weight:700;color:#4a2a7a;text-align:center">前測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.pretestDate)}</span></div>
-    <div style="font-size:11px;font-weight:700;color:#186637;text-align:center">後測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.posttestDate)}</span></div>
-    <div style="font-size:11px;font-weight:700;color:#9ca3af;text-align:center">變化</div>
-  </div>`;
-  const p2=`${bandHtml(2)}
+    <div style="font-size:11px;font-weight:700;color:#4a2a7a;text-align:center">前測體組成<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.bodytestDate?.pre)}</span></div>
+    <div style="font-size:11px;font-weight:700;color:#186637;text-align:center">後測體組成<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.bodytestDate?.post)}</span></div>`${bandHtml(2)}
   <div style="padding:14px 16px 10px">
     ${secTitle('體組成變化')}
     ${hasBodyData?`<div style="background:white;border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)">
@@ -4505,11 +4600,8 @@ function generateReport(){
   // ── P3：體檢 ──────────────────────────────────────────
   const examColHdr=`<div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 0.7fr;padding:7px 12px;background:#f9fafb;border-bottom:1px solid #f3f4f6">
     <div style="font-size:11px;font-weight:700;color:#9ca3af">項目</div>
-    <div style="font-size:11px;font-weight:700;color:#4a2a7a;text-align:center">前測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.pretestDate)}</span></div>
-    <div style="font-size:11px;font-weight:700;color:#186637;text-align:center">後測<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.posttestDate)}</span></div>
-    <div style="font-size:11px;font-weight:700;color:#9ca3af;text-align:center">變化</div>
-  </div>`;
-  const p3=`${bandHtml(3)}
+    <div style="font-size:11px;font-weight:700;color:#4a2a7a;text-align:center">前測抽血<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.bloodtestDate?.pre)}</span></div>
+    <div style="font-size:11px;font-weight:700;color:#186637;text-align:center">後測抽血<br><span style="font-size:10px;font-weight:400;color:#9ca3af">${fmtShort(state.bloodtestDate?.post)}</span></div>`${bandHtml(3)}
   <div style="padding:12px 14px 10px">
     ${secTitle('體檢結果對比')}
     <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
@@ -4998,8 +5090,8 @@ function renderHistoryReport(plan,td,tp,pct){
   const body=rd.body||{},exam=rd.exam||{};
   const start=s.startDate,end=start?addDays(start,44):null;
   const fmtDate=iso=>iso?iso.replace(/-/g,'/'):null;
-  const preDateStr=fmtDate(s.pretestDate);
-  const postDateStr=fmtDate(s.posttestDate);
+  const preDateStr=fmtDate(s.bodytestDate?.pre||s.pretestDate);
+  const postDateStr=fmtDate(s.bodytestDate?.post||s.posttestDate);
   const gender=body.gender||'';
 
   // 完成率統計卡
